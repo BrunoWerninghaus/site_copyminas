@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block title %}{% if is_admin %}Admin{% endif %} Dashboard - CopyMinas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- ── Status de Login ──────────────────────────────────────────────── -->
+    <div class="profile-header reveal">
+        <div class="profile-info">
+            <h1>👋 Bem-vindo, {{ user_name }}! {% if is_admin %}<span style="color: var(--warning); font-size: 0.8em;">[ADMIN]</span>{% endif %}</h1>
+            <p class="profile-detail"><strong>E-mail:</strong> {{ user_email }}</p>
+            <p class="profile-detail"><strong>Status:</strong> ✅ Autenticado</p>
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    <!-- ── Stats (Chamados Abertos) ───────────────────────────── -->
+    <div class="dashboard-grid reveal">
+        <div class="stat-card">
+            <div class="stat-value">{% if pending_requests %}{{ pending_requests }}{% else %}0{% endif %}</div>
+            <div class="stat-label">Chamados pendentes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{% if in_progress_requests %}{{ in_progress_requests }}{% else %}0{% endif %}</div>
+            <div class="stat-label">Chamados em andamento</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{% if is_admin %}{% if total_equipments %}{{ total_equipments }}{% else %}0{% endif %}{% else %}{% if total_rental_equipments %}{{ total_rental_equipments }}{% else %}0{% endif %}{% endif %}</div>
+            <div class="stat-label">Equipamentos</div>
+        </div>
+    </div>
+
+    {% if is_admin %}
+        <!-- ── ADMIN: Equipamentos de ALUGUEL ────────────────────────────── -->
+        <div class="content-section reveal">
+            <h2>🏢 Equipamentos de Aluguel</h2>
+            
+            {% if rental_equipments %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Nº Série</th>
+                                <th>Usuário</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for equipment in rental_equipments %}
+                                <tr>
+                                    <td><strong>#{{ equipment[0] }}</strong></td>
+                                    <td>{{ equipment[1] }}</td>
+                                    <td>{% if equipment[2] %}{{ equipment[2] }}{% else %}<em>-</em>{% endif %}</td>
+                                    <td>{% if equipment[3] %}{{ equipment[3] }}{% else %}<em>-</em>{% endif %}</td>
+                                    <td>{% if equipment[6] %}{{ equipment[6] }}{% else %}<em>-</em>{% endif %}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    ℹ️ Nenhum equipamento de aluguel cadastrado.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ── ADMIN: Equipamentos PESSOAIS ────────────────────────────── -->
+        <div class="content-section reveal">
+            <h2>👤 Equipamentos Pessoais</h2>
+            
+            {% if personal_equipments %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Nº Série</th>
+                                <th>Usuário</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for equipment in personal_equipments %}
+                                <tr>
+                                    <td><strong>#{{ equipment[0] }}</strong></td>
+                                    <td>{{ equipment[1] }}</td>
+                                    <td>{% if equipment[2] %}{{ equipment[2] }}{% else %}<em>-</em>{% endif %}</td>
+                                    <td>{% if equipment[3] %}{{ equipment[3] }}{% else %}<em>-</em>{% endif %}</td>
+                                    <td>{% if equipment[6] %}{{ equipment[6] }}{% else %}<em>-</em>{% endif %}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    ℹ️ Nenhum equipamento pessoal cadastrado.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ── ADMIN: Chamados PENDENTES ─────────────────────────────────────── -->
+        <div class="content-section reveal">
+            <h2>⏳ Chamados Pendentes</h2>
+            
+            {% if pending_requests_list %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuário</th>
+                                <th>Equipamento</th>
+                                <th>Descrição</th>
+                                <th>Prioridade</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in pending_requests_list %}
+                                <tr>
+                                    <td><strong>#{{ req[0] }}</strong></td>
+                                    <td>{{ req[6] }}</td>
+                                    <td>{{ req[3] }}</td>
+                                    <td>{{ req[1] }}</td>
+                                    <td>
+                                        {% if req[5] == 'alta' %}
+                                            <span class="badge badge-danger">🔴 Alta</span>
+                                        {% elif req[5] == 'media' %}
+                                            <span class="badge badge-warning">🟡 Média</span>
+                                        {% elif req[5] == 'baixa' %}
+                                            <span class="badge badge-success">🟢 Baixa</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ req[4] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-success">
+                    ✅ Não há chamados pendentes.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ── ADMIN: Chamados EM ANDAMENTO ─────────────────────────────────────── -->
+        <div class="content-section reveal">
+            <h2>🔄 Chamados em Andamento</h2>
+            
+            {% if in_progress_requests_list %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuário</th>
+                                <th>Equipamento</th>
+                                <th>Descrição</th>
+                                <th>Prioridade</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in in_progress_requests_list %}
+                                <tr>
+                                    <td><strong>#{{ req[0] }}</strong></td>
+                                    <td>{{ req[6] }}</td>
+                                    <td>{{ req[3] }}</td>
+                                    <td>{{ req[1] }}</td>
+                                    <td>
+                                        {% if req[5] == 'alta' %}
+                                            <span class="badge badge-danger">🔴 Alta</span>
+                                        {% elif req[5] == 'media' %}
+                                            <span class="badge badge-warning">🟡 Média</span>
+                                        {% elif req[5] == 'baixa' %}
+                                            <span class="badge badge-success">🟢 Baixa</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ req[4] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    ℹ️ Não há chamados em andamento.
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <!-- ── CLIENTE: Equipamentos Atribuídos ────────────────────────────── -->
+        <div class="content-section reveal">
+            <h2>🏢 Equipamentos atribuídos</h2>
+            
+            {% if rental_equipments %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Nº Série</th>
+                                <th>Tipo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for equipment in rental_equipments %}
+                                <tr>
+                                    <td><strong>#{{ equipment[0] }}</strong></td>
+                                    <td>{{ equipment[1] }}</td>
+                                    <td>{% if equipment[2] %}{{ equipment[2] }}{% else %}<em>-</em>{% endif %}</td>
+                                    <td>{% if equipment[3] %}{{ equipment[3] }}{% else %}<em>-</em>{% endif %}</td>
+                                    <td><span class="badge badge-success">🏢 Aluguel</span></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    ℹ️ Você não possui equipamentos de aluguel atribuídos. Entre em contato com o administrador.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ── CLIENTE: Seus Chamados em Aberto ───────────────────────────────────────– -->
+        <div class="content-section reveal">
+            <h2>🔴 Seus Chamados em Aberto</h2>
+            
+            {% if open_requests %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Equipamento</th>
+                                <th>Descrição</th>
+                                <th>Status</th>
+                                <th>Prioridade</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in open_requests %}
+                                <tr>
+                                    <td><strong>#{{ req[0] }}</strong></td>
+                                    <td>{{ req[3] }}</td>
+                                    <td>{{ req[1] }}</td>
+                                    <td>
+                                        {% if req[2] == 'pendente' %}
+                                            <span class="badge badge-warning">⏳ Pendente</span>
+                                        {% elif req[2] == 'em_andamento' %}
+                                            <span class="badge badge-info">🔄 Em Andamento</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if req[5] == 'alta' %}
+                                            <span class="badge badge-danger">🔴 Alta</span>
+                                        {% elif req[5] == 'media' %}
+                                            <span class="badge badge-warning">🟡 Média</span>
+                                        {% elif req[5] == 'baixa' %}
+                                            <span class="badge badge-success">🟢 Baixa</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ req[4] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    ✅ Você não possui chamados em aberto. Parabéns!
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

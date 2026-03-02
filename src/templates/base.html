@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CopyMinas{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- ── NAV ─────────────────────────────────────────────────── -->
+    <header class="site-header" id="topo">
+        <nav class="nav-inner">
+            <a href="{{ url_for('main') }}" class="logo-link">
+                <span class="logo-name">Copy<strong>Minas</strong></span>
+            </a>
+            {% if session.get('user_id') %}
+            <ul class="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('maintenance') }}">Manutenção</a></li>
+                {% if session.get('is_admin') %}
+                <li><a href="{{ url_for('admin') }}">Admin</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}" class="btn-nav btn-logout">Sair</a></li>
+            </ul>
+            {% else %}
+            <ul class="nav-links">
+                <li><a href="{{ url_for('main') }}#sobre">Sobre</a></li>
+                <li><a href="{{ url_for('main') }}#servicos">Serviços</a></li>
+                <li><a href="{{ url_for('main') }}#contato">Contato</a></li>
+                <li><a href="{{ url_for('login') }}" class="btn-nav">Área do Cliente</a></li>
+            </ul>
+            {% endif %}
+            <button class="menu-toggle" aria-label="Menu" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+        <div class="nav-mobile" id="nav-mobile">
+            {% if session.get('user_id') %}
+                <a href="{{ url_for('dashboard') }}" onclick="toggleMenu()">Dashboard</a>
+                <a href="{{ url_for('maintenance') }}" onclick="toggleMenu()">Manutenção</a>
+                {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin') }}" onclick="toggleMenu()">Admin</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="btn-nav-mobile btn-logout">Sair</a>
+            {% else %}
+                <a href="{{ url_for('main') }}#sobre" onclick="toggleMenu()">Sobre</a>
+                <a href="{{ url_for('main') }}#servicos" onclick="toggleMenu()">Serviços</a>
+                <a href="{{ url_for('main') }}#contato" onclick="toggleMenu()">Contato</a>
+                <a href="{{ url_for('login') }}" class="btn-nav-mobile">Área do Cliente</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- ── Main Content ────────────────────────────────────────── -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ── FOOTER ───────────────────────────────────────────────── -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <span class="logo-name footer-logo">Copy<strong>Minas</strong></span>
+                <p>Soluções em impressão em Elói Mendes, MG</p>
+            </div>
+            <div class="footer-copy">
+                <p>&copy; 2024 CopyMinas. Todos os direitos reservados.</p>
+                <p>CNPJ 97.537.200/0001-10</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ── Scripts ──────────────────────────────────────────────– -->
+    <script>
+        function toggleMenu() {
+            document.getElementById('nav-mobile').classList.toggle('open');
+        }
+        document.addEventListener('click', function(e) {
+            const m = document.getElementById('nav-mobile');
+            const btn = document.querySelector('.menu-toggle');
+            if (m && btn && !m.contains(e.target) && !btn.contains(e.target)) m.classList.remove('open');
+        });
+
+        const header = document.querySelector('.site-header');
+        window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 40));
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}Perfil do Usuário - CopyMinas{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    {% if user %}
+        <!-- ── User Profile Header ──────────────────────────────── -->
+        <div class="profile-header reveal">
+            <div class="profile-info">
+                <h1>👤 {{ user[1] }}
+                    {% if user[3] %}
+                        <span class="badge badge-admin">Admin</span>
+                    {% endif %}
+                </h1>
+                <p class="profile-detail"><strong>ID:</strong> #{{ user[0] }}</p>
+                <p class="profile-detail"><strong>E-mail:</strong> {{ user[2] }}</p>
+                <p class="profile-detail"><strong>Cadastro:</strong> {{ user[4] }}</p>
+            </div>
+            {% if session.get('is_admin') %}
+            <div>
+                <a href="{{ url_for('admin') }}" class="btn btn-outline">← Voltar Admin</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ── Equipamentos de Aluguel ───────────────────────────– -->
+        <div class="content-section reveal">
+            <h2>🏢 Equipamentos de Aluguel
+                <span style="color: var(--teal); font-size: 1.2rem;">({{ rental_equipments|length }})</span>
+            </h2>
+            
+            {% if rental_equipments %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Atribuído em</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for equipment in rental_equipments %}
+                                <tr>
+                                    <td><strong>#{{ equipment[0] }}</strong></td>
+                                    <td><strong>{{ equipment[1] }}</strong></td>
+                                    <td>{{ equipment[2] if equipment[2] else '—' }}</td>
+                                    <td>{{ equipment[3] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    ℹ️ Este usuário não possui equipamentos de aluguel atribuídos.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ── Equipamentos Pessoais ───────────────────────────– -->
+        <div class="content-section reveal">
+            <h2>🔧 Equipamentos Pessoais 
+                <span style="color: var(--teal); font-size: 1.2rem;">({{ personal_equipments|length }})</span>
+            </h2>
+            
+            {% if personal_equipments %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Criado em</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for equipment in personal_equipments %}
+                                <tr>
+                                    <td><strong>#{{ equipment[0] }}</strong></td>
+                                    <td><strong>{{ equipment[1] }}</strong></td>
+                                    <td>{{ equipment[2] if equipment[2] else '—' }}</td>
+                                    <td>{{ equipment[3] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    ℹ️ Este usuário não possui equipamentos pessoais cadastrados.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ── Atribuir Equipamento (Admin) ────────────────────────– -->
+        {% if session.get('is_admin') and available_equipments %}
+        <div class="content-section reveal">
+            <h2>➕ Atribuir Equipamento</h2>
+            
+            <form method="POST" class="form-container">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label for="equipment_id">Selecionar Equipamento *</label>
+                        <select id="equipment_id" name="equipment_id" required class="form-control">
+                            <option value="">-- Selecione um equipamento --</option>
+                            {% for equipment in available_equipments %}
+                                <option value="{{ equipment[0] }}">{{ equipment[1] }} - {{ equipment[2] if equipment[2] else 'Sem descrição' }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="equipment_type">Tipo de Equipamento *</label>
+                        <select id="equipment_type" name="equipment_type" required class="form-control">
+                            <option value="">-- Selecione o tipo --</option>
+                            <option value="rental">🏢 Aluguel (Empresa)</option>
+                            <option value="personal">🔧 Pessoal (Cliente)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        ➕ Atribuir Equipamento
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% elif session.get('is_admin') %}
+        <div class="content-section reveal">
+            <div class="alert alert-info">
+                ℹ️ Não há equipamentos disponíveis para atribuição. <a href="{{ url_for('admin') }}">Crie novos equipamentos no painel admin.</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ── Chamados de Manutenção ───────────────────────────– -->
+        <div class="content-section reveal">
+            <h2>🔧 Chamados de Manutenção 
+                <span style="color: var(--teal); font-size: 1.2rem;">({{ requests|length }})</span>
+            </h2>
+            
+            {% if requests %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Equipamento</th>
+                                <th>Descrição</th>
+                                <th>Status</th>
+                                <th>Prioridade</th>
+                                <th>Criado em</th>
+                                <th>Atualizado em</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in requests %}
+                                <tr>
+                                    <td><strong>#{{ request[0] }}</strong></td>
+                                    <td><strong>{{ request[1] }}</strong></td>
+                                    <td>{{ request[2] }}</td>
+                                    <td>
+                                        {% if request[3] == 'pendente' %}
+                                            <span class="badge badge-warning">⏳ Pendente</span>
+                                        {% elif request[3] == 'em_andamento' %}
+                                            <span class="badge badge-info">🔄 Em Andamento</span>
+                                        {% elif request[3] == 'concluida' %}
+                                            <span class="badge badge-success">✅ Concluída</span>
+                                        {% elif request[3] == 'cancelada' %}
+                                            <span class="badge badge-danger">❌ Cancelada</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if request[4] == 'alta' %}
+                                            <span class="badge badge-danger">🔴 Alta</span>
+                                        {% elif request[4] == 'media' %}
+                                            <span class="badge badge-warning">🟡 Média</span>
+                                        {% elif request[4] == 'baixa' %}
+                                            <span class="badge badge-success">🟢 Baixa</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ request[5] }}</td>
+                                    <td>{{ request[6] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    ℹ️ Este usuário não possui chamados de manutenção.
+                </div>
+            {% endif %}
+        </div>
+
+    {% else %}
+        <div class="alert alert-error">
+            <strong>❌ Erro!</strong> Usuário não encontrado.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

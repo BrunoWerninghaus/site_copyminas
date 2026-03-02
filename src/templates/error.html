@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Erro - CopyMinas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-container reveal" style="text-align: center; padding: 3rem 2rem;">
+        <h1 class="auth-title" style="color: var(--danger);">⚠️ Erro</h1>
+        
+        {% if error %}
+            <p class="auth-subtitle" style="font-size: 1.2rem; margin: 1.5rem 0;">
+                {{ error }}
+            </p>
+        {% endif %}
+        
+        {% if details %}
+            <p style="color: var(--slate); margin: 1rem 0;">
+                {{ details }}
+            </p>
+        {% endif %}
+        
+        <div style="margin-top: 2rem;">
+            <a href="{{ url_for('main') }}" class="btn btn-primary">
+                ← Voltar para Início
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

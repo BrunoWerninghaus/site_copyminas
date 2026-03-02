@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+{% block title %}Painel Admin - CopyMinas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- ── Header ──────────────────────────────────────────────── -->
+    <div class="profile-header reveal">
+        <div class="profile-info">
+            <h1>⚙️ Painel Administrativo</h1>
+            <p class="profile-detail"><strong>Bem-vindo,</strong> {{ user_name }}</p>
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    <!-- ── Usuários do Sistema ──────────────────────────────────── -->
+    <div class="content-section reveal">
+        <h2>👥 Usuários do Sistema</h2>
+        
+        {% if users %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Admin</th>
+                            <th>Data de Criação</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td><strong>#{{ user[0] }}</strong></td>
+                            <td>{{ user[1] }}</td>
+                            <td>{{ user[2] }}</td>
+                            <td>
+                                {% if user[3] %}
+                                    <span class="badge badge-admin">👤 Admin</span>
+                                {% else %}
+                                    <span class="badge badge-info">👤 Usuário</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user[4] }}</td>
+                            <td>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <a href="{{ url_for('user_profile', user_id=user[0]) }}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                                        👁️ Perfil                                    </a>
+                                    <button type="button" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;" data-user-id="{{ user[0] }}" data-user-name="{{ user[1] }}" data-user-email="{{ user[2] }}" data-user-admin="{{ user[3] }}" onclick="openEditUserModal(this)">
+                                        ✏️ Editar
+                                    </button>
+                                    {% if user[0] != session.get('user_id') %}
+                                    <form method="POST" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir o usuário {{ user[1] }}?')">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <input type="hidden" name="action" value="delete_user">
+                                        <input type="hidden" name="user_id" value="{{ user[0] }}">
+                                        <button type="submit" class="btn btn-danger" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">🗑️ Excluir</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                Nenhum usuário encontrado no sistema.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- ── Requisições de Manutenção ──────────────────────────── -->
+    <div class="content-section reveal">
+        <h2>🔧 Requisições de Manutenção</h2>
+        
+        {% if requests %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuário</th>
+                            <th>Equipamento</th>
+                            <th>Descrição</th>
+                            <th>Status</th>
+                            <th>Prioridade</th>
+                            <th>Data</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in requests %}
+                        <tr>
+                            <td><strong>#{{ request[0] }}</strong></td>
+                            <td>{{ request[4] }}</td>
+                            <td>{{ request[5] }}</td>
+                            <td>{{ request[1] }}</td>
+                            <td>
+                                {% if request[2] == 'pendente' %}
+                                    <span class="badge badge-warning">⏳ Pendente</span>
+                                {% elif request[2] == 'em_andamento' %}
+                                    <span class="badge badge-info">🔄 Em Andamento</span>
+                                {% elif request[2] == 'concluida' %}
+                                    <span class="badge badge-success">✅ Concluída</span>
+                                {% elif request[2] == 'cancelada' %}
+                                    <span class="badge badge-danger">❌ Cancelada</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if request[3] == 'alta' %}
+                                    <span class="badge badge-danger">🔴 Alta</span>
+                                {% elif request[3] == 'media' %}
+                                    <span class="badge badge-warning">🟡 Média</span>
+                                {% elif request[3] == 'baixa' %}
+                                    <span class="badge badge-success">🟢 Baixa</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ request[6] }}</td>
+                            <td>
+                                <form method="POST" style="display: flex; gap: 0.5rem;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                    <input type="hidden" name="action" value="update_request">
+                                    <input type="hidden" name="request_id" value="{{ request[0] }}">
+                                    <select name="status" style="max-width: 120px;">
+                                        <option value="pendente" {% if request[2]=='pendente' %}selected{% endif %}>Pendente</option>
+                                        <option value="em_andamento" {% if request[2]=='em_andamento' %}selected{% endif %}>Em Andamento</option>
+                                        <option value="concluida" {% if request[2]=='concluida' %}selected{% endif %}>Concluída</option>
+                                        <option value="cancelada" {% if request[2]=='cancelada' %}selected{% endif %}>Cancelada</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-success" style="font-size: 0.85rem;">Atualizar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                Nenhuma requisição de manutenção encontrada.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- ── Criar Novo Usuário ──────────────────────────────────── -->
+    <div class="content-section reveal">
+        <h2>➕ Criar Novo Usuário</h2>
+        
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="action" value="create_user">
+            
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label for="name">Nome Completo *</label>
+                    <input type="text" id="name" name="name" required placeholder="Digite o nome completo">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail *</label>
+                    <input type="email" id="email" name="email" required placeholder="Digite o e-mail">
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label for="password">Senha *</label>
+                    <input type="password" id="password" name="password" required placeholder="Digite uma senha segura">
+                </div>
+
+                <div class="form-group">
+                    <label for="is_admin">
+                        <input type="checkbox" id="is_admin" name="is_admin">
+                        Fazer Admin?
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">➕ Criar Usuário</button>
+        </form>
+    </div>
+
+    <!-- ── Criar Novo Equipamento ──────────────────────────────── -->
+    <div class="content-section reveal">
+        <h2>📱 Criar Novo Equipamento</h2>
+        
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="action" value="create_equipment">
+            
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label for="equipment_name">Nome do Equipamento *</label>
+                    <input type="text" id="equipment_name" name="equipment_name" required placeholder="Ex: Servidor Web, Impressora, etc.">
+                </div>
+
+                <div class="form-group">
+                    <label for="user_id_equipment">Atribuir a Usuário (Opcional)</label>
+                    <select id="user_id_equipment" name="user_id_equipment">
+                        <option value="">Nenhum - Equipamento Genérico</option>
+                        {% if users %}
+                            {% for user in users %}
+                                <option value="{{ user[0] }}">{{ user[1] }}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label for="equipment_type">Tipo de Atribuição</label>
+                    <select id="equipment_type" name="equipment_type">
+                        <option value="personal">Pessoal</option>
+                        <option value="rental">Aluguel</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="serial_number">Número de Série (Opcional)</label>
+                    <input type="text" id="serial_number" name="serial_number" placeholder="Ex: SN-12345, serial único do equipamento">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="equipment_description">Descrição</label>
+                <textarea id="equipment_description" name="equipment_description" placeholder="Descrição do equipamento (opcional)..." style="height: 100px;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">📱 Criar Equipamento</button>
+        </form>
+    </div>
+
+    <!-- ── Lista de Equipamentos Cadastrados ─────────────────── -->
+    <div class="content-section reveal">
+        <h2>📋 Lista de Equipamentos</h2>
+        
+        {% if user_equipments %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Descrição</th>
+                            <th>Usuário</th>
+                            <th>Tipo</th>
+                            <th>Nº Série</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for eq in user_equipments %}
+                        <tr>
+                            <td><strong>#{{ eq[1] }}</strong></td>
+                            <td>{{ eq[2] }}</td>
+                            <td>{{ eq[3] or '-' }}</td>
+                            <td>{{ eq[7] or '-' }}</td>
+                            <td>
+                                {% if eq[5] == 'rental' %}
+                                    <span class="badge badge-warning">Aluguel</span>
+                                {% else %}
+                                    <span class="badge badge-info">Pessoal</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ eq[4] or '-' }}</td>
+                            <td>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button type="button" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;" 
+                                        data-ue-id="{{ eq[0] or '' }}"
+                                        data-eq-id="{{ eq[1] }}"
+                                        data-eq-name="{{ eq[2] }}"
+                                        data-eq-desc="{{ eq[3] or '' }}"
+                                        data-eq-serial="{{ eq[4] or '' }}"
+                                        data-eq-type="{{ eq[5] or 'personal' }}"
+                                        data-user-id="{{ eq[6] or '' }}"
+                                        data-user-name="{{ eq[7] or '' }}"
+                                        onclick="openEditEquipmentModal(this)">
+                                        ✏️
+                                    </button>
+                                    <form method="POST" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir o equipamento {{ eq[2] }}?')">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <input type="hidden" name="action" value="delete_equipment">
+                                        <input type="hidden" name="equipment_id" value="{{ eq[1] }}">
+                                        {% if eq[0] %}
+                                        <input type="hidden" name="user_equipment_id" value="{{ eq[0] }}">
+                                        {% endif %}
+                                        <button type="submit" class="btn btn-danger" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">🗑️</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                Nenhum equipamento encontrado no sistema.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Modal de Editar Usuário -->
+<div id="editUserModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="background-color: #fff; margin: 10% auto; padding: 2rem; border-radius: 8px; max-width: 500px; position: relative;">
+        <span onclick="closeEditUserModal()" style="position: absolute; right: 1rem; top: 0.5rem; font-size: 1.5rem; cursor: pointer;">&times;</span>
+        <h2>Editar Usuário</h2>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="action" value="edit_user">
+            <input type="hidden" name="user_id" id="edit_user_id" value="">
+            
+            <div class="form-group">
+                <label for="edit_name">Nome Completo *</label>
+                <input type="text" id="edit_name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="edit_email">E-mail *</label>
+                <input type="email" id="edit_email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="edit_password">Nova Senha (deixe em branco para manter a atual)</label>
+                <input type="password" id="edit_password" name="password" placeholder="Digite uma nova senha">
+            </div>
+
+            <div class="form-group">
+                <label for="edit_is_admin">
+                    <input type="checkbox" id="edit_is_admin" name="is_admin">
+                    É Admin?
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Editar Equipamento -->
+<div id="editEquipmentModal" style="display: none; position: fixed; z-index: 99999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); overflow-y: auto; padding: 20px;">
+    <div style="background-color: #ffffff; margin: 30px auto; padding: 30px; border-radius: 12px; max-width: 650px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); border: 2px solid #007bff;">
+        <span onclick="closeEditEquipmentModal()" style="position: absolute; right: 1rem; top: 0.5rem; font-size: 1.5rem; cursor: pointer;">&times;</span>
+        <h2>Editar Equipamento</h2>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="action" value="edit_equipment">
+            <input type="hidden" name="user_equipment_id" id="edit_ue_id" value="">
+            <input type="hidden" name="equipment_id" id="edit_eq_id" value="">
+            
+            <div class="form-group">
+                <label for="edit_eq_name">Nome do Equipamento *</label>
+                <input type="text" id="edit_eq_name" name="equipment_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="edit_eq_description">Descrição</label>
+                <textarea id="edit_eq_description" name="equipment_description" style="height: 80px;"></textarea>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label for="edit_eq_type">Tipo</label>
+                    <select id="edit_eq_type" name="equipment_type">
+                        <option value="personal">Pessoal</option>
+                        <option value="rental">Aluguel</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_eq_serial">Número de Série</label>
+                    <input type="text" id="edit_eq_serial" name="serial_number">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="edit_eq_user">Atribuir a Usuário</label>
+                <select id="edit_eq_user" name="user_id">
+                    <option value="">Nenhum</option>
+                    {% if users %}
+                        {% for user in users %}
+                            <option value="{{ user[0] }}">{{ user[1] }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            <button type="button" class="btn btn-secondary" onclick="closeEditEquipmentModal()">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+// Usuário
+function openEditUserModal(btn) {
+    document.getElementById('edit_user_id').value = btn.dataset.userId;
+    document.getElementById('edit_name').value = btn.dataset.userName;
+    document.getElementById('edit_email').value = btn.dataset.userEmail;
+    document.getElementById('edit_is_admin').checked = btn.dataset.userAdmin === 'true';
+    document.getElementById('editUserModal').style.display = 'block';
+}
+
+function closeEditUserModal() {
+    document.getElementById('editUserModal').style.display = 'none';
+}
+
+// Equipamento
+function openEditEquipmentModal(btn) {
+    document.getElementById('edit_ue_id').value = btn.dataset.ueId;
+    document.getElementById('edit_eq_id').value = btn.dataset.eqId;
+    document.getElementById('edit_eq_name').value = btn.dataset.eqName;
+    document.getElementById('edit_eq_description').value = btn.dataset.eqDesc;
+    document.getElementById('edit_eq_type').value = btn.dataset.eqType;
+    document.getElementById('edit_eq_serial').value = btn.dataset.eqSerial;
+    document.getElementById('edit_eq_user').value = btn.dataset.userId;
+    document.getElementById('editEquipmentModal').style.display = 'block';
+}
+
+function closeEditEquipmentModal() {
+    document.getElementById('editEquipmentModal').style.display = 'none';
+}
+
+// Fechar modais ao clicar fora
+window.onclick = function(event) {
+    var userModal = document.getElementById('editUserModal');
+    var equipModal = document.getElementById('editEquipmentModal');
+    if (event.target == userModal) {
+        userModal.style.display = 'none';
+    }
+    if (event.target == equipModal) {
+        equipModal.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

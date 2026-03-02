@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Manutenção - CopyMinas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- ── Header ──────────────────────────────────────────────– -->
+    <div class="profile-header reveal">
+        <div class="profile-info">
+            <h1>🔧 Criar Requisição de Manutenção</h1>
+            <p class="profile-detail">
+                {% if is_admin %}<span class="badge badge-info">👨‍💼 ADMIN</span>{% endif %}
+                Abrir novo chamado técnico
+            </p>
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    <!-- ── Formulário de Nova Requisição ──────────────────────────────────────– -->
+    <div class="content-section reveal">
+        <h2>📋 Nova Requisição</h2>
+        
+        {% if equipments %}
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                
+                <!-- ── Seleção de Usuário (apenas admin) ── -->
+                {% if is_admin %}
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="user_id">Para Qual Usuário? *</label>
+                            <select id="user_id" name="user_id" required>
+                                {% for user in users %}
+                                    <option value="{{ user[0] }}">{{ user[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="equipment_id">Equipamento *</label>
+                            <select id="equipment_id" name="equipment_id" required>
+                                <option value="">Selecione um equipamento</option>
+                                {% for equipment in equipments %}
+                                    <option value="{{ equipment[0] }}">{{ equipment[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Cliente: sem seleção de usuário -->
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="equipment_id">Equipamento *</label>
+                            <select id="equipment_id" name="equipment_id" required>
+                                <option value="">Selecione um equipamento</option>
+                                {% for equipment in equipments %}
+                                    <option value="{{ equipment[0] }}">{{ equipment[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="priority">Prioridade</label>
+                            <select id="priority" name="priority">
+                                <option value="baixa">Baixa</option>
+                                <option value="media" selected>Média</option>
+                                <option value="alta">Alta</option>
+                            </select>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- ── Prioridade e Descrição ── -->
+                {% if is_admin %}
+                    <div class="form-group">
+                        <label for="priority">Prioridade</label>
+                        <select id="priority" name="priority">
+                            <option value="baixa">Baixa</option>
+                            <option value="media" selected>Média</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="description">Descrição do Problema *</label>
+                    <textarea id="description" name="description" placeholder="Descreva detalhadamente o problema..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    📤 Enviar Requisição
+                </button>
+            </form>
+        {% else %}
+            <div class="alert alert-warning">
+                <strong>⚠️ Nenhum equipamento disponível</strong><br>
+                {% if is_admin %}
+                    Não há equipamentos genéricos cadastrados no sistema.
+                {% else %}
+                    Você não possui equipamentos atribuídos. Entre em contato com o administrador.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

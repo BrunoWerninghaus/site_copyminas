@@ -1,0 +1,524 @@
+/* ============================================================
+   CopyMinas — responsive.css
+   Estilos responsivos complementares
+   ============================================================ */
+
+/* ── Mobile First Adjustments ──────────────────────────────── */
+@media (max-width: 1024px) {
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sobre-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .contato-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Dashboard tables - enable horizontal scroll */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Header */
+    .nav-links {
+        display: none !important;
+    }
+
+    .menu-toggle {
+        display: flex !important;
+    }
+
+    /* Main */
+    main {
+        margin-top: 60px;
+    }
+
+    section {
+        padding: 3rem 1rem !important;
+    }
+
+    /* Typography */
+    h1 {
+        font-size: 1.75rem !important;
+    }
+
+    h2 {
+        font-size: 1.4rem !important;
+    }
+
+    h3 {
+        font-size: 1.2rem !important;
+    }
+
+    /* Buttons */
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    button,
+    input[type="submit"] {
+        width: 100%;
+    }
+
+    /* Forms */
+    .grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .form-group {
+        margin-bottom: 1.2rem;
+    }
+
+    /* Cards */
+    .card {
+        padding: 1.5rem;
+    }
+
+    /* Dashboard - Stack stat cards vertically */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+    }
+    
+    /* Dashboard content sections */
+    .content-section {
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .content-section h2 {
+        font-size: 1.2rem !important;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+    }
+
+    /* Auth Container */
+    .auth-container {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+    }
+
+    /* Profile Header */
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.5rem !important;
+    }
+
+    .profile-header h1 {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Footer */
+    .footer-inner {
+        grid-template-columns: 1fr !important;
+        text-align: center;
+    }
+
+    .footer-copy {
+        text-align: center;
+    }
+
+    /* Tables - improved mobile with horizontal scroll */
+    .table-container {
+        margin: 1rem 0;
+        border-radius: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table {
+        font-size: 0.85rem;
+        min-width: 550px; /* Force scroll on small screens */
+    }
+
+    table th,
+    table td {
+        padding: 0.6rem 0.4rem;
+        white-space: nowrap;
+    }
+
+    /* Navigation Mobile */
+    .nav-mobile {
+        display: none;
+        position: fixed;
+    }
+
+    .nav-mobile.open {
+        display: flex;
+        top: 60px;
+    }
+
+    /* Hero */
+    .hero {
+        min-height: auto;
+        padding: 4rem 1rem;
+    }
+
+    .hero-title {
+        font-size: 2rem !important;
+    }
+
+    .hero-eyebrow {
+        font-size: 0.7rem;
+    }
+
+    /* Service Cards */
+    .servicos-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .servico-card {
+        padding: 1.5rem;
+    }
+    
+    /* Forms mobile */
+    .forms-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    /* Container */
+    .container {
+        padding: 0 1rem !important;
+    }
+
+    /* Typography */
+    h1 {
+        font-size: 1.5rem !important;
+    }
+
+    h2 {
+        font-size: 1.2rem !important;
+    }
+
+    /* Spacing */
+    section {
+        padding: 2rem 1rem !important;
+    }
+
+    /* Cards */
+    .card {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 0.65rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-nav {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    /* Forms */
+    label {
+        font-size: 0.9rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    textarea,
+    select {
+        padding: 0.7rem 0.9rem;
+        font-size: 0.9rem;
+    }
+
+    /* Tables */
+    table {
+        font-size: 0.8rem;
+    }
+
+    table th,
+    table td {
+        padding: 0.6rem 0.4rem;
+    }
+
+    /* Badges */
+    .badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.5rem;
+    }
+
+    /* Alerts */
+    .alert {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    /* Auth Container */
+    .auth-container {
+        margin: 1.5rem 1rem;
+        padding: 1.25rem 1rem;
+    }
+
+    .auth-title {
+        font-size: 1.5rem;
+    }
+
+    .auth-subtitle {
+        font-size: 0.85rem;
+    }
+
+    /* Profile Header */
+    .profile-header {
+        padding: 1.5rem 1rem;
+    }
+
+    .profile-info h1 {
+        font-size: 1.4rem;
+    }
+
+    .profile-detail {
+        font-size: 0.85rem;
+    }
+
+    /* Content Section */
+    .content-section {
+        padding: 1.5rem;
+    }
+
+    .content-section h2 {
+        font-size: 1.1rem;
+    }
+
+    /* Hero */
+    .hero {
+        padding: 3rem 1rem;
+    }
+
+    .hero-title {
+        font-size: 1.6rem !important;
+        margin-bottom: 1rem;
+    }
+
+    .hero-sub {
+        font-size: 0.95rem !important;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Logo */
+    .logo-name {
+        font-size: 1rem;
+    }
+
+    /* Stats */
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    /* Footer */
+    .footer {
+        padding: 2rem 1rem 1rem;
+    }
+
+    .footer-logo {
+        font-size: 1rem;
+    }
+
+    .footer-copy p {
+        font-size: 0.8rem;
+    }
+
+    /* Services */
+    .servico-icon {
+        font-size: 2rem;
+    }
+
+    .servico-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .servico-card p {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Container */
+    .container {
+        padding: 0 0.75rem !important;
+    }
+
+    /* Typography */
+    h1 {
+        font-size: 1.3rem !important;
+        line-height: 1.2;
+    }
+
+    h2 {
+        font-size: 1.1rem !important;
+    }
+
+    h3 {
+        font-size: 1rem !important;
+    }
+
+    /* Spacing */
+    section {
+        padding: 1.5rem 0.75rem !important;
+    }
+
+    /* Cards */
+    .card {
+        padding: 0.75rem;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    /* Forms */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    textarea,
+    select {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    textarea {
+        min-height: 100px;
+    }
+
+    /* Auth Container */
+    .auth-container {
+        margin: 1rem 0.75rem;
+        padding: 1rem;
+        border-radius: 10px;
+    }
+
+    .auth-title {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-subtitle {
+        font-size: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+        gap: 0.75rem;
+    }
+
+    .stat-card {
+        padding: 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    /* Footer */
+    .footer {
+        padding: 1.5rem 0.75rem 0.75rem;
+    }
+
+    .footer-inner {
+        gap: 1rem;
+    }
+
+    /* Hero adjustments */
+    .hero-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .btn-ghost {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.85rem;
+        width: 100%;
+    }
+
+    /* Profile Header */
+    .profile-header {
+        padding: 1rem 0.75rem;
+    }
+
+    .profile-header h1 {
+        font-size: 1.25rem;
+    }
+
+    .profile-detail {
+        font-size: 0.8rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    /* Table adjustments for very small screens */
+    table {
+        min-width: 480px;
+    }
+}
+
+/* ── Print Styles ──────────────────────────────────────────── */
+@media print {
+    .site-header,
+    .footer,
+    .btn-nav,
+    .menu-toggle,
+    .nav-mobile {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    main {
+        margin-top: 0;
+    }
+
+    table {
+        page-break-inside: avoid;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
+}
