@@ -20,7 +20,12 @@
 }
 
 .site-brand {
+    display: block;
     width: clamp(132px, 14vw, 220px);
+}
+
+.site-brand img {
+    width: 100%;
 }
 
 .site-nav {

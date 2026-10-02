@@ -17,22 +17,27 @@
 >
     <section class="intro-globe" aria-label="Globo Copy Minas">
         <div class="intro-globe__crop">
-            <div class="globe-fallback" aria-hidden="true">
+            <div class="globe-fallback" data-globe-fallback aria-hidden="true">
                 <div class="globe-fallback__surface"></div>
-                <div class="globe-fallback__latitude globe-fallback__latitude--one"></div>
-                <div class="globe-fallback__latitude globe-fallback__latitude--two"></div>
-                <div class="globe-fallback__longitude"></div>
             </div>
 
-            <div class="globe-mount" data-globe-mount aria-hidden="true"></div>
+            <div
+                class="globe-mount"
+                data-globe-mount="intro"
+                aria-hidden="true"
+            ></div>
+
+            <p class="globe-status" data-globe-status aria-live="polite">
+                Carregando globo
+            </p>
         </div>
     </section>
 
     <section class="intro-brand" aria-label="Copy Minas">
-        <div class="intro-brand__frame" data-asset-slot="official-copy-minas-logo">
+        <div class="intro-brand__frame">
             <img
                 class="intro-brand__logo"
-                src="{{ url_for('static', filename='images/brand/copy-minas-placeholder.svg') }}"
+                src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}"
                 alt="Copy Minas — Soluções em Tecnologia"
             >
         </div>
@@ -50,4 +55,8 @@
 
 {% block page_scripts %}
 <script src="{{ url_for('static', filename='js/intro.js') }}" defer></script>
+<script
+    type="module"
+    src="{{ url_for('static', filename='js/globe.js') }}"
+></script>
 {% endblock %}

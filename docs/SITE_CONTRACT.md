@@ -1,6 +1,6 @@
 # Contrato do Site — Copy Minas vNext
 
-Status: APROVADO PARA IMPLEMENTAÇÃO INICIAL
+Status: APROVADO PARA IMPLEMENTAÇÃO
 
 Este documento governa a construção da nova geração do site Copy Minas.
 
@@ -45,7 +45,7 @@ Cada slot deve informar sua finalidade no código/interface, por exemplo:
 
 A ausência de uma imagem nunca deve quebrar o layout.
 
-A nova logo cromada Copy Minas é a referência oficial de marca. Até o arquivo original ser incorporado ao repositório, a aplicação pode usar uma representação temporária claramente tratada como placeholder técnico.
+A nova logo cromada Copy Minas é a referência oficial de marca e deve ser usada como asset real nas superfícies principais. Derivados otimizados para web podem ser gerados a partir do arquivo-fonte, preservando a aparência da marca.
 
 ## 3. Arquitetura pública inicial
 
@@ -68,7 +68,14 @@ Contrato de interação:
 - gesto de swipe para cima em dispositivos touch avança para `/home`;
 - transição deve respeitar `prefers-reduced-motion`.
 
-O globo mostrado nessa página possui um mount dedicado. A primeira fundação pode usar fallback visual; o módulo geográfico definitivo entra sem alterar a anatomia da página.
+O globo da entrada é real e derivado de dados geográficos:
+- continentes em branco/prata;
+- Brasil em vermelho;
+- Minas Gerais em amarelo/dourado;
+- rotação automática;
+- sem controles de mouse nessa tela, porque clique e scroll pertencem à navegação da entrada.
+
+Durante a fase DEV, o módulo pode consumir GeoJSON externo conhecido. Antes da produção, os dados e dependências devem ser fixados/localizados ou pré-processados para remover dependência desnecessária de serviços externos em runtime.
 
 ### `/home` — Home
 
@@ -99,6 +106,8 @@ O globo definitivo deve respeitar:
 - dados geográficos de produção devem preferencialmente ser locais/pré-processados;
 - não executar milhões de testes geoespaciais no navegador a cada visita.
 
+O ponto azul ainda não deve ser ativado até que a localização oficial seja fornecida.
+
 ## 5. Separação de responsabilidades
 
 - `templates/public/intro.html`: entrada.
@@ -106,8 +115,8 @@ O globo definitivo deve respeitar:
 - `static/css/base.css`: tokens e estrutura global.
 - `static/css/pages/intro.css`: somente entrada.
 - `static/css/pages/home.css`: somente Home.
-- `static/js/intro.js`: somente interação da entrada.
-- módulos futuros do globo devem viver separados da navegação da página.
+- `static/js/intro.js`: somente navegação da entrada.
+- `static/js/globe.js`: renderização geográfica do globo.
 
 Uma página não deve importar CSS específico de outra página.
 
@@ -127,6 +136,7 @@ A interface deve evitar excesso de efeitos. Logo e globo são os elementos visua
 - catálogo completo;
 - produto individual;
 - contato/orçamento dedicado;
-- administração.
+- administração;
+- experiência fullscreen do globo.
 
-Essas rotas serão adicionadas em etapas próprias e não devem ser simuladas com páginas falsas.
+Essas rotas/experiências serão adicionadas em etapas próprias e não devem ser simuladas com páginas falsas.
