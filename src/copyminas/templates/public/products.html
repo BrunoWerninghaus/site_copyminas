@@ -23,10 +23,10 @@
 
 <main class="paper-stage">
     <section class="paper-sheet" data-sheet="CATÁLOGO / 03">
-        <p class="paper-kicker">Produtos / Site 3</p>
+        <p class="paper-kicker">Produtos / catálogo</p>
         <h1 class="paper-title">Catálogo Copy Minas</h1>
         <p class="paper-lead">
-            Catálogo migrado do Site 2. Os registros inativos e de teste ficaram fora da publicação.
+            Produtos apresentados no catálogo da Copy Minas. Consulte a equipe para confirmar disponibilidade, condições e atendimento.
         </p>
 
         <nav class="paper-index" aria-label="Categorias disponíveis">
@@ -43,12 +43,12 @@
                     {% if product.image_url %}
                     <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}">
                     {% else %}
-                    <span>IMG / {{ "%04d"|format(product.id) }}</span>
+                    <span>IMAGEM EM ATUALIZAÇÃO</span>
                     {% endif %}
                 </a>
 
                 <div class="product-card__body">
-                    <span class="paper-card__code">{{ product.category }} / {{ "%04d"|format(product.id) }}</span>
+                    <span class="paper-card__code">{{ product.category }}</span>
                     <h2>{{ product.name }}</h2>
                     <p>{{ product.summary }}</p>
                     <a class="paper-link" href="{{ url_for('public.product_detail', slug=product.slug) }}">Abrir ficha →</a>
@@ -59,14 +59,14 @@
 
         <div class="paper-category-register" aria-label="Índice de categorias">
             {% for category in categories %}
-            <span id="categoria-{{ category.id }}">[{{ "%02d"|format(category.id) }}] {{ category.name }}</span>
+            <span id="categoria-{{ category.id }}">{{ category.name }}</span>
             {% endfor %}
         </div>
     </section>
 </main>
 
 <footer class="paper-footer">
-    <span>Copy Minas / Catálogo migrado do Site 2</span>
+    <span>Copy Minas / Produtos e equipamentos</span>
     <a href="{{ url_for('public.contact') }}">Contato</a>
 </footer>
 {% endblock %}
