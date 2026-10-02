@@ -1,3 +1,5 @@
+import re
+
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, url_for
 
 from src.copyminas.catalog import (
@@ -140,13 +142,18 @@ def contact_submit():
 
     if not form_data["name"]:
         errors.append("Informe seu nome.")
+    elif len(form_data["name"]) < 2:
+        errors.append("Informe um nome com pelo menos 2 caracteres.")
     elif len(form_data["name"]) > 120:
         errors.append("O nome deve ter no máximo 120 caracteres.")
 
     if len(form_data["company"]) > 160:
         errors.append("O nome da empresa deve ter no máximo 160 caracteres.")
 
-    if not form_data["email"] or "@" not in form_data["email"]:
+    if not form_data["email"] or not re.fullmatch(
+        r"[^@\s]+@[^@\s]+\.[^@\s]+",
+        form_data["email"],
+    ):
         errors.append("Informe um e-mail válido.")
     elif len(form_data["email"]) > 254:
         errors.append("O e-mail deve ter no máximo 254 caracteres.")
@@ -155,9 +162,15 @@ def contact_submit():
         errors.append("Informe um telefone ou WhatsApp.")
     elif len(form_data["phone"]) > 20:
         errors.append("O telefone deve ter no máximo 20 caracteres.")
+    else:
+        phone_digits = re.sub(r"\D", "", form_data["phone"])
+        if not 8 <= len(phone_digits) <= 15:
+            errors.append("Informe um telefone válido, com DDD quando aplicável.")
 
     if not form_data["city"]:
         errors.append("Informe sua cidade.")
+    elif len(form_data["city"]) < 2:
+        errors.append("Informe uma cidade válida.")
     elif len(form_data["city"]) > 120:
         errors.append("A cidade deve ter no máximo 120 caracteres.")
 
@@ -181,6 +194,8 @@ def contact_submit():
 
     if not form_data["message"]:
         errors.append("Escreva uma mensagem.")
+    elif len(form_data["message"]) < 8:
+        errors.append("Escreva uma mensagem com pelo menos 8 caracteres.")
     elif len(form_data["message"]) > 5000:
         errors.append("A mensagem deve ter no máximo 5000 caracteres.")
 
