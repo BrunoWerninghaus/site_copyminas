@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Contato — Copy Minas{% endblock %}
+{% block meta_description %}Fale com a Copy Minas, solicite atendimento e consulte os canais de contato em Elói Mendes, MG.{% endblock %}
 {% block body_class %}paper-page contact-page{% endblock %}
 {% block page_styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">
@@ -10,7 +11,7 @@
 {% set active_page = "contact" %}
 {% include "public/_paper_header.html" %}
 
-<main class="paper-stage contact-stage">
+<main id="main-content" class="paper-stage contact-stage">
     <section class="paper-sheet contact-hero" data-sheet="CONTATO / 03">
         <p class="paper-kicker">Contato / diretório</p>
         <h1 class="paper-title">Contato & orçamento.</h1>
