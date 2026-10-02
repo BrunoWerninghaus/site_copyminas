@@ -211,3 +211,27 @@ Conflito de grafia de bairro:
 - bases cadastrais públicas: Ludovico Pavone.
 
 O Site 3 preserva o endereço informado diretamente pelo proprietário como fonte prioritária.
+
+
+## 10. Contato — canais e formulário
+
+A rota `/contato` deve funcionar como diretório oficial de contato e superfície de solicitação.
+
+Canais apresentados:
+- os dois números móveis verificados como WhatsApp/telefone;
+- e-mail público verificado;
+- endereço oficial usado pelo Site 3;
+- ação para Google Maps;
+- CNPJ;
+- horário como "A confirmar" enquanto não houver confirmação do proprietário.
+
+O número legado `(35) 3491-0201` permanece apenas como dado interno e não deve ser promovido como canal principal.
+
+Formulário:
+- campos: nome, empresa opcional, contato para retorno, assunto e mensagem;
+- assunto limitado às categorias definidas pela aplicação;
+- validação obrigatória no servidor antes do encaminhamento;
+- nenhum envio deve fingir persistência ou entrega por e-mail quando não houver infraestrutura configurada;
+- nesta etapa, o formulário prepara a mensagem em um dos WhatsApps oficiais e redireciona o usuário para revisar e concluir o envio;
+- o conteúdo do formulário não é persistido pelo Site 3 nessa etapa;
+- a interface deve comunicar claramente esse comportamento.
