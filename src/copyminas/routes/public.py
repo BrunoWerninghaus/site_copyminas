@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, url_for
 
 from src.copyminas.catalog import (
     get_product_by_slug,
@@ -187,7 +187,8 @@ def contact_submit():
 
     try:
         protocol = create_contact_request(form_data)
-    except DatabaseUnavailable:
+    except DatabaseUnavailable as exc:
+        current_app.logger.error("Contact persistence failed: %s", exc)
         return _render_contact(
             form_data=form_data,
             form_errors=[
