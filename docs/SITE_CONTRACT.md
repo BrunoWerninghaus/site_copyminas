@@ -272,3 +272,17 @@ Contrato:
 - a mesma operação SMTP também envia a notificação interna para `ti.processos@copyminas.com.br`;
 - a página pública nunca mostra `main_bd`, `contatos`, status interno ou identificadores de infraestrutura;
 - se a persistência funcionar e o SMTP falhar, o contato continua válido e a interface informa apenas que a confirmação por e-mail não pôde ser enviada naquele momento.
+
+
+### Identidade visual dos e-mails de contato
+
+As mensagens de contato devem preservar a identidade visual pública da Copy Minas sem depender do CSS ou JavaScript do site.
+
+Contrato:
+- todos os e-mails possuem fallback em texto puro;
+- a versão HTML usa fundo escuro, ficha clara, bordas quadradas, vermelho Copy Minas e azul tecnológico;
+- tipografia monoespaçada é preservada com fontes seguras para clientes de e-mail;
+- o e-mail interno apresenta os dados em formato de ficha operacional;
+- o e-mail do cliente destaca protocolo, serviço solicitado e a mensagem recebida;
+- conteúdo fornecido pelo usuário deve ser escapado antes de entrar no HTML;
+- o e-mail do cliente não pode expor banco de dados, tabela, origem técnica ou status interno.
