@@ -35,8 +35,8 @@ def create_app() -> Flask:
         DB_USER=_env("DB_USER", "DATABASE_USER", "root"),
         DB_PASSWORD=_env("DB_PASSWORD", "DATABASE_PASSWORD", ""),
         SMTP_HOST=os.getenv("SMTP_HOST", "smtp.copyminas.com.br"),
-        SMTP_PORT=int(os.getenv("SMTP_PORT", "465")),
-        SMTP_SECURITY=os.getenv("SMTP_SECURITY", "ssl").lower(),
+        SMTP_PORT=int(os.getenv("SMTP_PORT", "587")),
+        SMTP_SECURITY=os.getenv("SMTP_SECURITY", "none").lower(),
         SMTP_USER=os.getenv("SMTP_USER", "ti.processos@copyminas.com.br"),
         SMTP_PASSWORD=os.getenv("SMTP_PASSWORD", ""),
         CONTACT_NOTIFICATION_FROM=os.getenv(
