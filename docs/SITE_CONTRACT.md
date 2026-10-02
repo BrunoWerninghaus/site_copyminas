@@ -72,6 +72,7 @@ O globo da entrada é real e derivado de dados geográficos:
 - continentes em branco/prata;
 - Brasil em vermelho;
 - Minas Gerais em amarelo/dourado;
+- Elói Mendes em azul;
 - rotação automática;
 - sem controles de mouse nessa tela, porque clique e scroll pertencem à navegação da entrada.
 
@@ -92,31 +93,46 @@ A Home nasce com áreas independentes e substituíveis:
 
 Nenhum desses blocos depende do conteúdo definitivo para existir.
 
-## 4. Globo — contrato final
+## 4. Globo e localização — contrato oficial
 
-O globo definitivo deve respeitar:
+Hierarquia visual:
 - mundo/continentes: branco ou prata;
 - Brasil: vermelho;
 - Minas Gerais: amarelo/dourado;
-- Elói Mendes / Copy Minas: azul;
-- versão compacta e versão ampliada;
-- clique na versão compacta abre a experiência ampliada;
-- clique no ponto azul abre a localização oficial no Google Maps;
-- coordenada e URL do Google Maps não podem ser inventadas;
-- dados geográficos de produção devem preferencialmente ser locais/pré-processados;
-- não executar milhões de testes geoespaciais no navegador a cada visita.
+- Elói Mendes / Copy Minas: azul.
 
-O ponto azul ainda não deve ser ativado até que a localização oficial seja fornecida.
+Localização informada para a Copy Minas:
+- Rua Tonico da Serra, 89 - Ludovico Pavoni, Elói Mendes - MG, 37110-000.
+
+O marcador visual do globo representa Elói Mendes em escala planetária. Para isso, usa a coordenada da sede urbana/município:
+- latitude: -21.6094;
+- longitude: -45.5660.
+
+Essa coordenada não deve ser apresentada como geocodificação da porta do estabelecimento. O clique do marcador usa o endereço comercial exato acima como destino da pesquisa no Google Maps.
+
+Comportamento:
+- o globo compacto da Home abre a experiência fullscreen;
+- o fullscreen permite rotação por arraste e zoom pela roda do mouse;
+- o ponto azul pulsa para permanecer identificável;
+- clicar no ponto azul abre o Google Maps em nova aba;
+- existe também uma ação textual "Abrir no Google Maps" como alternativa acessível;
+- a experiência fullscreen deve ter botão de fechar e responder a Escape pelo comportamento nativo de `dialog`.
+
+Dados e desempenho:
+- dados geográficos de produção devem preferencialmente ser locais/pré-processados;
+- não executar milhões de testes geoespaciais no navegador a cada visita;
+- o motor atual trabalha com amostragem por máscara geográfica e quantidade de pontos adequada a uma interface web.
 
 ## 5. Separação de responsabilidades
 
 - `templates/public/intro.html`: entrada.
 - `templates/public/home.html`: Home.
+- `location.py`: localização oficial e destino Google Maps.
 - `static/css/base.css`: tokens e estrutura global.
 - `static/css/pages/intro.css`: somente entrada.
 - `static/css/pages/home.css`: somente Home.
 - `static/js/intro.js`: somente navegação da entrada.
-- `static/js/globe.js`: renderização geográfica do globo.
+- `static/js/globe.js`: renderização e interação geográfica do globo.
 
 Uma página não deve importar CSS específico de outra página.
 
@@ -131,12 +147,12 @@ Base visual:
 
 A interface deve evitar excesso de efeitos. Logo e globo são os elementos visuais dominantes.
 
-## 7. Rotas futuras previstas, não implementadas por este contrato
+## 7. Rotas/áreas futuras previstas
 
+Ainda entram em etapas próprias:
 - catálogo completo;
 - produto individual;
 - contato/orçamento dedicado;
-- administração;
-- experiência fullscreen do globo.
+- administração.
 
-Essas rotas/experiências serão adicionadas em etapas próprias e não devem ser simuladas com páginas falsas.
+Essas áreas não devem ser simuladas com páginas falsas.

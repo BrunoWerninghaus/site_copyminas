@@ -109,21 +109,39 @@
             <p data-content-key="home.location.description">
                 Texto de localização a definir.
             </p>
+
+            <address class="location-address">
+                {{ copyminas_location.address }}
+            </address>
+
             <p class="location-note">
-                O ponto oficial e o link do Google Maps serão configurados quando a localização for fornecida.
+                No globo: mundo em prata, Brasil em vermelho, Minas em dourado e Elói Mendes em azul.
             </p>
         </div>
 
         <button
-            class="globe-slot"
+            class="globe-card"
             type="button"
-            disabled
-            data-globe-mount="home"
-            aria-label="Globo interativo em construção"
+            data-globe-open
+            aria-haspopup="dialog"
+            aria-controls="copyminas-globe-dialog"
+            aria-label="Abrir globo interativo em tela cheia"
         >
-            <span class="globe-slot__sphere" aria-hidden="true"></span>
-            <strong>Globo interativo</strong>
-            <small>Mundo · Brasil · Minas · Elói Mendes</small>
+            <span class="globe-card__fallback" aria-hidden="true"></span>
+
+            <span
+                class="globe-card__mount"
+                data-globe-mount="home-preview"
+                data-location-lat="{{ copyminas_location.latitude }}"
+                data-location-lon="{{ copyminas_location.longitude }}"
+                data-location-label="{{ copyminas_location.city }}"
+                aria-hidden="true"
+            ></span>
+
+            <span class="globe-card__caption">
+                <strong>Explorar localização</strong>
+                <small>Mundo · Brasil · Minas · Elói Mendes</small>
+            </span>
         </button>
     </section>
 
@@ -142,4 +160,72 @@
     <p>Copy Minas</p>
     <p>Conteúdo institucional em construção.</p>
 </footer>
+
+<dialog
+    class="globe-dialog"
+    id="copyminas-globe-dialog"
+    data-globe-dialog
+    aria-labelledby="globe-dialog-title"
+>
+    <div class="globe-dialog__shell">
+        <header class="globe-dialog__header">
+            <div>
+                <p class="section-kicker">Localização</p>
+                <h2 id="globe-dialog-title">Copy Minas · Elói Mendes</h2>
+            </div>
+
+            <button
+                class="globe-dialog__close"
+                type="button"
+                data-globe-close
+                aria-label="Fechar globo"
+            >
+                ×
+            </button>
+        </header>
+
+        <div class="globe-dialog__stage">
+            <div
+                class="globe-fullscreen"
+                data-globe-mount="fullscreen"
+                data-location-lat="{{ copyminas_location.latitude }}"
+                data-location-lon="{{ copyminas_location.longitude }}"
+                data-location-label="{{ copyminas_location.city }}"
+                data-maps-url="{{ copyminas_location.maps_url }}"
+                aria-label="Globo 3D interativo com Elói Mendes destacado em azul"
+            ></div>
+
+            <div class="globe-legend" aria-label="Legenda do globo">
+                <span><i class="legend-dot legend-dot--world"></i>Mundo</span>
+                <span><i class="legend-dot legend-dot--brazil"></i>Brasil</span>
+                <span><i class="legend-dot legend-dot--minas"></i>Minas Gerais</span>
+                <span><i class="legend-dot legend-dot--eloi"></i>Elói Mendes</span>
+            </div>
+
+            <p class="globe-dialog__help">
+                Arraste para girar · use a roda para aproximar · clique no ponto azul para abrir no Google Maps
+            </p>
+        </div>
+
+        <footer class="globe-dialog__footer">
+            <address>{{ copyminas_location.address }}</address>
+
+            <a
+                class="button button--primary"
+                href="{{ copyminas_location.maps_url }}"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Abrir no Google Maps
+            </a>
+        </footer>
+    </div>
+</dialog>
+{% endblock %}
+
+{% block page_scripts %}
+<script
+    type="module"
+    src="{{ url_for('static', filename='js/globe.js') }}"
+></script>
 {% endblock %}

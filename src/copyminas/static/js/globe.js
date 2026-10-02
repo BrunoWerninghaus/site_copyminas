@@ -11,6 +11,7 @@ const COLORS = {
     land: 0xdfe4e8,
     brazil: 0xf01d27,
     minas: 0xffd447,
+    eloi: 0x1595ff,
 };
 
 const MASK_COLORS = {
@@ -23,14 +24,23 @@ const CONFIG = {
     radius: 4.75,
     pointCount: 130000,
     pointSize: 0.027,
-    rotationSpeed: 0.00075,
+    rotationSpeed: 0.00072,
 };
 
-const mounts = document.querySelectorAll("[data-globe-mount]");
+const preparedData = prepareGlobeData();
 
-for (const mount of mounts) {
-    if (mount.dataset.globeMount === "intro") {
-        createIntroGlobe(mount).catch((error) => {
+const introMount = document.querySelector('[data-globe-mount="intro"]');
+const previewMount = document.querySelector('[data-globe-mount="home-preview"]');
+const fullscreenMount = document.querySelector('[data-globe-mount="fullscreen"]');
+
+if (introMount) {
+    preparedData
+        .then((data) => createGlobe(introMount, data, {
+            mode: "intro",
+            interactive: false,
+            autoRotate: true,
+        }))
+        .catch((error) => {
             console.error("Copy Minas globe:", error);
 
             const status = document.querySelector("[data-globe-status]");
@@ -38,22 +48,42 @@ for (const mount of mounts) {
                 status.textContent = "Globo indisponível";
             }
         });
-    }
 }
 
-async function createIntroGlobe(mount) {
+if (previewMount) {
+    preparedData
+        .then((data) => createGlobe(previewMount, data, {
+            mode: "preview",
+            interactive: false,
+            autoRotate: true,
+        }))
+        .then(() => {
+            previewMount.closest(".globe-card")?.classList.add("globe-card--ready");
+        })
+        .catch((error) => {
+            console.error("Copy Minas globe preview:", error);
+        });
+}
+
+setupFullscreenGlobe();
+
+async function prepareGlobeData() {
     const [world, minas] = await Promise.all([
         loadJSON(WORLD_URL),
         loadJSON(MINAS_URL),
     ]);
 
     const mask = createGeoMask(world, minas);
-    const points = buildPointSets(mask);
 
+    return buildPointSets(mask);
+}
+
+async function createGlobe(mount, points, options) {
+    const location = readLocation(mount);
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
 
-    camera.position.set(0, 0, 11.2);
+    camera.position.set(0, 0, options.mode === "fullscreen" ? 12.2 : 11.2);
 
     const renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -64,63 +94,33 @@ async function createIntroGlobe(mount) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.65));
     renderer.setClearColor(0x000000, 0);
 
-    mount.appendChild(renderer.domElement);
+    mount.replaceChildren(renderer.domElement);
 
     const earth = new THREE.Group();
     earth.rotation.z = THREE.MathUtils.degToRad(-23.4);
     scene.add(earth);
 
-    const oceanMaterial = new THREE.PointsMaterial({
-        color: COLORS.ocean,
-        size: CONFIG.pointSize * 0.62,
-        transparent: true,
-        opacity: 0.24,
-        depthWrite: false,
-    });
-
-    const landMaterial = new THREE.PointsMaterial({
-        color: COLORS.land,
-        size: CONFIG.pointSize,
-        transparent: true,
-        opacity: 0.94,
-    });
-
-    const brazilMaterial = new THREE.PointsMaterial({
-        color: COLORS.brazil,
-        size: CONFIG.pointSize * 1.38,
-        transparent: true,
-        opacity: 1,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-    });
-
-    const minasMaterial = new THREE.PointsMaterial({
-        color: COLORS.minas,
-        size: CONFIG.pointSize * 2.25,
-        transparent: true,
-        opacity: 1,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-    });
-
-    const minasGlowMaterial = new THREE.PointsMaterial({
-        color: COLORS.minas,
-        size: CONFIG.pointSize * 5.5,
-        transparent: true,
-        opacity: 0.18,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-    });
+    const materials = createMaterials();
 
     earth.add(
-        new THREE.Points(createGeometry(points.ocean), oceanMaterial),
-        new THREE.Points(createGeometry(points.land), landMaterial),
-        new THREE.Points(createGeometry(points.brazil), brazilMaterial),
-        new THREE.Points(createGeometry(points.minas), minasMaterial),
-        new THREE.Points(createGeometry(points.minas), minasGlowMaterial),
+        new THREE.Points(createGeometry(points.ocean), materials.ocean),
+        new THREE.Points(createGeometry(points.land), materials.land),
+        new THREE.Points(createGeometry(points.brazil), materials.brazil),
+        new THREE.Points(createGeometry(points.minas), materials.minas),
+        new THREE.Points(createGeometry(points.minas), materials.minasGlow),
     );
 
+    const marker = createLocationMarker(location);
+    earth.add(marker.group);
+
+    const pinLabel = createPinLabel(mount, location.label);
     const clock = new THREE.Clock();
+
+    let dragging = false;
+    let dragged = false;
+    let previousX = 0;
+    let previousY = 0;
+    let active = true;
 
     const resize = () => {
         const width = Math.max(mount.clientWidth, 1);
@@ -130,39 +130,348 @@ async function createIntroGlobe(mount) {
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
 
-        if (window.matchMedia("(max-width: 820px)").matches) {
-            earth.position.x = 0;
-            earth.position.y = 1.45;
-            camera.position.z = 11.7;
+        if (options.mode === "intro") {
+            if (window.matchMedia("(max-width: 820px)").matches) {
+                earth.position.x = 0;
+                earth.position.y = 1.4;
+                camera.position.z = 11.7;
+            } else {
+                earth.position.x = -2.25;
+                earth.position.y = 0;
+                camera.position.z = 10.8;
+            }
         } else {
-            earth.position.x = -2.25;
-            earth.position.y = 0;
-            camera.position.z = 10.8;
+            earth.position.set(0, 0, 0);
         }
     };
 
     resize();
     window.addEventListener("resize", resize, { passive: true });
 
-    const host = mount.closest(".intro-globe");
-    if (host) {
-        host.classList.add("intro-globe--ready");
+    if (options.interactive) {
+        const raycaster = new THREE.Raycaster();
+        const pointer = new THREE.Vector2();
+
+        const markerHit = (event) => {
+            setRayFromPointer(event, renderer.domElement, camera, raycaster, pointer);
+            return raycaster.intersectObject(marker.core, false).length > 0;
+        };
+
+        const updatePinCursor = (event) => {
+            renderer.domElement.style.cursor = markerHit(event) ? "pointer" : "grab";
+        };
+
+        renderer.domElement.addEventListener("pointerdown", (event) => {
+            dragging = true;
+            dragged = false;
+            previousX = event.clientX;
+            previousY = event.clientY;
+            renderer.domElement.setPointerCapture(event.pointerId);
+        });
+
+        renderer.domElement.addEventListener("pointermove", (event) => {
+            if (!dragging) {
+                updatePinCursor(event);
+                return;
+            }
+
+            const deltaX = event.clientX - previousX;
+            const deltaY = event.clientY - previousY;
+
+            if (Math.abs(deltaX) + Math.abs(deltaY) > 2) {
+                dragged = true;
+            }
+
+            earth.rotation.y += deltaX * 0.006;
+            earth.rotation.x = THREE.MathUtils.clamp(
+                earth.rotation.x + deltaY * 0.004,
+                -0.75,
+                0.75,
+            );
+
+            previousX = event.clientX;
+            previousY = event.clientY;
+        });
+
+        renderer.domElement.addEventListener("pointerup", (event) => {
+            dragging = false;
+
+            if (!dragged && markerHit(event)) {
+                openMaps(location.mapsUrl);
+            }
+        });
+
+        renderer.domElement.addEventListener(
+            "wheel",
+            (event) => {
+                event.preventDefault();
+                camera.position.z = THREE.MathUtils.clamp(
+                    camera.position.z + event.deltaY * 0.008,
+                    7.2,
+                    18,
+                );
+            },
+            { passive: false },
+        );
     }
 
-    const animate = () => {
-        const elapsed = clock.getElapsedTime();
-        const pulse = (Math.sin(elapsed * 2.3) + 1) / 2;
+    if (options.mode === "intro") {
+        mount.closest(".intro-globe")?.classList.add("intro-globe--ready");
+    }
 
-        earth.rotation.y += CONFIG.rotationSpeed;
-        minasMaterial.size = CONFIG.pointSize * (2.05 + pulse * 0.45);
-        minasGlowMaterial.size = CONFIG.pointSize * (4.7 + pulse * 2.0);
-        minasGlowMaterial.opacity = 0.10 + pulse * 0.20;
+    const stop = () => {
+        active = false;
+    };
+
+    const start = () => {
+        if (active) {
+            return;
+        }
+
+        active = true;
+        animate();
+    };
+
+    const animate = () => {
+        if (!active) {
+            return;
+        }
+
+        const elapsed = clock.getElapsedTime();
+        const pulse = (Math.sin(elapsed * 2.4) + 1) / 2;
+
+        if (options.autoRotate && !dragging) {
+            earth.rotation.y += CONFIG.rotationSpeed;
+        }
+
+        materials.minas.size = CONFIG.pointSize * (2.05 + pulse * 0.45);
+        materials.minasGlow.size = CONFIG.pointSize * (4.7 + pulse * 2.0);
+        materials.minasGlow.opacity = 0.10 + pulse * 0.20;
+
+        marker.core.scale.setScalar(0.92 + pulse * 0.16);
+        marker.glow.scale.setScalar(0.82 + pulse * 0.55);
+        marker.glow.material.opacity = 0.16 + pulse * 0.30;
 
         renderer.render(scene, camera);
+        updatePinLabel(pinLabel, marker.core, earth, camera, renderer);
+
         requestAnimationFrame(animate);
     };
 
     animate();
+
+    return {
+        resize,
+        start,
+        stop,
+    };
+}
+
+function setupFullscreenGlobe() {
+    const dialog = document.querySelector("[data-globe-dialog]");
+    const openButton = document.querySelector("[data-globe-open]");
+    const closeButton = document.querySelector("[data-globe-close]");
+
+    if (!dialog || !openButton || !closeButton || !fullscreenMount) {
+        return;
+    }
+
+    let globeController = null;
+    let creating = null;
+
+    const ensureGlobe = () => {
+        if (globeController) {
+            globeController.start();
+            globeController.resize();
+            return Promise.resolve(globeController);
+        }
+
+        if (!creating) {
+            creating = preparedData
+                .then((data) => createGlobe(fullscreenMount, data, {
+                    mode: "fullscreen",
+                    interactive: true,
+                    autoRotate: true,
+                }))
+                .then((controller) => {
+                    globeController = controller;
+                    requestAnimationFrame(controller.resize);
+                    return controller;
+                });
+        }
+
+        return creating;
+    };
+
+    openButton.addEventListener("click", () => {
+        dialog.showModal();
+        document.documentElement.classList.add("globe-dialog-open");
+        ensureGlobe().catch((error) => {
+            console.error("Copy Minas fullscreen globe:", error);
+        });
+    });
+
+    closeButton.addEventListener("click", () => {
+        dialog.close();
+    });
+
+    dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) {
+            dialog.close();
+        }
+    });
+
+    dialog.addEventListener("close", () => {
+        document.documentElement.classList.remove("globe-dialog-open");
+        globeController?.stop();
+    });
+}
+
+function createMaterials() {
+    return {
+        ocean: new THREE.PointsMaterial({
+            color: COLORS.ocean,
+            size: CONFIG.pointSize * 0.62,
+            transparent: true,
+            opacity: 0.24,
+            depthWrite: false,
+        }),
+        land: new THREE.PointsMaterial({
+            color: COLORS.land,
+            size: CONFIG.pointSize,
+            transparent: true,
+            opacity: 0.94,
+        }),
+        brazil: new THREE.PointsMaterial({
+            color: COLORS.brazil,
+            size: CONFIG.pointSize * 1.38,
+            transparent: true,
+            opacity: 1,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+        }),
+        minas: new THREE.PointsMaterial({
+            color: COLORS.minas,
+            size: CONFIG.pointSize * 2.25,
+            transparent: true,
+            opacity: 1,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+        }),
+        minasGlow: new THREE.PointsMaterial({
+            color: COLORS.minas,
+            size: CONFIG.pointSize * 5.5,
+            transparent: true,
+            opacity: 0.18,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+        }),
+    };
+}
+
+function createLocationMarker(location) {
+    const group = new THREE.Group();
+    const position = latLonToXYZ(
+        location.lat,
+        location.lon,
+        CONFIG.radius + 0.16,
+    );
+
+    group.position.copy(position);
+
+    const core = new THREE.Mesh(
+        new THREE.SphereGeometry(0.105, 20, 20),
+        new THREE.MeshBasicMaterial({
+            color: COLORS.eloi,
+        }),
+    );
+
+    const glow = new THREE.Mesh(
+        new THREE.SphereGeometry(0.23, 20, 20),
+        new THREE.MeshBasicMaterial({
+            color: COLORS.eloi,
+            transparent: true,
+            opacity: 0.30,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+        }),
+    );
+
+    group.add(glow, core);
+
+    return {
+        group,
+        core,
+        glow,
+    };
+}
+
+function createPinLabel(mount, label) {
+    if (!label || mount.dataset.globeMount === "intro") {
+        return null;
+    }
+
+    const node = document.createElement("span");
+    node.className = "globe-pin-label";
+    node.textContent = label;
+    mount.appendChild(node);
+
+    return node;
+}
+
+function updatePinLabel(label, pin, earth, camera, renderer) {
+    if (!label) {
+        return;
+    }
+
+    const pinPosition = new THREE.Vector3();
+    const earthCenter = new THREE.Vector3();
+
+    pin.getWorldPosition(pinPosition);
+    earth.getWorldPosition(earthCenter);
+
+    const normal = pinPosition.clone().sub(earthCenter).normalize();
+    const towardCamera = camera.position.clone().sub(pinPosition).normalize();
+    const visible = normal.dot(towardCamera) > 0.08;
+
+    if (!visible) {
+        label.hidden = true;
+        return;
+    }
+
+    label.hidden = false;
+
+    const projected = pinPosition.clone().project(camera);
+    const rect = renderer.domElement.getBoundingClientRect();
+
+    label.style.left = ((projected.x * 0.5 + 0.5) * rect.width) + "px";
+    label.style.top = ((-projected.y * 0.5 + 0.5) * rect.height) + "px";
+}
+
+function setRayFromPointer(event, canvas, camera, raycaster, pointer) {
+    const rect = canvas.getBoundingClientRect();
+
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(pointer, camera);
+}
+
+function openMaps(url) {
+    if (!url) {
+        return;
+    }
+
+    window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function readLocation(mount) {
+    return {
+        lat: Number.parseFloat(mount.dataset.locationLat),
+        lon: Number.parseFloat(mount.dataset.locationLon),
+        label: mount.dataset.locationLabel || "Elói Mendes",
+        mapsUrl: mount.dataset.mapsUrl || "",
+    };
 }
 
 async function loadJSON(url) {
@@ -173,7 +482,7 @@ async function loadJSON(url) {
     });
 
     if (!response.ok) {
-        throw new Error(`Falha ao carregar dados geográficos: ${response.status}`);
+        throw new Error("Falha ao carregar dados geográficos: " + response.status);
     }
 
     return response.json();
@@ -373,6 +682,18 @@ function xyzToLatLon(x, y, z) {
     const lon = -Math.atan2(z, x) * 180 / Math.PI;
 
     return { lat, lon };
+}
+
+function latLonToXYZ(lat, lon, radius) {
+    const latRadians = THREE.MathUtils.degToRad(lat);
+    const lonRadians = THREE.MathUtils.degToRad(lon);
+    const horizontalRadius = Math.cos(latRadians);
+
+    return new THREE.Vector3(
+        Math.cos(lonRadians) * horizontalRadius * radius,
+        Math.sin(latRadians) * radius,
+        -Math.sin(lonRadians) * horizontalRadius * radius,
+    );
 }
 
 function createGeometry(positions) {
