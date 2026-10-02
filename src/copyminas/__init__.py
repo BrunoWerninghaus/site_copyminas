@@ -11,6 +11,14 @@ def create_app() -> Flask:
         "copyminas-dev-only-change-me",
     )
 
+    app.config.update(
+        DB_HOST=os.getenv("DB_HOST", "127.0.0.1"),
+        DB_PORT=int(os.getenv("DB_PORT", "3306")),
+        DB_NAME=os.getenv("DB_NAME", "main_bd"),
+        DB_USER=os.getenv("DB_USER", ""),
+        DB_PASSWORD=os.getenv("DB_PASSWORD", ""),
+    )
+
     from .routes.public import public_bp
 
     app.register_blueprint(public_bp)
