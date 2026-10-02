@@ -1,9 +1,26 @@
 import os
 
+from dotenv import load_dotenv
 from flask import Flask
 
 
+def _env(primary, legacy, default=""):
+    value = os.getenv(primary)
+    if value is not None:
+        return value
+
+    legacy_value = os.getenv(legacy)
+    if legacy_value is not None:
+        return legacy_value
+
+    return default
+
+
 def create_app() -> Flask:
+    # Site 2 already used a local .env for main_bd. Keep that contract
+    # compatible while allowing the shorter DB_* names in Site 3.
+    load_dotenv(".env")
+
     app = Flask(__name__)
 
     app.config["SECRET_KEY"] = os.getenv(
@@ -12,11 +29,11 @@ def create_app() -> Flask:
     )
 
     app.config.update(
-        DB_HOST=os.getenv("DB_HOST", "127.0.0.1"),
-        DB_PORT=int(os.getenv("DB_PORT", "3306")),
-        DB_NAME=os.getenv("DB_NAME", "main_bd"),
-        DB_USER=os.getenv("DB_USER", ""),
-        DB_PASSWORD=os.getenv("DB_PASSWORD", ""),
+        DB_HOST=_env("DB_HOST", "DATABASE_HOST", "127.0.0.1"),
+        DB_PORT=int(_env("DB_PORT", "DATABASE_PORT", "3306")),
+        DB_NAME=_env("DB_NAME", "DATABASE_NAME", "main_bd"),
+        DB_USER=_env("DB_USER", "DATABASE_USER", "root"),
+        DB_PASSWORD=_env("DB_PASSWORD", "DATABASE_PASSWORD", ""),
     )
 
     from .routes.public import public_bp
