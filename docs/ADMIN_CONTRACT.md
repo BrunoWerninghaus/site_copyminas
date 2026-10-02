@@ -33,6 +33,10 @@ Regras:
 - `GET|POST /admin/produtos/novo` — criação;
 - `GET|POST /admin/produtos/<id>` — edição;
 - `POST /admin/produtos/<id>/status` — ativação/desativação;
+- `GET /admin/categorias` — listagem de categorias;
+- `GET|POST /admin/categorias/nova` — criação de categoria;
+- `GET|POST /admin/categorias/<id>` — edição de categoria;
+- `POST /admin/categorias/<id>/status` — ativação/desativação de categoria;
 - `POST /admin/logout` — encerra a sessão.
 
 ## Produtos
@@ -48,7 +52,14 @@ Campos administrados:
 - `categoria_id`;
 - `qtd`.
 
-Categorias são lidas da tabela `categorias`.
+Categorias são lidas e administradas na tabela existente `categorias`.
+
+O painel também:
+- sinaliza nomes equivalentes como possíveis duplicidades sem alterar ou excluir registros automaticamente;
+- mostra miniatura quando `imagem1` aponta para um asset existente;
+- oferece link direto para a ficha pública quando o produto está publicável;
+- permite upload de PNG, JPG/JPEG e WEBP para `static/images/products`;
+- mantém caminhos manuais de `imagem1` a `imagem5` compatíveis com o banco existente.
 
 ### Regras de segurança de dados
 
@@ -69,7 +80,16 @@ Somente produtos ativos associados a categorias ativas são publicados.
 
 O painel administrativo lista também produtos inativos para permitir recuperação e reativação.
 
-Alterar um caminho de imagem no banco não faz upload do arquivo. O catálogo público só exibe uma imagem quando o arquivo indicado existe no diretório estático.
+O catálogo público só exibe uma imagem quando o arquivo indicado existe no diretório estático.
+
+O administrador pode informar o caminho manualmente ou enviar um arquivo. Uploads:
+- aceitam PNG, JPG/JPEG e WEBP;
+- usam nome sanitizado e sufixo aleatório para evitar colisões;
+- permanecem dentro de `static/images/products`;
+- não apagam automaticamente o arquivo anterior ao substituir um slot;
+- respeitam o limite total configurado por `ADMIN_UPLOAD_MAX_MB` (25 MB por padrão).
+
+Caminhos que tentem escapar de `static` são rejeitados.
 
 O campo `qtd` continua administrativo e não é exibido como estoque público.
 
@@ -80,14 +100,17 @@ Disponível:
 - dashboard;
 - listagem de produtos;
 - busca e filtro por status;
-- criação de produto;
-- edição de produto;
+- criação e edição de produto;
 - ativação/desativação;
-- visualização do catálogo público em nova aba.
+- miniaturas e preview da ficha pública;
+- aviso de possível duplicidade;
+- upload de imagens;
+- criação e edição de categorias;
+- ativação/desativação de categorias;
+- contagem de produtos vinculados por categoria.
 
 Fora do escopo desta etapa:
 - delete físico;
-- upload de arquivos;
-- gerenciamento de categorias;
+- limpeza automática de arquivos de imagem órfãos;
 - gerenciamento administrativo de contatos;
 - múltiplos usuários administrativos ou permissões por papel.
