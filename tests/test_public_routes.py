@@ -96,6 +96,22 @@ class PublicRoutesTestCase(unittest.TestCase):
             "Brother DCP-8157DN",
         )
 
+    def test_public_pages_do_not_expose_migration_or_storage_language(self):
+        for path in ("/home", "/produtos", "/produtos/brother-dcp-8157dn", "/empresa", "/contato"):
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                for forbidden in (
+                    b"Site 2",
+                    b"Site 3",
+                    b"main_bd",
+                    b"main_bd.contatos",
+                    b"Asset original:",
+                    b"Origem do registro:",
+                    b"STATUS INICIAL",
+                ):
+                    self.assertNotIn(forbidden, response.data)
+
     def test_company(self):
         self.assert_page("/empresa", "Desde 2011 em Elói Mendes")
 
