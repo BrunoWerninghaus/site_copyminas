@@ -24,6 +24,22 @@
     --page-x: clamp(1.25rem, 5vw, 5.5rem);
     --section-y: clamp(5rem, 10vw, 9rem);
     --content-width: 1480px;
+
+    --font-mono:
+        "Courier New",
+        Courier,
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+    --font-display:
+        "Segoe UI",
+        Arial,
+        Helvetica,
+        sans-serif;
+
     --radius-sm: 0;
     --radius-md: 0;
     --radius-lg: 0;
@@ -39,15 +55,7 @@ html {
     min-width: 320px;
     background: var(--bg);
     color: var(--text);
-    font-family:
-        "Courier New",
-        Courier,
-        ui-monospace,
-        SFMono-Regular,
-        Menlo,
-        Monaco,
-        Consolas,
-        monospace;
+    font-family: var(--font-mono);
     scroll-behavior: smooth;
 }
 
@@ -125,8 +133,11 @@ a {
     justify-content: center;
     padding: 0.8rem 1.15rem;
     border: 1px solid transparent;
+    max-width: 100%;
     border-radius: 0;
     font-weight: 750;
+    overflow-wrap: anywhere;
+    text-align: center;
     text-decoration: none;
 }
 
