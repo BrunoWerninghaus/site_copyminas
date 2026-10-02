@@ -41,12 +41,24 @@
             </label>
 
             <div class="catalog-filter-group" aria-label="Filtrar por categoria">
-                <button type="button" class="catalog-filter is-active" data-category-filter="all" aria-pressed="true">
+                <button
+                    type="button"
+                    class="catalog-filter is-active"
+                    data-category-filter="all"
+                    data-category-label="Todos"
+                    aria-pressed="true"
+                >
                     Todos / {{ products|length }}
                 </button>
                 {% for category in categories %}
                     {% set category_products = products | selectattr("category_id", "equalto", category.id) | list %}
-                    <button type="button" class="catalog-filter" data-category-filter="{{ category.id }}" aria-pressed="false">
+                    <button
+                        type="button"
+                        class="catalog-filter"
+                        data-category-filter="{{ category.id }}"
+                        data-category-label="{{ category.name }}"
+                        aria-pressed="false"
+                    >
                         {{ category.name }} / {{ category_products|length }}
                     </button>
                 {% endfor %}
@@ -72,7 +84,9 @@
                             <span class="paper-card__code">Categoria / {{ "%02d"|format(loop.index) }}</span>
                             <h2 id="categoria-{{ category.id }}-titulo">{{ category.name }}</h2>
                         </div>
-                        <span class="catalog-category__count">{{ category_products|length }} produto{% if category_products|length != 1 %}s{% endif %}</span>
+                        <span class="catalog-category__count" data-category-count>
+                            {{ category_products|length }} produto{% if category_products|length != 1 %}s{% endif %}
+                        </span>
                     </header>
 
                     <div class="paper-grid">
