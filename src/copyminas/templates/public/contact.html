@@ -94,7 +94,7 @@
                 <div class="contact-form__grid">
                     <label>
                         <span>Nome *</span>
-                        <input type="text" name="name" value="{{ form_data.get('name', '') }}" maxlength="120" autocomplete="name" required>
+                        <input type="text" name="name" value="{{ form_data.get('name', '') }}" minlength="2" maxlength="120" autocomplete="name" required>
                     </label>
 
                     <label>
@@ -109,12 +109,12 @@
 
                     <label>
                         <span>Telefone / WhatsApp *</span>
-                        <input type="tel" name="phone" value="{{ form_data.get('phone', '') }}" maxlength="20" autocomplete="tel" required>
+                        <input type="tel" name="phone" value="{{ form_data.get('phone', '') }}" minlength="8" maxlength="20" autocomplete="tel" inputmode="tel" required>
                     </label>
 
                     <label>
                         <span>Cidade *</span>
-                        <input type="text" name="city" value="{{ form_data.get('city', '') }}" maxlength="120" autocomplete="address-level2" required>
+                        <input type="text" name="city" value="{{ form_data.get('city', '') }}" minlength="2" maxlength="120" autocomplete="address-level2" required>
                     </label>
 
                     <label>
@@ -144,7 +144,7 @@
 
                 <label class="contact-form__message">
                     <span>Mensagem *</span>
-                    <textarea name="message" rows="8" maxlength="5000" required>{{ form_data.get('message', '') }}</textarea>
+                    <textarea name="message" rows="8" minlength="8" maxlength="5000" required>{{ form_data.get('message', '') }}</textarea>
                 </label>
 
                 <label class="contact-consent">
