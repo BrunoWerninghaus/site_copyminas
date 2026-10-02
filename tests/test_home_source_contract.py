@@ -72,5 +72,36 @@ class HomeSourceContractTestCase(unittest.TestCase):
         )
 
 
+    def test_home_uses_container_driven_display_type(self):
+        source = HOME_CSS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            source,
+            r"\.paper-panel--hero\s*\{[^}]*container-type:\s*inline-size",
+        )
+        self.assertRegex(
+            source,
+            r"\.paper-panel--hero h1\s*\{[^}]*font-size:[^;}]*cqi",
+        )
+        self.assertRegex(
+            source,
+            r"\.location-copy\s*\{[^}]*container-type:\s*inline-size",
+        )
+
+    def test_home_never_masks_horizontal_overflow(self):
+        source = HOME_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
+
+        self.assertNotIn("overflow-x:hidden", source)
+        self.assertNotIn("overflow-x:clip", source)
+
+    def test_navigation_items_wrap_as_items_not_inside_words(self):
+        source = HOME_CSS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            source,
+            r"\.site-nav a,[\s\S]{0,180}?white-space:\s*nowrap",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
