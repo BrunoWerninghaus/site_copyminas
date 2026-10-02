@@ -13,7 +13,7 @@
 {% include "public/_paper_header.html" %}
 
 <main id="main-content" class="paper-stage">
-    <section class="paper-sheet" data-sheet="CATÁLOGO / 03">
+    <section class="paper-sheet" data-sheet="CATÁLOGO / 03" id="catalogo">
         <p class="paper-kicker">Produtos / catálogo</p>
         <h1 class="paper-title">Catálogo Copy Minas</h1>
         <p class="paper-lead">
@@ -23,34 +23,46 @@
         <nav class="paper-index" aria-label="Categorias disponíveis">
             <a href="#catalogo">Todos / {{ products|length }}</a>
             {% for category in categories %}
-            <a href="#categoria-{{ category.id }}">{{ category.name }}</a>
+                {% set category_products = products | selectattr("category_id", "equalto", category.id) | list %}
+                <a href="#categoria-{{ category.id }}">{{ category.name }} / {{ category_products|length }}</a>
             {% endfor %}
         </nav>
 
-        <div class="paper-grid" id="catalogo">
-            {% for product in products %}
-            <article class="paper-card product-card" id="produto-{{ product.id }}" data-category="{{ product.category_id }}">
-                <a class="product-card__media" href="{{ url_for('public.product_detail', slug=product.slug) }}" aria-label="Abrir {{ product.name }}">
-                    {% if product.image_url %}
-                    <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}">
-                    {% else %}
-                    <span>IMAGEM EM ATUALIZAÇÃO</span>
-                    {% endif %}
-                </a>
-
-                <div class="product-card__body">
-                    <span class="paper-card__code">{{ product.category }}</span>
-                    <h2>{{ product.name }}</h2>
-                    <p>{{ product.summary }}</p>
-                    <a class="paper-link" href="{{ url_for('public.product_detail', slug=product.slug) }}">Abrir ficha →</a>
-                </div>
-            </article>
-            {% endfor %}
-        </div>
-
-        <div class="paper-category-register" aria-label="Índice de categorias">
+        <div class="catalog-sections">
             {% for category in categories %}
-            <span id="categoria-{{ category.id }}">{{ category.name }}</span>
+                {% set category_products = products | selectattr("category_id", "equalto", category.id) | list %}
+                {% if category_products %}
+                <section class="catalog-category" id="categoria-{{ category.id }}" aria-labelledby="categoria-{{ category.id }}-titulo">
+                    <header class="catalog-category__header">
+                        <div>
+                            <span class="paper-card__code">Categoria / {{ "%02d"|format(loop.index) }}</span>
+                            <h2 id="categoria-{{ category.id }}-titulo">{{ category.name }}</h2>
+                        </div>
+                        <span class="catalog-category__count">{{ category_products|length }} produto{% if category_products|length != 1 %}s{% endif %}</span>
+                    </header>
+
+                    <div class="paper-grid">
+                        {% for product in category_products %}
+                        <article class="paper-card product-card" id="produto-{{ product.id }}" data-category="{{ product.category_id }}">
+                            <a class="product-card__media" href="{{ url_for('public.product_detail', slug=product.slug) }}" aria-label="Abrir {{ product.name }}">
+                                {% if product.image_url %}
+                                <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}">
+                                {% else %}
+                                <span>IMAGEM EM ATUALIZAÇÃO</span>
+                                {% endif %}
+                            </a>
+
+                            <div class="product-card__body">
+                                <span class="paper-card__code">{{ product.category }}</span>
+                                <h3>{{ product.name }}</h3>
+                                <p>{{ product.summary }}</p>
+                                <a class="paper-link" href="{{ url_for('public.product_detail', slug=product.slug) }}">Abrir ficha →</a>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
             {% endfor %}
         </div>
     </section>
