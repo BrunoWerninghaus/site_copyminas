@@ -240,3 +240,20 @@ Formulário:
 - falha de conexão/persistência não deve fingir sucesso: a página retorna erro e preserva os canais diretos;
 - credenciais MySQL nunca são versionadas; conexão vem de `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` e `DB_PASSWORD`;
 - o catálogo continua temporariamente consumindo a fixture versionada do Site 2 até a migração controlada de Catalog/Admin para a persistência oficial.
+
+
+### Notificação interna de novo contato
+
+Após o INSERT bem-sucedido em `main_bd.contatos`, o Site 3 deve tentar enviar uma notificação interna por e-mail.
+
+Contrato:
+- remetente padrão: `ti.processos@copymina.com.br`;
+- destinatário padrão: `ti.processos@copymina.com.br`;
+- o assunto inclui o protocolo e o tipo de serviço;
+- o corpo inclui todos os campos relevantes do lead;
+- `Reply-To` usa o e-mail informado pelo cliente;
+- credenciais SMTP não são versionadas;
+- host, porta, modo de segurança, usuário e senha vêm do ambiente;
+- falha SMTP não desfaz nem invalida um lead já persistido em `main_bd`;
+- falha SMTP deve ser registrada no log da aplicação;
+- o banco continua sendo a autoridade do contato; o e-mail é apenas notificação operacional.
