@@ -12,7 +12,7 @@ from src.copyminas.db import DatabaseUnavailable
 from src.copyminas.location import COPY_MINAS_LOCATION
 from src.copyminas.notifications import (
     ContactNotificationError,
-    send_contact_notification,
+    send_contact_notifications,
 )
 
 
@@ -213,17 +213,25 @@ def contact_submit():
     current_app.config["CONTACT_SERVICE_LABELS"] = service_labels
     current_app.config["CONTACT_PREFERENCE_LABELS"] = preference_labels
 
+    confirmation_sent = True
     try:
-        send_contact_notification(protocol, form_data)
+        send_contact_notifications(protocol, form_data)
     except ContactNotificationError as exc:
+        confirmation_sent = False
         current_app.logger.error(
             "Contact %s persisted, but email notification failed: %s",
             protocol,
             exc,
         )
 
-    flash(
-        f"Solicitação registrada no main_bd. Protocolo: {protocol}",
-        "contact-success",
-    )
+    if confirmation_sent:
+        flash(
+            "Solicitação recebida. Enviamos uma confirmação para o e-mail informado.",
+            "contact-success",
+        )
+    else:
+        flash(
+            "Solicitação recebida. Não foi possível enviar a confirmação por e-mail neste momento.",
+            "contact-warning",
+        )
     return redirect(url_for("public.contact"), code=303)
