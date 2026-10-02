@@ -363,7 +363,7 @@
     padding: 1.35rem;
 }
 
-.product-card__body h2 {
+.product-card__body h3 {
     font-size: 1.05rem;
     line-height: 1.35;
 }
@@ -664,7 +664,7 @@
     padding: 1.2rem 1.25rem 1.3rem;
 }
 
-.page-products .product-card__body h2 {
+.page-products .product-card__body h3 {
     min-height: 3.9em;
     margin: .65rem 0 .8rem;
     font-size: 1rem;
@@ -854,7 +854,7 @@
         min-height: 0;
     }
 
-    .page-products .product-card__body h2 {
+    .page-products .product-card__body h3 {
         min-height: 0;
     }
 
@@ -864,5 +864,74 @@
 
     .page-product-detail .spec-sheet dl > div {
         grid-template-columns: 1fr;
+    }
+}
+
+
+/* Catalog category grouping */
+.catalog-sections {
+    display: grid;
+    gap: clamp(3rem, 6vw, 5.5rem);
+    margin-top: clamp(3rem, 6vw, 5rem);
+}
+
+.catalog-category {
+    scroll-margin-top: 7rem;
+}
+
+.catalog-category__header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    padding: 0 0 1rem;
+    border-bottom: 2px solid var(--paper-ink);
+}
+
+.catalog-category__header > div {
+    min-width: 0;
+}
+
+.catalog-category__header h2 {
+    margin: .45rem 0 0;
+    font-size: clamp(1.7rem, 3vw, 2.7rem);
+    line-height: 1;
+    letter-spacing: -.035em;
+    text-transform: uppercase;
+    text-wrap: balance;
+}
+
+.catalog-category__count {
+    flex: 0 0 auto;
+    color: var(--paper-muted);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.page-products .catalog-category .paper-grid {
+    margin-top: 0;
+}
+
+.page-products .catalog-category .product-card__body h3 {
+    min-height: 3.9em;
+    margin: .65rem 0 .8rem;
+    font-size: 1rem;
+    line-height: 1.3;
+    text-wrap: balance;
+}
+
+@media (max-width: 660px) {
+    .catalog-category__header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: .65rem;
+    }
+
+    .catalog-category__count {
+        padding-top: .25rem;
+        border-top: 1px solid var(--paper-line);
     }
 }
