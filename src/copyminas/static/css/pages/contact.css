@@ -311,10 +311,6 @@
     text-transform: uppercase;
 }
 
-.contact-directory .contact-source-note {
-    border-color: var(--line);
-    color: #9ba6ae;
-}
 
 @media (max-width: 980px) {
     .contact-layout {
