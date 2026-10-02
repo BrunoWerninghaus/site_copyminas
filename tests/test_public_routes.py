@@ -8,7 +8,7 @@ from src.copyminas import create_app
 class PublicRoutesTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
-        self.app.config.update(TESTING=True)
+        self.app.config.update(TESTING=True, CATALOG_SOURCE="fixture")
         self.client = self.app.test_client()
 
     def assert_page(self, path, expected_text):
