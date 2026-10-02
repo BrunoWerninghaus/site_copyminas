@@ -36,15 +36,40 @@
             </div>
         </article>
 
-        <aside class="registry-card" aria-label="Ficha institucional resumida">
-            <span class="registry-card__code">FICHA / COPY MINAS</span>
-            <dl>
-                <div><dt>Base</dt><dd>Elói Mendes / MG</dd></div>
-                <div><dt>Desde</dt><dd>2011</dd></div>
-                <div><dt>Status</dt><dd>Ativa</dd></div>
-                <div><dt>Catálogo</dt><dd>Produtos e equipamentos</dd></div>
-            </dl>
-            <a href="{{ url_for('public.company') }}">Abrir ficha da empresa →</a>
+        <aside class="service-matrix" aria-label="Matriz de atendimento da Copy Minas">
+            <span class="service-matrix__code">ATENDIMENTO / MATRIZ</span>
+
+            <div class="service-matrix__table" role="table" aria-label="Venda, aluguel e manutenção por tipo de equipamento">
+                <div class="service-matrix__row service-matrix__row--head" role="row">
+                    <span role="columnheader">Equipamento</span>
+                    <span role="columnheader">Venda</span>
+                    <span role="columnheader">Aluguel</span>
+                    <span role="columnheader">Manutenção</span>
+                </div>
+
+                <div class="service-matrix__row" role="row">
+                    <strong role="rowheader">Impressoras</strong>
+                    <span class="service-status service-status--yes" role="cell" aria-label="Venda disponível">✓</span>
+                    <span class="service-status service-status--yes" role="cell" aria-label="Aluguel disponível">✓</span>
+                    <span class="service-status service-status--yes" role="cell" aria-label="Manutenção disponível">✓</span>
+                </div>
+
+                <div class="service-matrix__row" role="row">
+                    <strong role="rowheader">Computadores</strong>
+                    <span class="service-status service-status--yes" role="cell" aria-label="Venda disponível">✓</span>
+                    <span class="service-status service-status--yes" role="cell" aria-label="Aluguel disponível">✓</span>
+                    <span class="service-status service-status--yes" role="cell" aria-label="Manutenção disponível">✓</span>
+                </div>
+
+                <div class="service-matrix__row" role="row">
+                    <strong role="rowheader">iPhones</strong>
+                    <span class="service-status service-status--yes" role="cell" aria-label="Venda disponível">✓</span>
+                    <span class="service-status service-status--no" role="cell" aria-label="Aluguel não disponível">×</span>
+                    <span class="service-status service-status--yes" role="cell" aria-label="Manutenção disponível">✓</span>
+                </div>
+            </div>
+
+            <a href="{{ url_for('public.solutions') }}">Ver áreas de atendimento →</a>
         </aside>
     </section>
 
