@@ -390,3 +390,28 @@
         position: static;
     }
 }
+
+
+.contact-product-context {
+    display: grid;
+    gap: .35rem;
+    margin-top: 1.5rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--paper-line);
+    border-left: 3px solid var(--red);
+    background: rgba(168,15,22,.045);
+}
+
+.contact-product-context span,
+.contact-product-context small {
+    color: var(--paper-muted);
+    font-size: .66rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.contact-product-context strong {
+    line-height: 1.45;
+    text-transform: uppercase;
+}
