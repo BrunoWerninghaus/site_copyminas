@@ -183,6 +183,14 @@ def _possible_duplicates(name, exclude_id=None):
     ]
 
 
+def _safe_possible_duplicates(name, exclude_id=None):
+    try:
+        return _possible_duplicates(name, exclude_id=exclude_id)
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        current_app.logger.warning("Duplicate check unavailable: %s", exc)
+        return []
+
+
 def _image_previews(data):
     previews = {}
     for index in range(1, 6):
@@ -443,7 +451,7 @@ def product_new():
         if not errors:
             try:
                 saved_uploads = _apply_product_uploads(form_data)
-                duplicates = _possible_duplicates(form_data["nome"])
+                duplicates = _safe_possible_duplicates(form_data["nome"])
                 product_id = create_product(form_data)
             except (DatabaseUnavailable, AdminCatalogError, AdminAssetError) as exc:
                 cleanup_new_uploads(saved_uploads)
@@ -511,10 +519,7 @@ def product_edit(product_id):
     errors = []
     duplicates = []
 
-    try:
-        duplicates = _possible_duplicates(form_data["nome"], exclude_id=product_id)
-    except (DatabaseUnavailable, AdminCatalogError):
-        duplicates = []
+    duplicates = _safe_possible_duplicates(form_data["nome"], exclude_id=product_id)
 
     if request.method == "POST":
         if not _csrf_valid(request.form.get("csrf_token", "")):
@@ -530,7 +535,7 @@ def product_edit(product_id):
         if not errors:
             try:
                 saved_uploads = _apply_product_uploads(form_data)
-                duplicates = _possible_duplicates(form_data["nome"], exclude_id=product_id)
+                duplicates = _safe_possible_duplicates(form_data["nome"], exclude_id=product_id)
                 update_product(product_id, form_data)
             except (DatabaseUnavailable, AdminCatalogError, AdminAssetError) as exc:
                 cleanup_new_uploads(saved_uploads)
