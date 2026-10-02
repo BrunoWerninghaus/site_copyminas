@@ -254,7 +254,7 @@ Contrato:
 - o corpo inclui todos os campos relevantes do lead;
 - `Reply-To` usa o e-mail informado pelo cliente;
 - credenciais SMTP não são versionadas;
-- host, porta, modo de segurança, usuário e senha vêm do ambiente; para a infraestrutura atual, o padrão é `smtp.copyminas.com.br`, porta `465`, com `SSL`;
+- host, porta, modo de segurança, usuário e senha vêm do ambiente; para a infraestrutura atual, o padrão operacional adotado pelo Site 3 é `smtp.copyminas.com.br`, porta `587`, sem SSL/STARTTLS, conforme a configuração SMTP padrão documentada pela Turbosite;
 - falha SMTP não desfaz nem invalida um lead já persistido em `main_bd`;
 - falha SMTP deve ser registrada no log da aplicação;
 - o banco continua sendo a autoridade do contato; o e-mail é apenas notificação operacional.
