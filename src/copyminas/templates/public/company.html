@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Empresa — Copy Minas{% endblock %}
+{% block meta_description %}Conheça a Copy Minas, empresa sediada em Elói Mendes, Minas Gerais.{% endblock %}
 {% block body_class %}paper-page{% endblock %}
 {% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">{% endblock %}
 {% block body %}
 {% set active_page = "company" %}
 {% include "public/_paper_header.html" %}
-<main class="paper-stage">
+<main id="main-content" class="paper-stage">
     <section class="paper-sheet" data-sheet="EMPRESA / 03">
         <p class="paper-kicker">Copy Minas / ficha institucional</p>
         <h1 class="paper-title">Desde 2011 em Elói Mendes.</h1>
