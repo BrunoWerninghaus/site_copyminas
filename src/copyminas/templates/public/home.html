@@ -36,12 +36,12 @@
         </article>
 
         <aside class="registry-card" aria-label="Ficha institucional resumida">
-            <span class="registry-card__code">ARQUIVO / COPY MINAS</span>
+            <span class="registry-card__code">FICHA / COPY MINAS</span>
             <dl>
                 <div><dt>Base</dt><dd>Elói Mendes / MG</dd></div>
                 <div><dt>Desde</dt><dd>2011</dd></div>
                 <div><dt>Status</dt><dd>Ativa</dd></div>
-                <div><dt>Catálogo</dt><dd>{{ featured_products|length }} destaques / 10 ativos</dd></div>
+                <div><dt>Catálogo</dt><dd>Produtos e equipamentos</dd></div>
             </dl>
             <a href="{{ url_for('public.company') }}">Abrir ficha da empresa →</a>
         </aside>
@@ -51,7 +51,7 @@
         <header class="section-heading">
             <p class="section-kicker">Soluções / índice</p>
             <h2>Áreas de atuação</h2>
-            <p>Um resumo das frentes relacionadas ao cadastro e ao catálogo atual da Copy Minas.</p>
+            <p>Impressão, equipamentos, locação, manutenção e suporte reunidos em áreas de atendimento.</p>
         </header>
 
         <div class="paper-grid">
@@ -69,19 +69,19 @@
 
     <section class="content-section section-shell" data-section="02 / PRODUTOS">
         <header class="section-heading">
-            <p class="section-kicker">Produtos / Site 2 → Site 3</p>
+            <p class="section-kicker">Produtos / destaques</p>
             <h2>Produtos em destaque</h2>
-            <p>Registros ativos do catálogo original, agora organizados em fichas individuais.</p>
+            <p>Uma seleção do catálogo da Copy Minas, com fichas individuais para consulta.</p>
         </header>
 
         <div class="product-strip" data-register="CATÁLOGO / DESTAQUES">
             {% for product in featured_products %}
             <article class="home-product">
                 <a class="home-product__media" href="{{ url_for('public.product_detail', slug=product.slug) }}">
-                    <span>IMG / {{ "%04d"|format(product.id) }}</span>
+                    <span>IMAGEM EM ATUALIZAÇÃO</span>
                 </a>
                 <div class="home-product__copy">
-                    <span>{{ product.category }} / {{ "%04d"|format(product.id) }}</span>
+                    <span>{{ product.category }}</span>
                     <h3>{{ product.name }}</h3>
                     <a href="{{ url_for('public.product_detail', slug=product.slug) }}">Abrir ficha →</a>
                 </div>
@@ -103,7 +103,7 @@
         </article>
 
         <div class="image-sheet" data-asset-slot="home.company.image">
-            <span>FOTO / EMPRESA<br>ESPAÇO RESERVADO</span>
+            <span>IMAGEM INSTITUCIONAL<br>EM ATUALIZAÇÃO</span>
         </div>
     </section>
 
