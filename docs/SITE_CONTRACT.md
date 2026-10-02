@@ -248,13 +248,13 @@ Formulário:
 Após o INSERT bem-sucedido em `main_bd.contatos`, o Site 3 deve tentar enviar uma notificação interna por e-mail.
 
 Contrato:
-- remetente padrão: `ti.processos@copymina.com.br`;
-- destinatário padrão: `ti.processos@copymina.com.br`;
+- remetente padrão: `ti.processos@copyminas.com.br`;
+- destinatário padrão: `ti.processos@copyminas.com.br`;
 - o assunto inclui o protocolo e o tipo de serviço;
 - o corpo inclui todos os campos relevantes do lead;
 - `Reply-To` usa o e-mail informado pelo cliente;
 - credenciais SMTP não são versionadas;
-- host, porta, modo de segurança, usuário e senha vêm do ambiente;
+- host, porta, modo de segurança, usuário e senha vêm do ambiente; para a infraestrutura atual, o padrão é `smtp.copyminas.com.br`, porta `465`, com `SSL`;
 - falha SMTP não desfaz nem invalida um lead já persistido em `main_bd`;
 - falha SMTP deve ser registrada no log da aplicação;
 - o banco continua sendo a autoridade do contato; o e-mail é apenas notificação operacional.
@@ -265,10 +265,10 @@ Contrato:
 O e-mail informado no formulário é obrigatório e recebe uma confirmação automática após o registro.
 
 Contrato:
-- remetente: `ti.processos@copymina.com.br`;
+- remetente: `ti.processos@copyminas.com.br`;
 - destinatário: o e-mail informado pelo cliente;
 - o e-mail contém o protocolo de atendimento e o tipo de serviço solicitado;
 - a mensagem confirma o recebimento sem expor nomes de banco, tabela ou estados internos;
-- a mesma operação SMTP também envia a notificação interna para `ti.processos@copymina.com.br`;
+- a mesma operação SMTP também envia a notificação interna para `ti.processos@copyminas.com.br`;
 - a página pública nunca mostra `main_bd`, `contatos`, status interno ou identificadores de infraestrutura;
 - se a persistência funcionar e o SMTP falhar, o contato continua válido e a interface informa apenas que a confirmação por e-mail não pôde ser enviada naquele momento.
