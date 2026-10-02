@@ -57,17 +57,26 @@
             {% for message in success_messages %}
             <strong>{{ message }}</strong>
             {% endfor %}
-            <span>A equipe pode usar o protocolo para localizar a solicitação no atendimento.</span>
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    {% with warning_messages = get_flashed_messages(category_filter=["contact-warning"]) %}
+        {% if warning_messages %}
+        <div class="contact-success contact-success--warning" role="status" aria-live="polite">
+            {% for message in warning_messages %}
+            <strong>{{ message }}</strong>
+            {% endfor %}
         </div>
         {% endif %}
     {% endwith %}
 
     <div class="contact-layout">
-        <section class="paper-sheet contact-form-sheet" data-sheet="FORM / MAIN_BD">
-            <p class="paper-kicker">Solicitação / main_bd.contatos</p>
+        <section class="paper-sheet contact-form-sheet" data-sheet="FORM / CONTATO">
+            <p class="paper-kicker">Solicitação de atendimento</p>
             <h2>Solicitar contato.</h2>
             <p class="contact-form-intro">
-                O formulário abaixo registra sua solicitação no banco da Copy Minas e gera um protocolo de atendimento.
+                Preencha os dados abaixo para enviar sua solicitação. Você receberá uma confirmação por e-mail após o registro.
             </p>
 
             {% if form_errors %}
@@ -145,7 +154,7 @@
 
                 <div class="contact-form__submit">
                     <button class="paper-action" type="submit">Registrar solicitação</button>
-                    <span>STATUS INICIAL / NOVO</span>
+                    <span>ENVIO SEGURO / CONFIRMAÇÃO POR E-MAIL</span>
                 </div>
             </form>
         </section>
