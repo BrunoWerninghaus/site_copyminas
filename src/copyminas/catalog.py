@@ -56,14 +56,21 @@ def _parse_specifications(raw):
 
 def _image_list(row):
     images = []
+    static_root = Path(current_app.static_folder)
+
     for key in ("imagem1", "imagem2", "imagem3", "imagem4", "imagem5"):
         value = (row.get(key) or "").strip()
         if not value:
             continue
+
         value = value.replace("\\", "/").lstrip("/")
         if value.startswith("static/"):
             value = value[len("static/"):]
-        images.append(value)
+
+        candidate = static_root / value
+        if candidate.is_file():
+            images.append(value)
+
     return images
 
 
