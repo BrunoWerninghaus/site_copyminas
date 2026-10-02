@@ -168,6 +168,35 @@ class PublicRoutesTestCase(unittest.TestCase):
 
     @patch("src.copyminas.routes.public.send_contact_notifications")
     @patch("src.copyminas.routes.public.create_contact_request")
+    def test_contact_form_rejects_implausible_submission(
+        self,
+        create_request,
+        send_notification,
+    ):
+        response = self.client.post(
+            "/contato/enviar",
+            data={
+                "name": "a",
+                "company": "a",
+                "email": "cliente@example.com",
+                "phone": "a",
+                "city": "a",
+                "service_type": "manutencao_impressora",
+                "equipment_quantity": "1",
+                "preferred_contact": "telefone",
+                "message": "a",
+                "consent_privacy": "1",
+            },
+        )
+
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("telefone válido".encode("utf-8"), response.data)
+        self.assertIn("pelo menos 8 caracteres".encode("utf-8"), response.data)
+        create_request.assert_not_called()
+        send_notification.assert_not_called()
+
+    @patch("src.copyminas.routes.public.send_contact_notifications")
+    @patch("src.copyminas.routes.public.create_contact_request")
     def test_contact_form_rejects_incomplete_submission(
         self,
         create_request,
