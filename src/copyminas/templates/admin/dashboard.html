@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Painel administrativo — Copy Minas{% endblock %}
+{% block meta_description %}Painel administrativo interno da Copy Minas.{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block page_styles %}
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <a class="admin-header__brand" href="{{ url_for('admin.dashboard') }}" aria-label="Painel administrativo Copy Minas">
+        <img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas">
+        <span>ADMIN</span>
+    </a>
+
+    <form method="post" action="{{ url_for('admin.logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="admin-header__logout" type="submit">Sair</button>
+    </form>
+</header>
+
+<main id="main-content" class="admin-stage">
+    <section class="admin-hero">
+        <span>PAINEL / INTERNO</span>
+        <h1>Administração</h1>
+        <p>Base administrativa do Site 3. Nesta etapa o painel é somente leitura; alterações no catálogo serão adicionadas em um bloco separado.</p>
+    </section>
+
+    <section class="admin-summary" aria-label="Resumo do sistema">
+        <article>
+            <span>Catálogo</span>
+            <strong>{{ "Disponível" if catalog_available else "Indisponível" }}</strong>
+            <small>main_bd</small>
+        </article>
+        <article>
+            <span>Produtos publicados</span>
+            <strong>{{ product_count }}</strong>
+            <small>ativos no catálogo</small>
+        </article>
+        <article>
+            <span>Categorias</span>
+            <strong>{{ category_count }}</strong>
+            <small>com produtos publicados</small>
+        </article>
+    </section>
+
+    <section class="admin-modules">
+        <article class="admin-module">
+            <div>
+                <span>MÓDULO / 01</span>
+                <h2>Produtos</h2>
+                <p>Catálogo conectado ao banco existente. Edição será habilitada no próximo bloco.</p>
+            </div>
+            <a href="{{ url_for('public.products') }}" target="_blank" rel="noopener noreferrer">Ver catálogo público →</a>
+        </article>
+
+        <article class="admin-module admin-module--future">
+            <div>
+                <span>MÓDULO / 02</span>
+                <h2>Contatos</h2>
+                <p>Solicitações registradas no banco. Gestão administrativa ainda não habilitada nesta base.</p>
+            </div>
+        </article>
+    </section>
+</main>
+{% endblock %}
