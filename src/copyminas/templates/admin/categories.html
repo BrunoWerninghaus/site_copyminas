@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Categorias — Copy Minas Admin{% endblock %}
+{% block meta_description %}Gestão interna de categorias da Copy Minas.{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block page_styles %}
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+{% set admin_page = "categories" %}
+{% include "admin/_header.html" %}
+
+<main id="main-content" class="admin-stage">
+    {% with messages = get_flashed_messages(category_filter=["admin-success"]) %}
+        {% if messages %}
+        <div class="admin-alert admin-alert--success" role="status">
+            {% for message in messages %}<strong>{{ message }}</strong>{% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <section class="admin-page-heading">
+        <div>
+            <span>CATÁLOGO / ESTRUTURA</span>
+            <h1>Categorias</h1>
+            <p>Organize as categorias existentes. Desativar uma categoria preserva os produtos, mas impede sua publicação enquanto ela permanecer inativa.</p>
+        </div>
+        <a class="admin-button" href="{{ url_for('admin.category_new') }}">Nova categoria</a>
+    </section>
+
+    <section class="admin-product-summary" aria-label="Resumo das categorias">
+        <div><span>Total</span><strong>{{ categories|length }}</strong></div>
+        <div><span>Ativas</span><strong>{{ active_count }}</strong></div>
+        <div><span>Inativas</span><strong>{{ categories|length - active_count }}</strong></div>
+    </section>
+
+    <section class="admin-category-list">
+        <div class="admin-category-row admin-category-row--head">
+            <span>ID</span>
+            <span>Categoria</span>
+            <span>Produtos</span>
+            <span>Ativos</span>
+            <span>Status</span>
+            <span>Ação</span>
+        </div>
+
+        {% for category in categories %}
+        <article class="admin-category-row">
+            <span class="admin-product-id">#{{ category.id }}</span>
+            <strong>{{ category.nome }}</strong>
+            <span>{{ category.product_count }}</span>
+            <span>{{ category.active_product_count }}</span>
+            <span class="admin-status {{ 'admin-status--active' if category.ativo else 'admin-status--inactive' }}">
+                {{ "Ativa" if category.ativo else "Inativa" }}
+            </span>
+            <div class="admin-product-actions">
+                <a href="{{ url_for('admin.category_edit', category_id=category.id) }}">Editar</a>
+                <form method="post" action="{{ url_for('admin.category_status', category_id=category.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="active" value="{{ '0' if category.ativo else '1' }}">
+                    <button type="submit">{{ "Desativar" if category.ativo else "Ativar" }}</button>
+                </form>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+</main>
+{% endblock %}
