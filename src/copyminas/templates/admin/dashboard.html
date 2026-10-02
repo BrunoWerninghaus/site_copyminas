@@ -12,14 +12,6 @@
 {% include "admin/_header.html" %}
 
 <main id="main-content" class="admin-stage">
-    {% with messages = get_flashed_messages(category_filter=["admin-success"]) %}
-        {% if messages %}
-        <div class="admin-alert admin-alert--success" role="status">
-            {% for message in messages %}<strong>{{ message }}</strong>{% endfor %}
-        </div>
-        {% endif %}
-    {% endwith %}
-
     <section class="admin-hero">
         <span>PAINEL / INTERNO</span>
         <h1>Administração</h1>
@@ -27,21 +19,9 @@
     </section>
 
     <section class="admin-summary" aria-label="Resumo do sistema">
-        <article>
-            <span>Catálogo</span>
-            <strong>{{ "Disponível" if catalog_available else "Indisponível" }}</strong>
-            <small>main_bd</small>
-        </article>
-        <article>
-            <span>Produtos publicados</span>
-            <strong>{{ product_count }}</strong>
-            <small>ativos no catálogo</small>
-        </article>
-        <article>
-            <span>Categorias</span>
-            <strong>{{ category_count }}</strong>
-            <small>com produtos publicados</small>
-        </article>
+        <article><span>Catálogo</span><strong>{{ "Disponível" if catalog_available else "Indisponível" }}</strong><small>main_bd</small></article>
+        <article><span>Produtos publicados</span><strong>{{ product_count }}</strong><small>ativos no catálogo</small></article>
+        <article><span>Categorias</span><strong>{{ category_count }}</strong><small>com produtos publicados</small></article>
     </section>
 
     <section class="admin-modules">
@@ -49,14 +29,23 @@
             <div>
                 <span>MÓDULO / 01</span>
                 <h2>Produtos</h2>
-                <p>Crie, edite, ative e desative produtos diretamente no banco existente, sem apagar o histórico.</p>
+                <p>Crie, edite, faça upload de imagens, visualize a ficha pública e controle a publicação dos produtos.</p>
             </div>
             <a href="{{ url_for('admin.products') }}">Gerenciar produtos →</a>
         </article>
 
-        <article class="admin-module admin-module--future">
+        <article class="admin-module">
             <div>
                 <span>MÓDULO / 02</span>
+                <h2>Categorias</h2>
+                <p>Organize a estrutura do catálogo sem apagar produtos já vinculados.</p>
+            </div>
+            <a href="{{ url_for('admin.categories') }}">Gerenciar categorias →</a>
+        </article>
+
+        <article class="admin-module admin-module--future">
+            <div>
+                <span>MÓDULO / 03</span>
                 <h2>Contatos</h2>
                 <p>Solicitações registradas no banco. A gestão administrativa entra no próximo bloco.</p>
             </div>
