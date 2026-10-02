@@ -71,3 +71,27 @@ Ele preserva:
 A aplicação pública consome esse arquivo por `src/copyminas/catalog.py`.
 
 Quando a camada persistente definitiva do Site 3 for introduzida, esse JSON pode funcionar como seed/migration fixture sem perder a rastreabilidade com o Site 2.
+
+
+## Estado atual — catálogo ligado ao main_bd
+
+O Site 3 passou a usar o banco existente `main_bd` como autoridade operacional do catálogo público.
+
+Em execução normal:
+- `produtos` fornece nome, descrição, imagens, especificações, quantidade, categoria e estado ativo;
+- `categorias` fornece o nome da categoria e seu estado ativo;
+- somente produtos com `produtos.ativo = 1` e categorias com `categorias.ativo = 1` são publicados;
+- nenhuma tabela ou coluna nova foi criada para esta integração;
+- o campo `qtd` é lido, mas continua sem exposição como estoque público até confirmação da semântica comercial;
+- `imagem1` a `imagem5` são considerados caminhos de assets do catálogo; o site só publica uma imagem quando o arquivo existe no diretório estático, evitando URLs quebradas.
+
+O arquivo `catalog_presentation.json` contém apenas metadados de apresentação que não pertencem ao modelo comercial do banco:
+- slug estável;
+- destaque na Home.
+
+O arquivo histórico `catalog_site2.json` permanece como fixture de migração e fonte explícita dos testes quando `CATALOG_SOURCE=fixture`. Ele não é fallback silencioso da aplicação em produção.
+
+Se o banco estiver indisponível:
+- a Home permanece funcional e omite temporariamente os produtos em destaque;
+- a página Produtos responde HTTP 503 com uma mensagem pública própria e link para Contato;
+- o sistema não troca silenciosamente para dados históricos.
