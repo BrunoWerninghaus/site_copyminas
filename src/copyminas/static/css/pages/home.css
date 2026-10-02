@@ -55,9 +55,9 @@ html.globe-dialog-open body { overflow: hidden; }
 .home-hero {
     position: relative;
     display: grid;
-    min-height: calc(100svh - 82px);
-    grid-template-columns: minmax(0,1.32fr) minmax(280px,.68fr);
-    gap: clamp(1.5rem,4vw,4.5rem);
+    min-height: calc(92svh - 82px);
+    grid-template-columns: minmax(0,1.22fr) minmax(300px,.78fr);
+    gap: clamp(2rem,4vw,4rem);
     align-items: center;
     isolation: isolate;
     padding-top: clamp(2.5rem,6vw,6rem);
@@ -319,7 +319,7 @@ html.globe-dialog-open body { overflow: hidden; }
 
 .solution-card {
     --sheet-y: 0px;
-    min-height: 310px;
+    min-height: 285px;
     padding: 1.35rem;
     border-top: 3px solid #2e3031;
     box-shadow: 7px 7px 0 rgba(0,0,0,.3);
@@ -397,7 +397,7 @@ html.globe-dialog-open body { overflow: hidden; }
 }
 .home-product__media {
     display: grid;
-    min-height: 260px;
+    min-height: 235px;
     place-items: center;
     border-bottom: 1px solid #aaa59c;
     background:
@@ -413,7 +413,7 @@ html.globe-dialog-open body { overflow: hidden; }
 .home-product__copy { min-width: 0; padding: 1.25rem; }
 .home-product__copy > span { color: #a80f16; font-size: .67rem; text-transform: uppercase; }
 .home-product h3 {
-    min-height: 4.2em;
+    min-height: 3.9em;
     margin: .65rem 0 1rem;
     font-family: var(--font-display);
     font-size: 1.05rem;
@@ -445,7 +445,7 @@ html.globe-dialog-open body { overflow: hidden; }
 .image-sheet {
     position: relative;
     display: grid;
-    min-height: 480px;
+    min-height: 430px;
     place-items: center;
     border: 1px solid #aaa59c;
     background:
@@ -460,7 +460,7 @@ html.globe-dialog-open body { overflow: hidden; }
 }
 
 .image-sheet::before {
-    content: "ASSET / HOME.COMPANY.IMAGE";
+    content: "IMAGEM / INSTITUCIONAL";
     position: absolute;
     top: 1rem;
     left: 1rem;
@@ -471,7 +471,7 @@ html.globe-dialog-open body { overflow: hidden; }
 
 .location-section {
     display: grid;
-    grid-template-columns: minmax(0,.72fr) minmax(360px,1.28fr);
+    grid-template-columns: minmax(0,.8fr) minmax(360px,1.2fr);
     gap: clamp(2rem,6vw,6rem);
     align-items: center;
 }
@@ -521,7 +521,7 @@ html.globe-dialog-open body { overflow: hidden; }
 .globe-card {
     position: relative;
     display: block;
-    min-height: 560px;
+    min-height: 520px;
     overflow: hidden;
     padding: 0;
     border: 1px solid var(--line-strong);
@@ -702,4 +702,40 @@ html.globe-dialog-open body { overflow: hidden; }
     .globe-card__caption{align-items:flex-start;flex-direction:column}
     .globe-dialog__help{right:1rem;bottom:1rem;left:1rem}
     .site-footer{flex-direction:column}
+}
+
+
+/* Home refinement pass */
+@media (min-width: 981px) {
+    .registry-card {
+        width: min(100%, 520px);
+        justify-self: end;
+        align-self: center;
+    }
+
+    .section-heading {
+        max-width: 760px;
+    }
+}
+
+.home-product__copy {
+    display: flex;
+    flex-direction: column;
+}
+
+.home-product__copy > a {
+    margin-top: auto;
+    padding-top: .85rem;
+    border-top: 1px solid var(--paper-line);
+}
+
+.company-callout .paper-panel,
+.location-copy {
+    align-self: stretch;
+}
+
+.location-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
