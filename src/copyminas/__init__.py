@@ -48,11 +48,17 @@ def create_app() -> Flask:
             "ti.processos@copyminas.com.br",
         ),
         CATALOG_SOURCE=os.getenv("CATALOG_SOURCE", "database").lower(),
+        ADMIN_USERNAME=os.getenv("ADMIN_USERNAME", ""),
+        ADMIN_PASSWORD=os.getenv("ADMIN_PASSWORD", ""),
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Lax",
     )
 
+    from .routes.admin import admin_bp
     from .routes.public import public_bp
 
     app.register_blueprint(public_bp)
+    app.register_blueprint(admin_bp)
 
     @app.errorhandler(404)
     def not_found(_error):
