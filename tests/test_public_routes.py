@@ -111,7 +111,7 @@ class PublicRoutesTestCase(unittest.TestCase):
         response = self.client.get("/produtos")
 
         self.assertEqual(response.status_code, 503)
-        self.assertIn("temporariamente indispon".encode("utf-8"), response.data)
+        self.assertIn("Não foi possível consultar os produtos agora.".encode("utf-8"), response.data)
         self.assertIn("Falar com a Copy Minas".encode("utf-8"), response.data)
 
     @patch(
