@@ -228,10 +228,15 @@ Canais apresentados:
 O número legado `(35) 3491-0201` permanece apenas como dado interno e não deve ser promovido como canal principal.
 
 Formulário:
-- campos: nome, empresa opcional, contato para retorno, assunto e mensagem;
-- assunto limitado às categorias definidas pela aplicação;
-- validação obrigatória no servidor antes do encaminhamento;
-- nenhum envio deve fingir persistência ou entrega por e-mail quando não houver infraestrutura configurada;
-- nesta etapa, o formulário prepara a mensagem em um dos WhatsApps oficiais e redireciona o usuário para revisar e concluir o envio;
-- o conteúdo do formulário não é persistido pelo Site 3 nessa etapa;
-- a interface deve comunicar claramente esse comportamento.
+- a persistência oficial usa o banco MySQL existente `main_bd`;
+- a tabela autoritativa desta etapa é `main_bd.contatos`, sem criação de um banco paralelo;
+- campos do formulário seguem o schema existente: nome, empresa opcional, e-mail, telefone, cidade, tipo de serviço, quantidade opcional, preferência de contato, mensagem e consentimento;
+- `service_type` usa somente os valores aceitos pelo enum existente no banco;
+- `preferred_contact` usa somente `whatsapp`, `telefone` ou `email`;
+- validação ocorre no servidor antes do INSERT;
+- cada solicitação recebe protocolo único compatível com `varchar(20)`;
+- o banco mantém `status = novo`, `source = site` e timestamps pelos defaults do schema existente;
+- após persistência, a interface apresenta o protocolo ao usuário;
+- falha de conexão/persistência não deve fingir sucesso: a página retorna erro e preserva os canais diretos;
+- credenciais MySQL nunca são versionadas; conexão vem de `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` e `DB_PASSWORD`;
+- o catálogo continua temporariamente consumindo a fixture versionada do Site 2 até a migração controlada de Catalog/Admin para a persistência oficial.
