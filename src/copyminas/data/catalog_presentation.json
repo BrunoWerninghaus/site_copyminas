@@ -1,0 +1,44 @@
+{
+  "products": {
+    "14": {
+      "slug": "computador-desktop-i3-3220-12gb-ssd-128gb",
+      "featured": true
+    },
+    "15": {
+      "slug": "computador-desktop-i3-3220-8gb-ssd-128gb",
+      "featured": false
+    },
+    "16": {
+      "slug": "computador-desktop-i3-2100-8gb-ssd-128gb",
+      "featured": false
+    },
+    "19": {
+      "slug": "brother-dcp-8157dn",
+      "featured": true
+    },
+    "21": {
+      "slug": "samsung-proxpress-sl-m4070fr",
+      "featured": false
+    },
+    "22": {
+      "slug": "samsung-proxpress-sl-m4080fx",
+      "featured": false
+    },
+    "23": {
+      "slug": "brother-mfc-8912dw",
+      "featured": false
+    },
+    "24": {
+      "slug": "epson-ecotank-l6490",
+      "featured": false
+    },
+    "25": {
+      "slug": "brother-dcp-l5652dn",
+      "featured": false
+    },
+    "26": {
+      "slug": "cabo-rede-cat6-10-metros",
+      "featured": true
+    }
+  }
+}
