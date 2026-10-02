@@ -106,11 +106,16 @@ class PublicRoutesTestCase(unittest.TestCase):
         self.assertIn(b"main_bd.contatos", response.data)
         self.assertIn(b"/contato/enviar", response.data)
 
+    @patch("src.copyminas.routes.public.send_contact_notification")
     @patch(
         "src.copyminas.routes.public.create_contact_request",
         return_value="CM261002A1B2C3D4E5F6",
     )
-    def test_contact_form_persists_and_returns_protocol(self, create_request):
+    def test_contact_form_persists_and_returns_protocol(
+        self,
+        create_request,
+        send_notification,
+    ):
         response = self.client.post(
             "/contato/enviar",
             data={
@@ -135,9 +140,18 @@ class PublicRoutesTestCase(unittest.TestCase):
         self.assertEqual(saved["service_type"], "locacao_impressora")
         self.assertEqual(saved["equipment_quantity"], 3)
         self.assertEqual(saved["preferred_contact"], "whatsapp")
+        send_notification.assert_called_once_with(
+            "CM261002A1B2C3D4E5F6",
+            saved,
+        )
 
+    @patch("src.copyminas.routes.public.send_contact_notification")
     @patch("src.copyminas.routes.public.create_contact_request")
-    def test_contact_form_rejects_incomplete_submission(self, create_request):
+    def test_contact_form_rejects_incomplete_submission(
+        self,
+        create_request,
+        send_notification,
+    ):
         response = self.client.post(
             "/contato/enviar",
             data={
@@ -156,6 +170,37 @@ class PublicRoutesTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertIn("Revise o formul".encode("utf-8"), response.data)
         create_request.assert_not_called()
+        send_notification.assert_not_called()
+
+    @patch(
+        "src.copyminas.routes.public.send_contact_notification",
+        side_effect=Exception("unexpected raw exception"),
+    )
+    @patch(
+        "src.copyminas.routes.public.create_contact_request",
+        return_value="CM261002A1B2C3D4E5F6",
+    )
+    def test_unexpected_notification_errors_are_not_silently_swallowed(
+        self,
+        create_request,
+        send_notification,
+    ):
+        with self.assertRaises(Exception):
+            self.client.post(
+                "/contato/enviar",
+                data={
+                    "name": "Cliente Teste",
+                    "company": "",
+                    "email": "cliente@example.com",
+                    "phone": "(35) 99999-9999",
+                    "city": "Eloi Mendes",
+                    "service_type": "suporte",
+                    "equipment_quantity": "",
+                    "preferred_contact": "email",
+                    "message": "Teste.",
+                    "consent_privacy": "1",
+                },
+            )
 
     def test_unknown_product_returns_404(self):
         response = self.client.get("/produtos/produto-inexistente")
