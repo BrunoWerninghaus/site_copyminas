@@ -1,19 +1,145 @@
 {% extends "base.html" %}
 
-{% block title %}Copy Minas — Soluções em Tecnologia{% endblock %}
+{% block title %}Copy Minas — Home{% endblock %}
+{% block body_class %}page-home{% endblock %}
 
-{% block content %}
-<section class="foundation-hero">
-    <div class="foundation-copy">
-        <p class="eyebrow">NOVA GERAÇÃO</p>
-        <h1>Copy Minas</h1>
-        <p>Soluções em tecnologia.</p>
-        <p class="status">Fundação limpa criada. A identidade, o globo, o catálogo e os produtos serão construídos daqui para frente.</p>
-    </div>
+{% block page_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/home.css') }}">
+{% endblock %}
 
-    <button class="globe-placeholder" type="button" disabled aria-label="Globo 3D em construção">
-        <span>GLOBO 3D</span>
-        <small>Mundo · Brasil · Minas · Elói Mendes</small>
-    </button>
-</section>
+{% block body %}
+<header class="site-header">
+    <a class="site-brand" href="{{ url_for('public.home') }}" aria-label="Copy Minas — Home">
+        <img
+            src="{{ url_for('static', filename='images/brand/copy-minas-placeholder.svg') }}"
+            alt="Copy Minas"
+        >
+    </a>
+
+    <nav class="site-nav" aria-label="Navegação principal">
+        <a href="#inicio">Início</a>
+        <a href="#solucoes">Soluções</a>
+        <a href="#produtos">Produtos</a>
+        <a href="#empresa">Empresa</a>
+        <a href="#localizacao">Localização</a>
+        <a href="#contato">Contato</a>
+    </nav>
+</header>
+
+<main>
+    <section class="home-hero section-shell" id="inicio">
+        <div class="home-hero__copy">
+            <p class="section-kicker">Copy Minas</p>
+            <h1 data-content-key="home.hero.title">Título principal a definir</h1>
+            <p class="lead" data-content-key="home.hero.description">
+                Descrição principal da empresa a definir.
+            </p>
+
+            <div class="action-row" aria-label="Ações principais">
+                <a class="button button--primary" href="#produtos">Ação principal</a>
+                <a class="button button--secondary" href="#contato">Ação secundária</a>
+            </div>
+        </div>
+
+        <div class="media-slot media-slot--hero" data-asset-slot="home.hero.image">
+            <span>Espaço para imagem principal</span>
+        </div>
+    </section>
+
+    <section class="content-section section-shell" id="solucoes">
+        <header class="section-heading">
+            <p class="section-kicker">Soluções</p>
+            <h2 data-content-key="home.solutions.title">Título da seção de soluções</h2>
+            <p data-content-key="home.solutions.description">Descrição da seção a definir.</p>
+        </header>
+
+        <div class="placeholder-grid placeholder-grid--three">
+            {% for index in range(1, 4) %}
+            <article class="placeholder-card">
+                <div class="media-slot" data-asset-slot="home.solutions.{{ index }}.image">
+                    <span>Imagem da solução {{ index }}</span>
+                </div>
+                <p class="placeholder-card__eyebrow">Solução {{ "%02d"|format(index) }}</p>
+                <h3>Título da solução</h3>
+                <p>Descrição da solução a definir.</p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="content-section section-shell" id="produtos">
+        <header class="section-heading">
+            <p class="section-kicker">Produtos</p>
+            <h2 data-content-key="home.products.title">Título da seção de produtos</h2>
+            <p data-content-key="home.products.description">Descrição da seleção de produtos a definir.</p>
+        </header>
+
+        <div class="placeholder-grid placeholder-grid--three">
+            {% for index in range(1, 4) %}
+            <article class="placeholder-card placeholder-card--product">
+                <div class="media-slot media-slot--product" data-asset-slot="home.products.{{ index }}.image">
+                    <span>Imagem do produto {{ index }}</span>
+                </div>
+                <p class="placeholder-card__eyebrow">Categoria a definir</p>
+                <h3>Nome do produto</h3>
+                <p>Resumo do produto a definir.</p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="split-section section-shell" id="empresa">
+        <div>
+            <p class="section-kicker">Empresa</p>
+            <h2 data-content-key="home.company.title">Título institucional</h2>
+            <p class="lead" data-content-key="home.company.description">
+                Texto institucional da Copy Minas a definir.
+            </p>
+        </div>
+
+        <div class="media-slot media-slot--wide" data-asset-slot="home.company.image">
+            <span>Espaço para imagem institucional</span>
+        </div>
+    </section>
+
+    <section class="location-section section-shell" id="localizacao">
+        <div class="location-copy">
+            <p class="section-kicker">Localização</p>
+            <h2 data-content-key="home.location.title">Título da seção de localização</h2>
+            <p data-content-key="home.location.description">
+                Texto de localização a definir.
+            </p>
+            <p class="location-note">
+                O ponto oficial e o link do Google Maps serão configurados quando a localização for fornecida.
+            </p>
+        </div>
+
+        <button
+            class="globe-slot"
+            type="button"
+            disabled
+            data-globe-mount="home"
+            aria-label="Globo interativo em construção"
+        >
+            <span class="globe-slot__sphere" aria-hidden="true"></span>
+            <strong>Globo interativo</strong>
+            <small>Mundo · Brasil · Minas · Elói Mendes</small>
+        </button>
+    </section>
+
+    <section class="contact-section section-shell" id="contato">
+        <p class="section-kicker">Contato</p>
+        <h2 data-content-key="home.contact.title">Título da área de contato</h2>
+        <p data-content-key="home.contact.description">Descrição do atendimento a definir.</p>
+
+        <div class="contact-placeholder">
+            <span>Formulário / WhatsApp / dados de contato entram em etapa própria.</span>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <p>Copy Minas</p>
+    <p>Conteúdo institucional em construção.</p>
+</footer>
 {% endblock %}

@@ -3,22 +3,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Copy Minas — Soluções em Tecnologia">
+    <meta name="description" content="{% block meta_description %}Copy Minas — Soluções em Tecnologia{% endblock %}">
     <title>{% block title %}Copy Minas{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-</head>
-<body>
-    <header class="site-header">
-        <a class="brand" href="{{ url_for('public.home') }}" aria-label="Copy Minas — início">
-            <span class="brand-copy">COPY</span>
-            <span class="brand-minas">MINAS</span>
-        </a>
-    </header>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    {% block page_styles %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    {% block body %}{% endblock %}
 
     <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+    {% block page_scripts %}{% endblock %}
 </body>
 </html>

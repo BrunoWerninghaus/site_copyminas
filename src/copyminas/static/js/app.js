@@ -1,4 +1,4 @@
 "use strict";
 
-// Nova base Copy Minas.
-// Interações do globo e navegação entram nas próximas etapas.
+// Código global deve permanecer mínimo.
+// Interações específicas pertencem aos módulos de cada página.

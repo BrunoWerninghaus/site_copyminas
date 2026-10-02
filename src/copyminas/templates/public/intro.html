@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Copy Minas{% endblock %}
+{% block body_class %}page-intro{% endblock %}
+
+{% block page_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/intro.css') }}">
+{% endblock %}
+
+{% block body %}
+<main
+    class="intro-screen"
+    data-intro-screen
+    data-home-url="{{ url_for('public.home') }}"
+    tabindex="0"
+    aria-label="Entrada Copy Minas. Clique, role para baixo ou pressione Enter para acessar o site."
+>
+    <section class="intro-globe" aria-label="Globo Copy Minas">
+        <div class="intro-globe__crop">
+            <div class="globe-fallback" aria-hidden="true">
+                <div class="globe-fallback__surface"></div>
+                <div class="globe-fallback__latitude globe-fallback__latitude--one"></div>
+                <div class="globe-fallback__latitude globe-fallback__latitude--two"></div>
+                <div class="globe-fallback__longitude"></div>
+            </div>
+
+            <div class="globe-mount" data-globe-mount aria-hidden="true"></div>
+        </div>
+    </section>
+
+    <section class="intro-brand" aria-label="Copy Minas">
+        <div class="intro-brand__frame" data-asset-slot="official-copy-minas-logo">
+            <img
+                class="intro-brand__logo"
+                src="{{ url_for('static', filename='images/brand/copy-minas-placeholder.svg') }}"
+                alt="Copy Minas — Soluções em Tecnologia"
+            >
+        </div>
+
+        <p class="intro-brand__hint">
+            Clique ou role para entrar
+        </p>
+    </section>
+
+    <div class="intro-progress" aria-hidden="true">
+        <span></span>
+    </div>
+</main>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/intro.js') }}" defer></script>
+{% endblock %}
