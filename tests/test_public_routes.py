@@ -103,10 +103,12 @@ class PublicRoutesTestCase(unittest.TestCase):
         self.assert_page("/contato", "(35) 98877-6969")
         response = self.client.get("/contato")
         self.assertIn(b"copyminas@hotmail.com", response.data)
-        self.assertIn(b"main_bd.contatos", response.data)
         self.assertIn(b"/contato/enviar", response.data)
+        self.assertNotIn(b"main_bd", response.data)
+        self.assertNotIn(b"main_bd.contatos", response.data)
+        self.assertNotIn(b"STATUS INICIAL", response.data)
 
-    @patch("src.copyminas.routes.public.send_contact_notification")
+    @patch("src.copyminas.routes.public.send_contact_notifications")
     @patch(
         "src.copyminas.routes.public.create_contact_request",
         return_value="CM261002A1B2C3D4E5F6",
@@ -134,7 +136,10 @@ class PublicRoutesTestCase(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"CM261002A1B2C3D4E5F6", response.data)
+        self.assertIn("Solicitação recebida".encode("utf-8"), response.data)
+        self.assertIn("confirmação".encode("utf-8"), response.data)
+        self.assertNotIn(b"CM261002A1B2C3D4E5F6", response.data)
+        self.assertNotIn(b"main_bd", response.data)
         create_request.assert_called_once()
         saved = create_request.call_args.args[0]
         self.assertEqual(saved["service_type"], "locacao_impressora")
@@ -145,7 +150,7 @@ class PublicRoutesTestCase(unittest.TestCase):
             saved,
         )
 
-    @patch("src.copyminas.routes.public.send_contact_notification")
+    @patch("src.copyminas.routes.public.send_contact_notifications")
     @patch("src.copyminas.routes.public.create_contact_request")
     def test_contact_form_rejects_incomplete_submission(
         self,
@@ -173,7 +178,7 @@ class PublicRoutesTestCase(unittest.TestCase):
         send_notification.assert_not_called()
 
     @patch(
-        "src.copyminas.routes.public.send_contact_notification",
+        "src.copyminas.routes.public.send_contact_notifications",
         side_effect=Exception("unexpected raw exception"),
     )
     @patch(
