@@ -96,11 +96,34 @@ class PublicRoutesTestCase(unittest.TestCase):
         self.assertIn("Impressoras / 6".encode("utf-8"), response.data)
         self.assertIn("Computadores / 3".encode("utf-8"), response.data)
         self.assertIn("Redes / 1".encode("utf-8"), response.data)
+        self.assertIn(b"data-catalog-search", response.data)
+        self.assertIn(b'data-category-filter="all"', response.data)
+        self.assertIn("Sob consulta".encode("utf-8"), response.data)
+        self.assertIn("Manutenção".encode("utf-8"), response.data)
 
     def test_product_detail(self):
         self.assert_page(
             "/produtos/brother-dcp-8157dn",
             "Brother DCP-8157DN",
+        )
+        response = self.client.get("/produtos/brother-dcp-8157dn")
+        self.assertIn("Consultar este produto".encode("utf-8"), response.data)
+        self.assertIn(b"/contato?product=brother-dcp-8157dn", response.data)
+        self.assertIn("Venda".encode("utf-8"), response.data)
+        self.assertIn("Aluguel".encode("utf-8"), response.data)
+        self.assertIn("Manutenção".encode("utf-8"), response.data)
+
+    def test_contact_can_be_prefilled_from_product(self):
+        response = self.client.get(
+            "/contato?product=brother-dcp-8157dn"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Produto selecionado".encode("utf-8"), response.data)
+        self.assertIn(b"Brother DCP-8157DN", response.data)
+        self.assertIn(
+            "Tenho interesse no produto".encode("utf-8"),
+            response.data,
         )
 
     @patch(
