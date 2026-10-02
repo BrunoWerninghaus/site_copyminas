@@ -47,6 +47,7 @@ def create_app() -> Flask:
             "CONTACT_NOTIFICATION_TO",
             "ti.processos@copyminas.com.br",
         ),
+        CATALOG_SOURCE=os.getenv("CATALOG_SOURCE", "database").lower(),
     )
 
     from .routes.public import public_bp
