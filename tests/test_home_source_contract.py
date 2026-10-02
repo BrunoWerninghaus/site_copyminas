@@ -116,12 +116,23 @@ class HomeSourceContractTestCase(unittest.TestCase):
         source = HOME_CSS.read_text(encoding="utf-8")
 
         self.assertIn('.paper-panel--hero::before', source)
-        self.assertIn('content: "REG / 03";', source)
+        self.assertIn('content: "SERVIÇOS / 03";', source)
         self.assertIn('content: "GEO / 03";', source)
         self.assertRegex(
             source,
-            r"\.registry-card\s*\{[^}]*border-left:\s*3px solid var\(--red\)",
+            r"\.service-matrix\s*\{[^}]*border-left:\s*3px solid var\(--red\)",
         )
+
+    def test_home_service_matrix_matches_current_offering(self):
+        template = (ROOT / "src/copyminas/templates/public/home.html").read_text(encoding="utf-8")
+
+        self.assertIn("ATENDIMENTO / MATRIZ", template)
+        self.assertIn(">Impressoras<", template)
+        self.assertIn(">Computadores<", template)
+        self.assertIn(">iPhones<", template)
+        self.assertEqual(template.count('aria-label="Aluguel não disponível"'), 1)
+        self.assertEqual(template.count('aria-label="Venda disponível"'), 3)
+        self.assertEqual(template.count('aria-label="Manutenção disponível"'), 3)
 
     def test_home_never_masks_horizontal_overflow(self):
         source = HOME_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
