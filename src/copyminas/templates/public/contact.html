@@ -26,7 +26,7 @@
         <p class="paper-kicker">Contato / diretório</p>
         <h1 class="paper-title">Contato & orçamento.</h1>
         <p class="paper-lead">
-            Escolha um canal direto ou use o formulário para preparar sua mensagem no WhatsApp da Copy Minas.
+            Fale diretamente com a Copy Minas ou registre uma solicitação para atendimento.
         </p>
 
         <div class="contact-channel-grid" aria-label="Canais principais">
@@ -51,12 +51,23 @@
         </div>
     </section>
 
+    {% with success_messages = get_flashed_messages(category_filter=["contact-success"]) %}
+        {% if success_messages %}
+        <div class="contact-success" role="status" aria-live="polite">
+            {% for message in success_messages %}
+            <strong>{{ message }}</strong>
+            {% endfor %}
+            <span>A equipe pode usar o protocolo para localizar a solicitação no atendimento.</span>
+        </div>
+        {% endif %}
+    {% endwith %}
+
     <div class="contact-layout">
-        <section class="paper-sheet contact-form-sheet" data-sheet="FORM / 01">
-            <p class="paper-kicker">Solicitação</p>
+        <section class="paper-sheet contact-form-sheet" data-sheet="FORM / MAIN_BD">
+            <p class="paper-kicker">Solicitação / main_bd.contatos</p>
             <h2>Solicitar contato.</h2>
             <p class="contact-form-intro">
-                Preencha os dados abaixo. O site valida a mensagem e prepara o texto no WhatsApp escolhido; o envio final acontece no próprio WhatsApp.
+                O formulário abaixo registra sua solicitação no banco da Copy Minas e gera um protocolo de atendimento.
             </p>
 
             {% if form_errors %}
@@ -83,16 +94,40 @@
                     </label>
 
                     <label>
-                        <span>Telefone, WhatsApp ou e-mail para retorno *</span>
-                        <input type="text" name="reply" value="{{ form_data.get('reply', '') }}" maxlength="160" autocomplete="email" required>
+                        <span>E-mail *</span>
+                        <input type="email" name="email" value="{{ form_data.get('email', '') }}" maxlength="254" autocomplete="email" required>
                     </label>
 
                     <label>
-                        <span>Assunto *</span>
-                        <select name="subject" required>
+                        <span>Telefone / WhatsApp *</span>
+                        <input type="tel" name="phone" value="{{ form_data.get('phone', '') }}" maxlength="20" autocomplete="tel" required>
+                    </label>
+
+                    <label>
+                        <span>Cidade *</span>
+                        <input type="text" name="city" value="{{ form_data.get('city', '') }}" maxlength="120" autocomplete="address-level2" required>
+                    </label>
+
+                    <label>
+                        <span>Tipo de serviço *</span>
+                        <select name="service_type" required>
                             <option value="">Selecione</option>
-                            {% for subject in contact_subjects %}
-                            <option value="{{ subject }}" {% if form_data.get('subject') == subject %}selected{% endif %}>{{ subject }}</option>
+                            {% for value, label in contact_service_types %}
+                            <option value="{{ value }}" {% if form_data.get('service_type') == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    <label>
+                        <span>Quantidade de equipamentos</span>
+                        <input type="number" name="equipment_quantity" value="{{ form_data.get('equipment_quantity') or '' }}" min="1" max="65535" inputmode="numeric">
+                    </label>
+
+                    <label>
+                        <span>Preferência de contato *</span>
+                        <select name="preferred_contact" required>
+                            {% for value, label in contact_preferences %}
+                            <option value="{{ value }}" {% if form_data.get('preferred_contact', 'whatsapp') == value %}selected{% endif %}>{{ label }}</option>
                             {% endfor %}
                         </select>
                     </label>
@@ -100,21 +135,18 @@
 
                 <label class="contact-form__message">
                     <span>Mensagem *</span>
-                    <textarea name="message" rows="8" maxlength="2000" required>{{ form_data.get('message', '') }}</textarea>
+                    <textarea name="message" rows="8" maxlength="5000" required>{{ form_data.get('message', '') }}</textarea>
                 </label>
 
-                <fieldset class="contact-form__targets">
-                    <legend>Preparar mensagem em</legend>
-                    {% for phone in contact.phones %}
-                    <button class="paper-action" type="submit" name="target" value="{{ loop.index0 }}">
-                        WhatsApp {{ "%02d"|format(loop.index) }}
-                    </button>
-                    {% endfor %}
-                </fieldset>
+                <label class="contact-consent">
+                    <input type="checkbox" name="consent_privacy" value="1" required>
+                    <span>Autorizo o registro destes dados para que a Copy Minas possa responder a esta solicitação.</span>
+                </label>
 
-                <p class="contact-form__privacy">
-                    Nenhuma mensagem é armazenada pelo site nesta etapa. O botão apenas prepara o conteúdo no WhatsApp selecionado para você revisar e enviar.
-                </p>
+                <div class="contact-form__submit">
+                    <button class="paper-action" type="submit">Registrar solicitação</button>
+                    <span>STATUS INICIAL / NOVO</span>
+                </div>
             </form>
         </section>
 
