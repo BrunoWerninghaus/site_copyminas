@@ -1,0 +1,295 @@
+{
+  "source": {
+    "generation": "Site 2",
+    "database": "main_bd",
+    "imported_from": "MySQL dump supplied by owner",
+    "policy": "Only ativo=1 product rows are public. Source IDs and image paths are retained for traceability."
+  },
+  "categories": [
+    {
+      "id": 1,
+      "name": "Impressoras",
+      "active": true
+    },
+    {
+      "id": 2,
+      "name": "Computadores",
+      "active": true
+    },
+    {
+      "id": 3,
+      "name": "Notebooks",
+      "active": true
+    },
+    {
+      "id": 4,
+      "name": "Celulares",
+      "active": true
+    },
+    {
+      "id": 5,
+      "name": "Monitores",
+      "active": true
+    },
+    {
+      "id": 6,
+      "name": "Suprimentos",
+      "active": true
+    },
+    {
+      "id": 7,
+      "name": "Peças",
+      "active": true
+    },
+    {
+      "id": 8,
+      "name": "Redes",
+      "active": true
+    },
+    {
+      "id": 9,
+      "name": "Periféricos",
+      "active": true
+    },
+    {
+      "id": 10,
+      "name": "Acessórios",
+      "active": true
+    }
+  ],
+  "products": [
+    {
+      "source_id": 14,
+      "slug": "computador-desktop-i3-3220-12gb-ssd-128gb",
+      "name": "Computador Desktop Intel Core i3-3220 12GB RAM SSD 128GB",
+      "source_name": "Computador Desktop Intel Core i3-3220 12GB RAM SSD 128GB",
+      "category_id": 2,
+      "featured": true,
+      "description": "Computador desktop indicado para tarefas administrativas, estudos e uso cotidiano. Equipado com processador Intel Core i3-3220 de 3.3 GHz, 12 GB de memória RAM DDR3 e 128 GB de armazenamento, oferece bom desempenho para navegação na internet, pacote Office, sistemas comerciais, emissão de documentos e demais atividades de escritório",
+      "specifications": [
+        "Processador: Intel Core i3-3220 3.3 GHz",
+        "Memória RAM: 12 GB DDR3",
+        "Armazenamento: 128 GB SSD SATA III",
+        "Vídeo: Integrado"
+      ],
+      "source_image_path": "images/products/86fdb23ecc13aa24_pc-04.png",
+      "image_url": null,
+      "source_quantity": 1
+    },
+    {
+      "source_id": 15,
+      "slug": "computador-desktop-i3-3220-8gb-ssd-128gb",
+      "name": "Computador Desktop Intel Core i3-3220 8GB RAM SSD 128GB",
+      "source_name": "Computador Desktop Intel Core i3-3220 8GB RAM SSD 128GB",
+      "category_id": 2,
+      "featured": false,
+      "description": "Computador desktop voltado para uso em escritório, estudos e tarefas do dia a dia. Possui processador Intel Core i3-3220 de 3.3 GHz, acompanhado de 8 GB de memória RAM DDR3 e 128 GB de armazenamento, configuração adequada para navegação, pacote Office, sistemas administrativos, emissão de notas e aplicações comerciais.",
+      "specifications": [
+        "Processador: Intel Core i3-3220 3.3 GHz",
+        "Memória RAM: 8 GB DDR3",
+        "Armazenamento: 128 GB",
+        "Vídeo: Integrado"
+      ],
+      "source_image_path": "images/products/7bf899d0f19f6314_pc-05.png",
+      "image_url": null,
+      "source_quantity": 1
+    },
+    {
+      "source_id": 16,
+      "slug": "computador-desktop-i3-2100-8gb-ssd-128gb",
+      "name": "Computador Desktop Intel Core i3-2100 8GB RAM SSD 128GB",
+      "source_name": "Computador Desktop Intel Core i3-2100 8GB RAM SSD 128GB",
+      "category_id": 2,
+      "featured": false,
+      "description": "Computador desktop indicado para tarefas básicas de escritório, estudos e uso cotidiano. Equipado com processador Intel Core i3-2100 de 3.1 GHz, 8 GB de memória RAM DDR3 e SSD de 128 GB, oferece boa agilidade na inicialização do sistema e na abertura de programas essenciais. Conta com vídeo integrado, sendo uma opção adequada para navegação na internet, pacote Office, sistemas comerciais, emissão de documentos e atividades administrativas.",
+      "specifications": [
+        "Processador: Intel Core i3-2100 3.1 GHz",
+        "Memória RAM: 8 GB DDR3",
+        "Armazenamento: SSD 128 GB",
+        "Vídeo: Integrado"
+      ],
+      "source_image_path": "images/products/cdd587b4297ac483_pc-0123.png",
+      "image_url": null,
+      "source_quantity": 4
+    },
+    {
+      "source_id": 19,
+      "slug": "brother-dcp-8157dn",
+      "name": "Brother DCP-8157DN — Multifuncional Laser Monocromática Duplex com Rede",
+      "source_name": "Brother DCP-8157DN — Multifuncional Laser Monocromática Duplex com Rede",
+      "category_id": 1,
+      "featured": true,
+      "description": "Multifuncional laser monocromática indicada para escritórios, empresas e ambientes com alto volume de documentos. A Brother DCP-8157DN reúne impressão, cópia e digitalização, contando com impressão frente e verso automática, digitalização duplex pelo ADF e conexão em rede. Possui velocidade de impressão de até 40 páginas por minuto, alimentador automático para até 50 folhas e bandeja principal com capacidade para 250 folhas, oferecendo boa produtividade para rotinas administrativas.",
+      "specifications": [
+        "Tipo: Multifuncional Laser Monocromática",
+        "Funções: Impressão, cópia e digitalização",
+        "Velocidade de impressão: Até 40 ppm",
+        "Resolução de impressão: Até 1200 × 1200 dpi",
+        "Impressão Duplex: Automática",
+        "Digitalização Duplex: Automática pelo ADF",
+        "Alimentador automático (ADF): Até 50 folhas",
+        "Bandeja principal: Até 250 folhas",
+        "Bandeja multiuso: Até 50 folhas",
+        "Saída de papel: Até 150 folhas",
+        "Memória: 128 MB",
+        "Scanner óptico: Até 1200 × 1200 dpi",
+        "Cópias: Até 99 por operação",
+        "Ampliação/Redução: 25% a 400%",
+        "Conectividade: USB e Rede Ethernet",
+        "Impressão direta: USB",
+        "Tecnologia: Laser eletrofotográfica"
+      ],
+      "source_image_path": "images/products/2c78487f69c7d448_BROTHER-DCP-81528157b.webp",
+      "image_url": null,
+      "source_quantity": null
+    },
+    {
+      "source_id": 21,
+      "slug": "samsung-proxpress-sl-m4070fr",
+      "name": "Samsung ProXpress SL-M4070FR — Multifuncional Laser Monocromática",
+      "source_name": "SAMSUNG PROXPRESS SL-M4070FR — MULTIFUNCIONAL LASER MONOCROMÁTICA",
+      "category_id": 1,
+      "featured": false,
+      "description": "Multifuncional laser monocromática voltada para escritórios e empresas com rotinas intensas de documentos. A Samsung ProXpress SL-M4070FR combina impressão, cópia, digitalização e fax, com impressão frente e verso automática e conexão de rede Gigabit Ethernet. Sua velocidade de até 40 páginas por minuto em A4 favorece ambientes que precisam de produtividade e boa capacidade de trabalho.",
+      "specifications": [
+        "Tecnologia: Laser monocromática",
+        "Funções: Impressão, cópia, digitalização e fax",
+        "Velocidade de impressão: Até 40 ppm em A4",
+        "Resolução de impressão: Até 1200 x 1200 dpi",
+        "Impressão duplex: Automática",
+        "ADF: Até 50 folhas",
+        "Bandeja principal: 250 folhas",
+        "Bandeja multifuncional: 50 folhas",
+        "Saída de papel: Até 150 folhas",
+        "Memória: 256 MB, expansível até 512 MB",
+        "Processador: 600 MHz",
+        "Conectividade: USB 2.0, USB Host e Gigabit Ethernet",
+        "Ciclo mensal máximo: Até 100.000 páginas"
+      ],
+      "source_image_path": "images/products/c63e79e36b2d0e91_SAMSUNG_M4070.png",
+      "image_url": null,
+      "source_quantity": null,
+      "verification": "Samsung official support specifications checked."
+    },
+    {
+      "source_id": 22,
+      "slug": "samsung-proxpress-sl-m4080fx",
+      "name": "Samsung ProXpress SL-M4080FX — Multifuncional Laser Monocromática",
+      "source_name": "SAMSUNG PROXPRESS SL-M4080FX — MULTIFUNCIONAL LASER MONOCROMÁTICA",
+      "category_id": 1,
+      "featured": false,
+      "description": "Multifuncional laser monocromática corporativa desenvolvida para fluxos de trabalho de médio e alto volume. A Samsung ProXpress SL-M4080FX reúne impressão, cópia, digitalização e fax, oferecendo velocidade de até 40 páginas por minuto, painel touchscreen colorido de 7 polegadas e alimentador com digitalização duplex de alta velocidade.",
+      "specifications": [
+        "Tecnologia: Laser monocromática",
+        "Funções: Impressão, cópia, digitalização e fax",
+        "Velocidade de impressão: Até 40 ppm em A4",
+        "Resolução de impressão: Até 1200 x 1200 dpi",
+        "Impressão duplex: Automática",
+        "Digitalização duplex: Sim, por alimentador de dupla leitura",
+        "Tela: Touchscreen colorida de 7 polegadas",
+        "Processador: Dual-core de 1 GHz",
+        "Memória: 1 GB, expansível",
+        "Conectividade: USB e Gigabit Ethernet",
+        "Ciclo mensal máximo: Até 120.000 páginas",
+        "Volume mensal recomendado: Aproximadamente 2.000 a 12.000 páginas"
+      ],
+      "source_image_path": "images/products/e61c880678aceddf_SamsungProXpressSL-M4080FX_1.webp",
+      "image_url": null,
+      "source_quantity": null,
+      "verification": "Samsung official support specifications checked."
+    },
+    {
+      "source_id": 23,
+      "slug": "brother-mfc-8912dw",
+      "name": "Brother MFC-8912DW — Multifuncional Laser Monocromática com Fax e Wi-Fi",
+      "source_name": "BROTHER MFC-8912DW — MULTIFUNCIONAL LASER MONOCROMÁTICA COM FAX E WI-FI",
+      "category_id": 1,
+      "featured": false,
+      "description": "Multifuncional laser monocromática voltada para escritórios com grande fluxo de documentos. A Brother MFC-8912DW reúne impressão, cópia, digitalização e fax, conta com duplex completo, rede cabeada e Wi-Fi, além de alimentador automático para documentos.",
+      "specifications": [
+        "Tecnologia: Laser eletrofotográfica monocromática",
+        "Funções: Impressão, cópia, digitalização e fax",
+        "Velocidade de impressão: Até 40 ppm em A4 / 42 ppm em Carta",
+        "Resolução de impressão: Até 1200 x 1200 dpi",
+        "Impressão duplex: Automática",
+        "Cópia duplex: Automática pelo ADF",
+        "Digitalização duplex: Automática pelo ADF",
+        "ADF: Até 50 folhas",
+        "Bandeja principal: 250 folhas",
+        "Bandeja multiuso: 50 folhas",
+        "Saída de papel: Até 150 folhas",
+        "Memória: 128 MB, expansível",
+        "Conectividade: USB 2.0, Ethernet e Wi-Fi 802.11 b/g/n",
+        "Fax: 33,6 kbps"
+      ],
+      "source_image_path": "images/products/5b9f075440c960fb_BROTHER-DCP-81528157b.webp",
+      "image_url": null,
+      "source_quantity": null
+    },
+    {
+      "source_id": 24,
+      "slug": "epson-ecotank-l6490",
+      "name": "Epson EcoTank L6490 — Multifuncional Colorida",
+      "source_name": "EPSON 6490",
+      "category_id": 1,
+      "featured": false,
+      "description": "Multifuncional EcoTank colorida com impressão, cópia, digitalização e fax, ADF, impressão automática frente e verso, Ethernet, Wi-Fi e Wi-Fi Direct. O cadastro do Site 2 não trazia descrição ou especificações; esta identificação foi normalizada como L6490 a partir da página oficial da Epson.",
+      "specifications": [
+        "Tecnologia: Tanque de tinta colorida EcoTank",
+        "Funções: Impressão, cópia, digitalização e fax",
+        "Bandeja frontal: Até 250 folhas",
+        "Impressão duplex: Automática",
+        "Conectividade: Ethernet, Wi-Fi e Wi-Fi Direct",
+        "Tela: Touch colorida de 2,4 polegadas",
+        "Velocidade ISO: 17 ppm preto / 9,5 ppm colorido",
+        "Ciclo mensal máximo: Até 20.000 páginas"
+      ],
+      "source_image_path": "images/products/585ac487053199e4_width1200.png",
+      "image_url": null,
+      "source_quantity": null,
+      "verification": "Epson Brasil product page used to normalize model and specifications."
+    },
+    {
+      "source_id": 25,
+      "slug": "brother-dcp-l5652dn",
+      "name": "Brother DCP-L5652DN — Multifuncional Laser Monocromática",
+      "source_name": "BROTHER DCP-L5652DN",
+      "category_id": 1,
+      "featured": false,
+      "description": "Multifuncional laser monocromática para grupos de trabalho, com impressão, cópia e digitalização, duplex automático e conectividade Ethernet. O cadastro do Site 2 não trazia descrição ou especificações; os dados técnicos foram preenchidos a partir da página oficial da Brother Brasil.",
+      "specifications": [
+        "Tecnologia: Laser monocromática",
+        "Funções: Impressão, cópia e digitalização",
+        "Velocidade de impressão: Até 40 ppm em A4",
+        "Resolução de impressão: Até 1200 x 1200 dpi",
+        "Duplex: Impressão, cópia e digitalização",
+        "ADF/SPDF: Até 70 folhas",
+        "Bandeja principal: 250 folhas",
+        "Bandeja multiuso: 50 folhas",
+        "Memória: 512 MB",
+        "Conectividade: Gigabit Ethernet e USB 2.0",
+        "Tela: Touchscreen colorida de 3,7 polegadas"
+      ],
+      "source_image_path": "images/products/659905e5e4da96f3_brother-dcp-5652-frente.webp",
+      "image_url": null,
+      "source_quantity": null,
+      "verification": "Brother Brasil product page used to fill missing Site 2 description/specifications."
+    },
+    {
+      "source_id": 26,
+      "slug": "cabo-rede-cat6-10-metros",
+      "name": "Cabo de Rede CAT6 — 10 metros",
+      "source_name": "Cabo de Rede (10 METROS)",
+      "category_id": 8,
+      "featured": true,
+      "description": "Cabo CAT6 com 10 metros.",
+      "specifications": [
+        "Categoria: CAT6",
+        "Comprimento: 10 metros"
+      ],
+      "source_image_path": "images/products/fe4fc98c9561009f_cabo_de_rede_10_metros_de_rapida_transmissao_de_dados_1571166600_d75c_600x600.webp",
+      "image_url": null,
+      "source_quantity": null
+    }
+  ]
+}

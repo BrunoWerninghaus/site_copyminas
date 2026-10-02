@@ -1,6 +1,10 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, abort, render_template
 
-from src.copyminas.catalog import get_public_products
+from src.copyminas.catalog import (
+    get_product_by_slug,
+    get_public_categories,
+    get_public_products,
+)
 from src.copyminas.contact import COPY_MINAS_CONTACT
 from src.copyminas.location import COPY_MINAS_LOCATION
 
@@ -30,6 +34,20 @@ def products():
     return render_template(
         "public/products.html",
         products=get_public_products(),
+        categories=get_public_categories(),
+    )
+
+
+@public_bp.get("/produtos/<slug>")
+def product_detail(slug):
+    product = get_product_by_slug(slug)
+
+    if product is None:
+        abort(404)
+
+    return render_template(
+        "public/product_detail.html",
+        product=product,
     )
 
 

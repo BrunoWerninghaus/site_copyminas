@@ -14,7 +14,10 @@ O projeto está sendo reconstruído do zero.
 ## Rotas atuais
 
 - `/` — entrada imersiva Copy Minas;
-- `/home` — Home institucional.
+- `/home` — Home institucional;
+- `/produtos` — catálogo migrado do Site 2;
+- `/produtos/<slug>` — ficha individual do produto;
+- `/contato` — contato e localização.
 
 ## Contrato de conteúdo
 
@@ -38,3 +41,12 @@ python app.py
 ```
 
 A configuração local deve ficar em `.env`, nunca versionado.
+
+
+## Gerações
+
+- **Site 1**: snapshot histórico em `/old`.
+- **Site 2**: fonte de dados do catálogo migrado.
+- **Site 3**: aplicação atual.
+
+A rastreabilidade da migração do catálogo está documentada em `docs/SITE2_CATALOG_MIGRATION.md`.
