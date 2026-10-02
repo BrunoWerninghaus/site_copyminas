@@ -10,6 +10,10 @@ from src.copyminas.contact import COPY_MINAS_CONTACT
 from src.copyminas.contact_store import create_contact_request
 from src.copyminas.db import DatabaseUnavailable
 from src.copyminas.location import COPY_MINAS_LOCATION
+from src.copyminas.notifications import (
+    ContactNotificationError,
+    send_contact_notification,
+)
 
 
 public_bp = Blueprint("public", __name__)
@@ -28,6 +32,13 @@ CONTACT_PREFERENCES = (
     ("telefone", "Telefone"),
     ("email", "E-mail"),
 )
+
+
+def _contact_label_maps():
+    return (
+        dict(CONTACT_SERVICE_TYPES),
+        dict(CONTACT_PREFERENCES),
+    )
 
 
 @public_bp.get("/")
@@ -196,6 +207,19 @@ def contact_submit():
                 "Use um dos canais diretos ao lado."
             ],
             status=503,
+        )
+
+    service_labels, preference_labels = _contact_label_maps()
+    current_app.config["CONTACT_SERVICE_LABELS"] = service_labels
+    current_app.config["CONTACT_PREFERENCE_LABELS"] = preference_labels
+
+    try:
+        send_contact_notification(protocol, form_data)
+    except ContactNotificationError as exc:
+        current_app.logger.error(
+            "Contact %s persisted, but email notification failed: %s",
+            protocol,
+            exc,
         )
 
     flash(
