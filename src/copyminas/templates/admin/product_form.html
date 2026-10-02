@@ -20,6 +20,14 @@
         {% endif %}
     {% endwith %}
 
+    {% with messages = get_flashed_messages(category_filter=["admin-warning"]) %}
+        {% if messages %}
+        <div class="admin-alert admin-alert--warning" role="status">
+            {% for message in messages %}<strong>{{ message }}</strong>{% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
     <div class="admin-form-heading">
         <a href="{{ url_for('admin.products') }}">← Produtos</a>
         <span>{{ "NOVO / PRODUTO" if mode == "new" else "EDIÇÃO / PRODUTO" }}</span>
@@ -29,7 +37,20 @@
         {% else %}
         <p>Cria um novo registro na tabela <code>produtos</code>.</p>
         {% endif %}
+
+        {% if public_slug %}
+        <a class="admin-public-preview" href="{{ url_for('public.product_detail', slug=public_slug) }}" target="_blank" rel="noopener noreferrer">Abrir ficha pública ↗</a>
+        {% endif %}
     </div>
+
+    {% if duplicates %}
+    <div class="admin-alert admin-alert--warning" role="alert">
+        <strong>Possível duplicidade encontrada.</strong>
+        {% for duplicate in duplicates %}
+        <span>#{{ duplicate.id }} · {{ duplicate.nome }} · {{ "ativo" if duplicate.ativo else "inativo" }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     {% if form_errors %}
     <div class="admin-alert admin-alert--error" role="alert">
@@ -38,7 +59,7 @@
     </div>
     {% endif %}
 
-    <form class="admin-product-form" method="post">
+    <form class="admin-product-form" method="post" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
         <section class="admin-form-section">
@@ -101,21 +122,39 @@
         <section class="admin-form-section">
             <header>
                 <span>03</span>
-                <div><strong>Imagens</strong><small>Caminhos já usados pelo catálogo</small></div>
+                <div><strong>Imagens</strong><small>Caminho existente ou upload direto</small></div>
             </header>
 
             <div class="admin-image-fields">
                 {% for index in range(1, 6) %}
                 {% set key = "imagem" ~ index %}
-                <label class="admin-field">
-                    <span>Imagem {{ index }}</span>
-                    <input type="text" name="{{ key }}" value="{{ form_data[key] }}" maxlength="500" placeholder="images/products/exemplo.webp">
-                </label>
+                <div class="admin-image-slot">
+                    <div class="admin-image-preview">
+                        {% if image_previews[key] %}
+                        <img src="{{ url_for('static', filename=image_previews[key]) }}" alt="Prévia da imagem {{ index }}">
+                        {% else %}
+                        <span>IMAGEM {{ index }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="admin-image-slot__fields">
+                        <label class="admin-field">
+                            <span>Caminho da imagem {{ index }}</span>
+                            <input type="text" name="{{ key }}" value="{{ form_data[key] }}" maxlength="500" placeholder="images/products/exemplo.webp">
+                        </label>
+
+                        <label class="admin-upload">
+                            <span>Enviar nova imagem</span>
+                            <input type="file" name="upload{{ index }}" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
+                            <small>PNG, JPG/JPEG ou WEBP. O upload substitui o caminho deste slot ao salvar.</small>
+                        </label>
+                    </div>
+                </div>
                 {% endfor %}
             </div>
 
             <p class="admin-form-note">
-                O catálogo só publica o arquivo quando ele realmente existe dentro de <code>static</code>. Alterar o caminho aqui não faz upload do arquivo.
+                Uploads são salvos em <code>static/images/products</code>. Substituir um slot não apaga automaticamente o arquivo antigo.
             </p>
         </section>
 
