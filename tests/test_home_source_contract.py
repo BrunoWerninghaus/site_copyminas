@@ -95,6 +95,17 @@ class HomeSourceContractTestCase(unittest.TestCase):
             r"\.location-copy\s*\{[^}]*container-type:\s*inline-size",
         )
 
+    def test_home_refinement_preserves_editorial_technical_language(self):
+        source = HOME_CSS.read_text(encoding="utf-8")
+
+        self.assertIn('.paper-panel--hero::before', source)
+        self.assertIn('content: "REG / 03";', source)
+        self.assertIn('content: "GEO / 03";', source)
+        self.assertRegex(
+            source,
+            r"\.registry-card\s*\{[^}]*border-left:\s*3px solid var\(--red\)",
+        )
+
     def test_home_never_masks_horizontal_overflow(self):
         source = HOME_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
 
