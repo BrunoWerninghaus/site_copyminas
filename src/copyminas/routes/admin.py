@@ -1,6 +1,8 @@
 import hmac
+import re
 import secrets
 import time
+import unicodedata
 from functools import wraps
 
 from flask import (
@@ -14,16 +16,31 @@ from flask import (
     url_for,
 )
 
+from src.copyminas.admin_assets import (
+    AdminAssetError,
+    cleanup_new_uploads,
+    normalize_static_path,
+    save_product_image,
+    static_asset_exists,
+)
 from src.copyminas.admin_catalog import (
     AdminCatalogError,
+    create_category,
     create_product,
+    get_category,
     get_product,
     list_categories,
     list_products,
+    set_category_active,
     set_product_active,
+    update_category,
     update_product,
 )
-from src.copyminas.catalog import get_public_categories, get_public_products
+from src.copyminas.catalog import (
+    get_public_categories,
+    get_public_products,
+    get_public_slug,
+)
 from src.copyminas.db import DatabaseUnavailable
 
 
@@ -106,6 +123,66 @@ def _admin_error(title, message, status=400):
     )
 
 
+def _normalized_name(value):
+    normalized = unicodedata.normalize("NFKD", value or "")
+    ascii_value = normalized.encode("ascii", "ignore").decode("ascii")
+    return re.sub(r"[^a-z0-9]+", " ", ascii_value.casefold()).strip()
+
+
+def _duplicate_ids(products):
+    groups = {}
+    for product in products:
+        key = _normalized_name(product.get("nome", ""))
+        if not key:
+            continue
+        groups.setdefault(key, []).append(product["id"])
+
+    duplicates = set()
+    for ids in groups.values():
+        if len(ids) > 1:
+            duplicates.update(ids)
+    return duplicates
+
+
+def _decorate_products(products):
+    duplicates = _duplicate_ids(products)
+    decorated = []
+
+    for source in products:
+        product = dict(source)
+        product["duplicate_warning"] = product["id"] in duplicates
+        product["preview_image"] = (
+            normalize_static_path(product.get("imagem1"))
+            if static_asset_exists(product.get("imagem1"))
+            else None
+        )
+        product["public_slug"] = (
+            get_public_slug(product["id"], product["nome"])
+            if product.get("ativo") and product.get("categoria_ativa")
+            else None
+        )
+        decorated.append(product)
+
+    return decorated
+
+
+def _possible_duplicates(name, exclude_id=None):
+    if not name:
+        return []
+
+    target = _normalized_name(name)
+    if not target:
+        return []
+
+    products = list_products()
+    return [
+        product
+        for product in products
+        if product["id"] != exclude_id
+        and _normalized_name(product.get("nome", "")) == target
+    ]
+
+
 def _parse_product_form():
     raw_quantity = request.form.get("qtd", "").strip()
     raw_category = request.form.get("categoria_id", "").strip()
@@ -153,6 +230,44 @@ def _parse_product_form():
     for key in ("imagem1", "imagem2", "imagem3", "imagem4", "imagem5"):
         if len(data[key]) > 500:
             errors.append(f"{key} deve ter no máximo 500 caracteres.")
+            continue
+        if data[key]:
+            try:
+                data[key] = normalize_static_path(data[key])
+            except AdminAssetError as exc:
+                errors.append(f"{key}: {exc}")
+
+    return data, errors
+
+
+def _apply_product_uploads(data):
+    saved = []
+
+    for index in range(1, 6):
+        file_storage = request.files.get(f"upload{index}")
+        if file_storage is None or not file_storage.filename:
+            continue
+
+        relative_path = save_product_image(file_storage)
+        if relative_path:
+            data[f"imagem{index}"] = relative_path
+            saved.append(relative_path)
+
+    return saved
+
+
+def _parse_category_form():
+    name = request.form.get("nome", "").strip()
+    data = {
+        "nome": name,
+        "ativo": 1 if request.form.get("ativo") == "1" else 0,
+    }
+    errors = []
+
+    if not name:
+        errors.append("Informe o nome da categoria.")
+    elif len(name) > 120:
+        errors.append("O nome da categoria deve ter no máximo 120 caracteres.")
 
     return data, errors
 
@@ -250,8 +365,8 @@ def dashboard():
 @login_required
 def products():
     try:
-        catalog_products = list_products()
-    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        catalog_products = _decorate_products(list_products())
+    except (DatabaseUnavailable, AdminCatalogError, AdminAssetError) as exc:
         current_app.logger.error("Admin product list unavailable: %s", exc)
         return _admin_error(
             "Catálogo indisponível",
@@ -260,11 +375,14 @@ def products():
         )
 
     active_count = sum(1 for product in catalog_products if product["ativo"])
+    duplicate_count = sum(1 for product in catalog_products if product["duplicate_warning"])
+
     return render_template(
         "admin/products.html",
         products=catalog_products,
         active_count=active_count,
         inactive_count=len(catalog_products) - active_count,
+        duplicate_count=duplicate_count,
         csrf_token=_csrf_token(),
     )
 
@@ -296,6 +414,7 @@ def product_new():
         "qtd": "",
     }
     errors = []
+    duplicates = []
 
     if request.method == "POST":
         if not _csrf_valid(request.form.get("csrf_token", "")):
@@ -306,13 +425,23 @@ def product_new():
             )
 
         form_data, errors = _parse_product_form()
+        saved_uploads = []
+
         if not errors:
             try:
+                saved_uploads = _apply_product_uploads(form_data)
+                duplicates = _possible_duplicates(form_data["nome"])
                 product_id = create_product(form_data)
-            except (DatabaseUnavailable, AdminCatalogError) as exc:
+            except (DatabaseUnavailable, AdminCatalogError, AdminAssetError) as exc:
+                cleanup_new_uploads(saved_uploads)
                 errors.append(str(exc))
             else:
                 flash("Produto criado com sucesso.", "admin-success")
+                if duplicates:
+                    flash(
+                        "Atenção: existem registros com nome equivalente. Revise possíveis duplicidades.",
+                        "admin-warning",
+                    )
                 return redirect(url_for("admin.product_edit", product_id=product_id))
 
     return (
@@ -323,6 +452,8 @@ def product_new():
             form_data=form_data,
             categories=categories,
             form_errors=errors,
+            duplicates=duplicates,
+            public_slug=None,
             csrf_token=_csrf_token(),
         ),
         422 if errors else 200,
@@ -364,6 +495,12 @@ def product_edit(product_id):
         "qtd": "" if product["qtd"] is None else product["qtd"],
     }
     errors = []
+    duplicates = []
+
+    try:
+        duplicates = _possible_duplicates(form_data["nome"], exclude_id=product_id)
+    except (DatabaseUnavailable, AdminCatalogError):
+        duplicates = []
 
     if request.method == "POST":
         if not _csrf_valid(request.form.get("csrf_token", "")):
@@ -374,14 +511,30 @@ def product_edit(product_id):
             )
 
         form_data, errors = _parse_product_form()
+        saved_uploads = []
+
         if not errors:
             try:
+                saved_uploads = _apply_product_uploads(form_data)
+                duplicates = _possible_duplicates(form_data["nome"], exclude_id=product_id)
                 update_product(product_id, form_data)
-            except (DatabaseUnavailable, AdminCatalogError) as exc:
+            except (DatabaseUnavailable, AdminCatalogError, AdminAssetError) as exc:
+                cleanup_new_uploads(saved_uploads)
                 errors.append(str(exc))
             else:
                 flash("Produto atualizado com sucesso.", "admin-success")
+                if duplicates:
+                    flash(
+                        "Atenção: existem registros com nome equivalente. Revise possíveis duplicidades.",
+                        "admin-warning",
+                    )
                 return redirect(url_for("admin.product_edit", product_id=product_id))
+
+    public_slug = (
+        get_public_slug(product_id, form_data["nome"])
+        if form_data["ativo"] and product.get("categoria_ativa")
+        else None
+    )
 
     return (
         render_template(
@@ -391,6 +544,8 @@ def product_edit(product_id):
             form_data=form_data,
             categories=categories,
             form_errors=errors,
+            duplicates=duplicates,
+            public_slug=public_slug,
             csrf_token=_csrf_token(),
         ),
         422 if errors else 200,
@@ -424,6 +579,149 @@ def product_status(product_id):
         "admin-success",
     )
     return redirect(url_for("admin.products"))
+
+
+@admin_bp.get("/categorias")
+@login_required
+def categories():
+    try:
+        rows = list_categories()
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        current_app.logger.error("Admin category list unavailable: %s", exc)
+        return _admin_error(
+            "Categorias indisponíveis",
+            "Não foi possível consultar as categorias no banco neste momento.",
+            503,
+        )
+
+    return render_template(
+        "admin/categories.html",
+        categories=rows,
+        active_count=sum(1 for category in rows if category["ativo"]),
+        csrf_token=_csrf_token(),
+    )
+
+
+@admin_bp.route("/categorias/nova", methods=["GET", "POST"])
+@login_required
+def category_new():
+    form_data = {"nome": "", "ativo": 1}
+    errors = []
+
+    if request.method == "POST":
+        if not _csrf_valid(request.form.get("csrf_token", "")):
+            return _admin_error(
+                "Sessão inválida",
+                "Recarregue o formulário antes de salvar a categoria.",
+                400,
+            )
+
+        form_data, errors = _parse_category_form()
+        if not errors:
+            try:
+                category_id = create_category(form_data)
+            except (DatabaseUnavailable, AdminCatalogError) as exc:
+                errors.append(str(exc))
+            else:
+                flash("Categoria criada com sucesso.", "admin-success")
+                return redirect(url_for("admin.category_edit", category_id=category_id))
+
+    return (
+        render_template(
+            "admin/category_form.html",
+            mode="new",
+            category=None,
+            form_data=form_data,
+            form_errors=errors,
+            csrf_token=_csrf_token(),
+        ),
+        422 if errors else 200,
+    )
+
+
+@admin_bp.route("/categorias/<int:category_id>", methods=["GET", "POST"])
+@login_required
+def category_edit(category_id):
+    try:
+        category = get_category(category_id)
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        current_app.logger.error("Admin category lookup unavailable: %s", exc)
+        return _admin_error(
+            "Categoria indisponível",
+            "Não foi possível consultar esta categoria.",
+            503,
+        )
+
+    if category is None:
+        return _admin_error(
+            "Categoria não encontrada",
+            "O registro solicitado não existe no banco.",
+            404,
+        )
+
+    form_data = {
+        "nome": category["nome"] or "",
+        "ativo": int(bool(category["ativo"])),
+    }
+    errors = []
+
+    if request.method == "POST":
+        if not _csrf_valid(request.form.get("csrf_token", "")):
+            return _admin_error(
+                "Sessão inválida",
+                "Recarregue o formulário antes de salvar a categoria.",
+                400,
+            )
+
+        form_data, errors = _parse_category_form()
+        if not errors:
+            try:
+                update_category(category_id, form_data)
+            except (DatabaseUnavailable, AdminCatalogError) as exc:
+                errors.append(str(exc))
+            else:
+                flash("Categoria atualizada com sucesso.", "admin-success")
+                return redirect(url_for("admin.category_edit", category_id=category_id))
+
+    return (
+        render_template(
+            "admin/category_form.html",
+            mode="edit",
+            category=category,
+            form_data=form_data,
+            form_errors=errors,
+            csrf_token=_csrf_token(),
+        ),
+        422 if errors else 200,
+    )
+
+
+@admin_bp.post("/categorias/<int:category_id>/status")
+@login_required
+def category_status(category_id):
+    if not _csrf_valid(request.form.get("csrf_token", "")):
+        return _admin_error(
+            "Sessão inválida",
+            "Não foi possível alterar o status com este formulário.",
+            400,
+        )
+
+    active = request.form.get("active") == "1"
+
+    try:
+        set_category_active(category_id, active)
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        return _admin_error(
+            "Não foi possível alterar a categoria",
+            str(exc),
+            503 if isinstance(exc, DatabaseUnavailable) else 400,
+        )
+
+    flash(
+        "Categoria ativada." if active else "Categoria desativada. Seus produtos deixam de ser publicados enquanto ela estiver inativa.",
+        "admin-success",
+    )
+    return redirect(url_for("admin.categories"))
 
 
 @admin_bp.post("/logout")
