@@ -3,8 +3,11 @@ from unittest.mock import MagicMock, patch
 
 from src.copyminas import create_app
 from src.copyminas.admin_catalog import (
+    create_category,
     create_product,
+    set_category_active,
     set_product_active,
+    update_category,
     update_product,
 )
 
@@ -87,6 +90,44 @@ class AdminCatalogStoreTestCase(unittest.TestCase):
         self.assertIn("UPDATE produtos SET ativo", sql)
         self.assertEqual(params, (0, 19))
         connection.commit.assert_called_once()
+
+    def test_category_create_update_and_status_never_delete(self):
+        connection, cursor = self._connection()
+        cursor.lastrowid = 12
+        cursor.rowcount = 1
+
+        with self.app.app_context(), patch(
+            "src.copyminas.admin_catalog.open_database",
+            return_value=connection,
+        ):
+            category_id = create_category({"nome": "Celulares", "ativo": 1})
+
+        self.assertEqual(category_id, 12)
+        self.assertTrue(
+            any(
+                "INSERT INTO categorias" in call.args[0]
+                for call in cursor.execute.call_args_list
+            )
+        )
+        self.assertFalse(
+            any(
+                "DELETE" in call.args[0].upper()
+                for call in cursor.execute.call_args_list
+            )
+        )
+
+        connection2, cursor2 = self._connection()
+        cursor2.rowcount = 1
+        with self.app.app_context(), patch(
+            "src.copyminas.admin_catalog.open_database",
+            return_value=connection2,
+        ):
+            update_category(12, {"nome": "Smartphones", "ativo": 1})
+            set_category_active(12, False)
+
+        sql_calls = [call.args[0] for call in cursor2.execute.call_args_list]
+        self.assertTrue(any("UPDATE categorias" in sql for sql in sql_calls))
+        self.assertFalse(any("DELETE" in sql.upper() for sql in sql_calls))
 
     def test_failed_write_rolls_back(self):
         connection, cursor = self._connection()
