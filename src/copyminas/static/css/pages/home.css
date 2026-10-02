@@ -193,7 +193,7 @@ html.globe-dialog-open body { overflow: hidden; }
 
 .action-row .button,
 .section-link,
-.registry-card > a,
+.service-matrix > a,
 .home-product__copy a {
     transition:
         transform 140ms ease,
@@ -206,8 +206,8 @@ html.globe-dialog-open body { overflow: hidden; }
 .action-row .button:focus-visible,
 .section-link:hover,
 .section-link:focus-visible,
-.registry-card > a:hover,
-.registry-card > a:focus-visible,
+.service-matrix > a:hover,
+.service-matrix > a:focus-visible,
 .home-product__copy a:hover,
 .home-product__copy a:focus-visible {
     transform: translate(-2px,-2px);
@@ -252,8 +252,8 @@ html.globe-dialog-open body { overflow: hidden; }
     border-bottom: 1px solid var(--line);
 }
 .registry-card dt { color: #aab3bb; font-size: .74rem; text-transform: uppercase; }
-.registry-card dd { margin: 0; color: white; }
-.registry-card > a,
+.service-matrix__row { margin: 0; color: white; }
+.service-matrix > a,
 .section-link {
     color: white;
     font-size: .76rem;
@@ -651,8 +651,8 @@ html.globe-dialog-open body { overflow: hidden; }
 .paper-panel--hero .lead,
 .section-heading > p:last-child,
 .location-copy > p:not(.section-kicker),
-.registry-card dd,
-.registry-card > a,
+.service-matrix__row,
+.service-matrix > a,
 .section-link,
 .site-footer span,
 .site-footer a {
@@ -697,7 +697,11 @@ html.globe-dialog-open body { overflow: hidden; }
     .paper-panel--hero{padding:1.5rem}
     .paper-panel--hero h1{font-size:clamp(2.45rem,12vw,3.65rem)}
     .section-heading h2,.company-callout h2,.location-section h2{font-size:clamp(2rem,10vw,3rem)}
-    .registry-card dl div{grid-template-columns:1fr}
+    .service-matrix__row {
+        grid-template-columns: minmax(96px,1.2fr) repeat(3,minmax(50px,.8fr));
+    }
+    .service-matrix__row--head > * { font-size:.56rem; letter-spacing:.04em; }
+    .service-matrix__row strong { font-size:.66rem; }
     .globe-card{min-height:400px}
     .globe-card__caption{align-items:flex-start;flex-direction:column}
     .globe-dialog__help{right:1rem;bottom:1rem;left:1rem}
@@ -707,8 +711,8 @@ html.globe-dialog-open body { overflow: hidden; }
 
 /* Home refinement pass */
 @media (min-width: 981px) {
-    .registry-card {
-        width: min(100%, 520px);
+    .service-matrix {
+        width: min(100%, 560px);
         justify-self: end;
         align-self: center;
     }
