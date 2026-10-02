@@ -236,6 +236,12 @@
     overflow-wrap: anywhere;
 }
 
+.contact-success--warning {
+    border-color: rgba(241,194,50,.55);
+    border-left-color: var(--gold);
+    box-shadow: 7px 7px 0 rgba(241,194,50,.08);
+}
+
 .contact-success span {
     color: #aeb8c0;
     font-size: .72rem;
