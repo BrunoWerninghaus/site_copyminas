@@ -4,6 +4,14 @@ Status: APROVADO PARA IMPLEMENTAÇÃO
 
 Este documento governa a construção da nova geração do site Copy Minas.
 
+## 0. Nomenclatura das gerações
+
+- **Site 1**: versão histórica preservada integralmente em `/old`.
+- **Site 2**: protótipo/ZIP de desenvolvimento usado como fonte de referência e, especificamente, como fonte dos produtos e dados de catálogo que serão migrados.
+- **Site 3**: versão atual em construção na raiz deste repositório.
+
+Regra: código e arquitetura do Site 2 não são copiados por inércia. Produtos, categorias, imagens e relações de banco que forem úteis são migrados para o modelo limpo do Site 3.
+
 ## 1. Regra de conteúdo
 
 Enquanto o conteúdo comercial definitivo não for fornecido, a interface deve usar somente conteúdo provisório explicitamente genérico.
@@ -143,16 +151,32 @@ Base visual:
 - branco / prata;
 - vermelho Copy Minas;
 - azul como acento tecnológico;
-- amarelo/dourado para Minas no sistema geográfico.
+- amarelo/dourado para Minas no sistema geográfico;
+- blocos quadrados, sem cantos arredondados;
+- superfícies claras inspiradas em folhas/fichas técnicas sobre o fundo escuro;
+- tipografia monoespaçada com linguagem de máquina de escrever/documento técnico.
 
-A interface deve evitar excesso de efeitos. Logo e globo são os elementos visuais dominantes.
+A interface deve evitar excesso de efeitos. Logo e globo são os elementos tecnológicos dominantes; as áreas de conteúdo usam a metáfora de papel/ficha técnica sem virar uma estética retrô caricata.
 
-## 7. Rotas/áreas futuras previstas
+## 7. Rotas públicas
 
-Ainda entram em etapas próprias:
-- catálogo completo;
-- produto individual;
-- contato/orçamento dedicado;
-- administração.
+- `/`: entrada imersiva.
+- `/home`: Home institucional.
+- `/produtos`: catálogo em página própria.
+- `/contato`: contato em página própria.
+- produto individual: entra junto da migração real do catálogo do Site 2.
+- administração: etapa posterior.
 
-Essas áreas não devem ser simuladas com páginas falsas.
+A Home pode exibir chamadas e produtos em destaque, mas não substitui as páginas dedicadas de Produtos e Contato.
+
+## 8. Fonte de dados do catálogo
+
+O catálogo do Site 3 deve ser populado a partir dos dados reais do **Site 2**.
+
+Regras:
+- não usar o banco do Site 1 como substituto silencioso;
+- não inventar modelos, preços, estoque, marcas ou especificações;
+- preservar os identificadores úteis do Site 2 durante a migração quando isso ajudar rastreabilidade;
+- normalizar categorias, imagens e relacionamentos para o modelo do Site 3;
+- segredos, credenciais e configuração de desenvolvimento do Site 2 não entram no repositório;
+- pesquisa pública pode validar categorias e informações institucionais, mas não substitui a fonte real dos produtos.

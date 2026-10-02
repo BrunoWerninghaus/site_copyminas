@@ -19,10 +19,10 @@
     <nav class="site-nav" aria-label="Navegação principal">
         <a href="#inicio">Início</a>
         <a href="#solucoes">Soluções</a>
-        <a href="#produtos">Produtos</a>
+        <a href="{{ url_for('public.products') }}">Produtos</a>
         <a href="#empresa">Empresa</a>
         <a href="#localizacao">Localização</a>
-        <a href="#contato">Contato</a>
+        <a href="{{ url_for('public.contact') }}">Contato</a>
     </nav>
 </header>
 
@@ -36,8 +36,8 @@
             </p>
 
             <div class="action-row" aria-label="Ações principais">
-                <a class="button button--primary" href="#produtos">Ação principal</a>
-                <a class="button button--secondary" href="#contato">Ação secundária</a>
+                <a class="button button--primary" href="{{ url_for('public.products') }}">Ver produtos</a>
+                <a class="button button--secondary" href="{{ url_for('public.contact') }}">Contato</a>
             </div>
         </div>
 
@@ -74,17 +74,27 @@
             <p data-content-key="home.products.description">Descrição da seleção de produtos a definir.</p>
         </header>
 
+        {% if featured_products %}
         <div class="placeholder-grid placeholder-grid--three">
-            {% for index in range(1, 4) %}
+            {% for product in featured_products %}
             <article class="placeholder-card placeholder-card--product">
-                <div class="media-slot media-slot--product" data-asset-slot="home.products.{{ index }}.image">
-                    <span>Imagem do produto {{ index }}</span>
+                <div class="media-slot media-slot--product" data-asset-slot="product.{{ product.id }}.image">
+                    <span>Imagem do produto</span>
                 </div>
-                <p class="placeholder-card__eyebrow">Categoria a definir</p>
-                <h3>Nome do produto</h3>
-                <p>Resumo do produto a definir.</p>
+                <p class="placeholder-card__eyebrow">{{ product.category }}</p>
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.summary }}</p>
             </article>
             {% endfor %}
+        </div>
+        {% else %}
+        <div class="contact-placeholder">
+            <span>O catálogo real será publicado após a migração dos produtos do Site 2.</span>
+        </div>
+        {% endif %}
+
+        <div class="action-row">
+            <a class="button button--primary" href="{{ url_for('public.products') }}">Abrir página de produtos</a>
         </div>
     </section>
 
@@ -151,7 +161,11 @@
         <p data-content-key="home.contact.description">Descrição do atendimento a definir.</p>
 
         <div class="contact-placeholder">
-            <span>Formulário / WhatsApp / dados de contato entram em etapa própria.</span>
+            <span>Os dados de atendimento ficam na página dedicada de contato.</span>
+        </div>
+
+        <div class="action-row">
+            <a class="button button--primary" href="{{ url_for('public.contact') }}">Abrir contato</a>
         </div>
     </section>
 </main>
