@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Soluções — Copy Minas{% endblock %}
+{% block meta_description %}Conheça as áreas de atuação da Copy Minas em impressão, equipamentos, locação, manutenção e suporte.{% endblock %}
 {% block body_class %}paper-page{% endblock %}
 {% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">{% endblock %}
 {% block body %}
 {% set active_page = "solutions" %}
 {% include "public/_paper_header.html" %}
-<main class="paper-stage">
+<main id="main-content" class="paper-stage">
     <section class="paper-sheet" data-sheet="SOLUÇÕES / 03">
         <p class="paper-kicker">Soluções / áreas de atuação</p>
         <h1 class="paper-title">Tecnologia para a rotina de trabalho.</h1>
