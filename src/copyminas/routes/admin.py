@@ -6,6 +6,7 @@ from functools import wraps
 from flask import (
     Blueprint,
     current_app,
+    flash,
     redirect,
     render_template,
     request,
@@ -13,6 +14,15 @@ from flask import (
     url_for,
 )
 
+from src.copyminas.admin_catalog import (
+    AdminCatalogError,
+    create_product,
+    get_product,
+    list_categories,
+    list_products,
+    set_product_active,
+    update_product,
+)
 from src.copyminas.catalog import get_public_categories, get_public_products
 from src.copyminas.db import DatabaseUnavailable
 
@@ -83,6 +93,68 @@ def login_required(view):
         return view(*args, **kwargs)
 
     return wrapped
+
+
+def _admin_error(title, message, status=400):
+    return (
+        render_template(
+            "admin/error.html",
+            title=title,
+            message=message,
+        ),
+        status,
+    )
+
+
+def _parse_product_form():
+    raw_quantity = request.form.get("qtd", "").strip()
+    raw_category = request.form.get("categoria_id", "").strip()
+
+    data = {
+        "nome": request.form.get("nome", "").strip(),
+        "descricao": request.form.get("descricao", "").strip(),
+        "imagem1": request.form.get("imagem1", "").strip(),
+        "imagem2": request.form.get("imagem2", "").strip(),
+        "imagem3": request.form.get("imagem3", "").strip(),
+        "imagem4": request.form.get("imagem4", "").strip(),
+        "imagem5": request.form.get("imagem5", "").strip(),
+        "espec": request.form.get("espec", "").strip(),
+        "ativo": 1 if request.form.get("ativo") == "1" else 0,
+        "categoria_id": None,
+        "qtd": None,
+    }
+    errors = []
+
+    if not data["nome"]:
+        errors.append("Informe o nome do produto.")
+    elif len(data["nome"]) > 255:
+        errors.append("O nome do produto deve ter no máximo 255 caracteres.")
+
+    if not raw_category:
+        errors.append("Selecione uma categoria.")
+    else:
+        try:
+            data["categoria_id"] = int(raw_category)
+        except ValueError:
+            errors.append("Selecione uma categoria válida.")
+        else:
+            if data["categoria_id"] < 1:
+                errors.append("Selecione uma categoria válida.")
+
+    if raw_quantity:
+        try:
+            data["qtd"] = int(raw_quantity)
+        except ValueError:
+            errors.append("A quantidade deve ser um número inteiro.")
+        else:
+            if data["qtd"] < 0:
+                errors.append("A quantidade não pode ser negativa.")
+
+    for key in ("imagem1", "imagem2", "imagem3", "imagem4", "imagem5"):
+        if len(data[key]) > 500:
+            errors.append(f"{key} deve ter no máximo 500 caracteres.")
+
+    return data, errors
 
 
 @admin_bp.route("/login", methods=["GET", "POST"])
@@ -174,16 +246,193 @@ def dashboard():
     )
 
 
+@admin_bp.get("/produtos")
+@login_required
+def products():
+    try:
+        catalog_products = list_products()
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        current_app.logger.error("Admin product list unavailable: %s", exc)
+        return _admin_error(
+            "Catálogo indisponível",
+            "Não foi possível consultar os produtos no banco neste momento.",
+            503,
+        )
+
+    active_count = sum(1 for product in catalog_products if product["ativo"])
+    return render_template(
+        "admin/products.html",
+        products=catalog_products,
+        active_count=active_count,
+        inactive_count=len(catalog_products) - active_count,
+        csrf_token=_csrf_token(),
+    )
+
+
+@admin_bp.route("/produtos/novo", methods=["GET", "POST"])
+@login_required
+def product_new():
+    try:
+        categories = list_categories()
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        current_app.logger.error("Admin categories unavailable: %s", exc)
+        return _admin_error(
+            "Categorias indisponíveis",
+            "Não foi possível consultar as categorias do banco.",
+            503,
+        )
+
+    form_data = {
+        "nome": "",
+        "descricao": "",
+        "imagem1": "",
+        "imagem2": "",
+        "imagem3": "",
+        "imagem4": "",
+        "imagem5": "",
+        "espec": "",
+        "ativo": 1,
+        "categoria_id": "",
+        "qtd": "",
+    }
+    errors = []
+
+    if request.method == "POST":
+        if not _csrf_valid(request.form.get("csrf_token", "")):
+            return _admin_error(
+                "Sessão inválida",
+                "Recarregue o formulário antes de salvar o produto.",
+                400,
+            )
+
+        form_data, errors = _parse_product_form()
+        if not errors:
+            try:
+                product_id = create_product(form_data)
+            except (DatabaseUnavailable, AdminCatalogError) as exc:
+                errors.append(str(exc))
+            else:
+                flash("Produto criado com sucesso.", "admin-success")
+                return redirect(url_for("admin.product_edit", product_id=product_id))
+
+    return (
+        render_template(
+            "admin/product_form.html",
+            mode="new",
+            product=None,
+            form_data=form_data,
+            categories=categories,
+            form_errors=errors,
+            csrf_token=_csrf_token(),
+        ),
+        422 if errors else 200,
+    )
+
+
+@admin_bp.route("/produtos/<int:product_id>", methods=["GET", "POST"])
+@login_required
+def product_edit(product_id):
+    try:
+        product = get_product(product_id)
+        categories = list_categories()
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        current_app.logger.error("Admin product lookup unavailable: %s", exc)
+        return _admin_error(
+            "Produto indisponível",
+            "Não foi possível consultar este produto no banco.",
+            503,
+        )
+
+    if product is None:
+        return _admin_error(
+            "Produto não encontrado",
+            "O registro solicitado não existe no banco.",
+            404,
+        )
+
+    form_data = {
+        "nome": product["nome"] or "",
+        "descricao": product["descricao"] or "",
+        "imagem1": product["imagem1"] or "",
+        "imagem2": product["imagem2"] or "",
+        "imagem3": product["imagem3"] or "",
+        "imagem4": product["imagem4"] or "",
+        "imagem5": product["imagem5"] or "",
+        "espec": product["espec"] or "",
+        "ativo": int(bool(product["ativo"])),
+        "categoria_id": product["categoria_id"],
+        "qtd": "" if product["qtd"] is None else product["qtd"],
+    }
+    errors = []
+
+    if request.method == "POST":
+        if not _csrf_valid(request.form.get("csrf_token", "")):
+            return _admin_error(
+                "Sessão inválida",
+                "Recarregue o formulário antes de salvar o produto.",
+                400,
+            )
+
+        form_data, errors = _parse_product_form()
+        if not errors:
+            try:
+                update_product(product_id, form_data)
+            except (DatabaseUnavailable, AdminCatalogError) as exc:
+                errors.append(str(exc))
+            else:
+                flash("Produto atualizado com sucesso.", "admin-success")
+                return redirect(url_for("admin.product_edit", product_id=product_id))
+
+    return (
+        render_template(
+            "admin/product_form.html",
+            mode="edit",
+            product=product,
+            form_data=form_data,
+            categories=categories,
+            form_errors=errors,
+            csrf_token=_csrf_token(),
+        ),
+        422 if errors else 200,
+    )
+
+
+@admin_bp.post("/produtos/<int:product_id>/status")
+@login_required
+def product_status(product_id):
+    if not _csrf_valid(request.form.get("csrf_token", "")):
+        return _admin_error(
+            "Sessão inválida",
+            "Não foi possível alterar o status com este formulário.",
+            400,
+        )
+
+    active = request.form.get("active") == "1"
+
+    try:
+        set_product_active(product_id, active)
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        current_app.logger.error("Admin product status failed: %s", exc)
+        return _admin_error(
+            "Não foi possível alterar o produto",
+            str(exc),
+            503 if isinstance(exc, DatabaseUnavailable) else 400,
+        )
+
+    flash(
+        "Produto ativado no catálogo." if active else "Produto desativado do catálogo.",
+        "admin-success",
+    )
+    return redirect(url_for("admin.products"))
+
+
 @admin_bp.post("/logout")
 @login_required
 def logout():
     if not _csrf_valid(request.form.get("csrf_token", "")):
-        return (
-            render_template(
-                "admin/error.html",
-                title="Sessão inválida",
-                message="Não foi possível encerrar a sessão com este formulário.",
-            ),
+        return _admin_error(
+            "Sessão inválida",
+            "Não foi possível encerrar a sessão com este formulário.",
             400,
         )
 
