@@ -3,16 +3,8 @@
 {% block body_class %}paper-page{% endblock %}
 {% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">{% endblock %}
 {% block body %}
-<header class="paper-header">
-    <a class="paper-header__brand" href="{{ url_for('public.home') }}" aria-label="Copy Minas — Home"><img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas"></a>
-    <nav class="paper-nav" aria-label="Navegação principal">
-        <a href="{{ url_for('public.home') }}">Home</a>
-        <a href="{{ url_for('public.solutions') }}" aria-current="page">Soluções</a>
-        <a href="{{ url_for('public.products') }}">Produtos</a>
-        <a href="{{ url_for('public.company') }}">Empresa</a>
-        <a href="{{ url_for('public.contact') }}">Contato</a>
-    </nav>
-</header>
+{% set active_page = "solutions" %}
+{% include "public/_paper_header.html" %}
 <main class="paper-stage">
     <section class="paper-sheet" data-sheet="SOLUÇÕES / 03">
         <p class="paper-kicker">Soluções / áreas de atuação</p>
