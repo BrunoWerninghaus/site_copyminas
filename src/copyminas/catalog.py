@@ -86,10 +86,24 @@ def _presentation_for(product_id):
     return _presentation_data().get("products", {}).get(str(product_id), {})
 
 
+def _service_capabilities(name, category):
+    normalized_name = (name or "").casefold()
+    normalized_category = (category or "").casefold()
+
+    if normalized_category in {"impressoras", "computadores"}:
+        return ["Venda", "Aluguel", "Manutenção"]
+
+    if "iphone" in normalized_name:
+        return ["Venda", "Manutenção"]
+
+    return []
+
+
 def _hydrate_database_product(row):
     images = _image_list(row)
     description = (row.get("descricao") or "").strip()
     presentation = _presentation_for(row["id"])
+    category = row.get("categoria") or "Sem categoria"
 
     return {
         "id": row["id"],
@@ -98,7 +112,7 @@ def _hydrate_database_product(row):
         "name": row["nome"],
         "source_name": row["nome"],
         "category_id": row["categoria_id"],
-        "category": row.get("categoria") or "Sem categoria",
+        "category": category,
         "description": description or "Informações do produto a confirmar.",
         "summary": description or "Informações do produto a confirmar.",
         "specifications": _parse_specifications(row.get("espec")),
@@ -106,6 +120,7 @@ def _hydrate_database_product(row):
         "image_url": images[0] if images else None,
         "source_quantity": row.get("qtd"),
         "featured": bool(presentation.get("featured", False)),
+        "services": _service_capabilities(row["nome"], category),
     }
 
 
@@ -161,6 +176,7 @@ def _fixture_products():
         item["category"] = category_map.get(item["category_id"], "Sem categoria")
         item["summary"] = item.get("description") or "Informações do produto a confirmar."
         item["images"] = [item["image_url"]] if item.get("image_url") else []
+        item["services"] = _service_capabilities(item["name"], item["category"])
         products.append(item)
     return products
 
