@@ -69,6 +69,14 @@
                 Preencha os dados abaixo para enviar sua solicitação. Você receberá uma confirmação por e-mail após o registro.
             </p>
 
+            {% if contact_context %}
+            <div class="contact-product-context" aria-label="Produto selecionado">
+                <span>{{ contact_context.label }}</span>
+                <strong>{{ contact_context.name }}</strong>
+                <small>{{ contact_context.category }}</small>
+            </div>
+            {% endif %}
+
             {% if form_errors %}
             <div class="contact-form-errors" role="alert" aria-live="polite">
                 <strong>Revise o formulário:</strong>
