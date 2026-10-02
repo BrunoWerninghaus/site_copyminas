@@ -247,7 +247,7 @@ class PublicRoutesTestCase(unittest.TestCase):
                     "service_type": "suporte",
                     "equipment_quantity": "",
                     "preferred_contact": "email",
-                    "message": "Teste.",
+                    "message": "Mensagem de teste.",
                     "consent_privacy": "1",
                 },
             )
