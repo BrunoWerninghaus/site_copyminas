@@ -17,7 +17,8 @@
         <p class="paper-kicker">Produtos / catálogo</p>
         <h1 class="paper-title">Catálogo Copy Minas</h1>
         <p class="paper-lead">
-            Produtos apresentados no catálogo da Copy Minas. Consulte a equipe para confirmar disponibilidade, condições e atendimento.
+            Consulte os equipamentos cadastrados e use os filtros para localizar rapidamente o que procura.
+            Disponibilidade e condições são confirmadas diretamente com a equipe.
         </p>
 
         {% if catalog_unavailable %}
@@ -28,19 +29,44 @@
             <a class="paper-action" href="{{ url_for('public.contact') }}">Falar com a Copy Minas</a>
         </div>
         {% else %}
-        <nav class="paper-index" aria-label="Categorias disponíveis">
-            <a href="#catalogo">Todos / {{ products|length }}</a>
-            {% for category in categories %}
-                {% set category_products = products | selectattr("category_id", "equalto", category.id) | list %}
-                <a href="#categoria-{{ category.id }}">{{ category.name }} / {{ category_products|length }}</a>
-            {% endfor %}
-        </nav>
+        <section class="catalog-tools" aria-label="Ferramentas do catálogo">
+            <label class="catalog-search">
+                <span>Localizar produto</span>
+                <input
+                    type="search"
+                    placeholder="Nome, modelo, categoria..."
+                    autocomplete="off"
+                    data-catalog-search
+                >
+            </label>
+
+            <div class="catalog-filter-group" aria-label="Filtrar por categoria">
+                <button type="button" class="catalog-filter is-active" data-category-filter="all" aria-pressed="true">
+                    Todos / {{ products|length }}
+                </button>
+                {% for category in categories %}
+                    {% set category_products = products | selectattr("category_id", "equalto", category.id) | list %}
+                    <button type="button" class="catalog-filter" data-category-filter="{{ category.id }}" aria-pressed="false">
+                        {{ category.name }} / {{ category_products|length }}
+                    </button>
+                {% endfor %}
+            </div>
+
+            <p class="catalog-result-count" data-catalog-count aria-live="polite">
+                {{ products|length }} produto{% if products|length != 1 %}s{% endif %}
+            </p>
+        </section>
 
         <div class="catalog-sections">
             {% for category in categories %}
                 {% set category_products = products | selectattr("category_id", "equalto", category.id) | list %}
                 {% if category_products %}
-                <section class="catalog-category" id="categoria-{{ category.id }}" aria-labelledby="categoria-{{ category.id }}-titulo">
+                <section
+                    class="catalog-category"
+                    id="categoria-{{ category.id }}"
+                    aria-labelledby="categoria-{{ category.id }}-titulo"
+                    data-category-section="{{ category.id }}"
+                >
                     <header class="catalog-category__header">
                         <div>
                             <span class="paper-card__code">Categoria / {{ "%02d"|format(loop.index) }}</span>
@@ -51,7 +77,13 @@
 
                     <div class="paper-grid">
                         {% for product in category_products %}
-                        <article class="paper-card product-card" id="produto-{{ product.id }}" data-category="{{ product.category_id }}">
+                        <article
+                            class="paper-card product-card"
+                            id="produto-{{ product.id }}"
+                            data-category="{{ product.category_id }}"
+                            data-catalog-item
+                            data-search="{{ product.name }} {{ product.category }} {{ product.summary }}"
+                        >
                             <a class="product-card__media" href="{{ url_for('public.product_detail', slug=product.slug) }}" aria-label="Abrir {{ product.name }}">
                                 {% if product.image_url %}
                                 <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}">
@@ -61,9 +93,22 @@
                             </a>
 
                             <div class="product-card__body">
-                                <span class="paper-card__code">{{ product.category }}</span>
+                                <div class="product-card__topline">
+                                    <span class="paper-card__code">{{ product.category }}</span>
+                                    <span class="product-card__availability">Sob consulta</span>
+                                </div>
+
                                 <h3>{{ product.name }}</h3>
                                 <p>{{ product.summary }}</p>
+
+                                {% if product.services %}
+                                <div class="product-card__services" aria-label="Modalidades disponíveis">
+                                    {% for service in product.services %}
+                                    <span>{{ service }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+
                                 <a class="paper-link" href="{{ url_for('public.product_detail', slug=product.slug) }}">Abrir ficha →</a>
                             </div>
                         </article>
@@ -73,6 +118,12 @@
                 {% endif %}
             {% endfor %}
         </div>
+
+        <div class="catalog-empty" data-catalog-empty hidden>
+            <span class="paper-card__code">CATÁLOGO / BUSCA</span>
+            <strong>Nenhum produto encontrado.</strong>
+            <p>Altere o termo de busca ou selecione outra categoria.</p>
+        </div>
         {% endif %}
     </section>
 </main>
@@ -81,4 +132,8 @@
     <span>Copy Minas / Produtos e equipamentos</span>
     <a href="{{ url_for('public.contact') }}">Contato</a>
 </footer>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/products.js') }}" defer></script>
 {% endblock %}
