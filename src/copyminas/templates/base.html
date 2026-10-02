@@ -3,8 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{% block meta_description %}Copy Minas — Soluções em Tecnologia{% endblock %}">
+    <meta name="description" content="{% block meta_description %}Copy Minas — impressão, tecnologia, equipamentos e atendimento em Elói Mendes, MG.{% endblock %}">
+    <meta name="theme-color" content="#050608">
     <title>{% block title %}Copy Minas{% endblock %}</title>
+
+    <link rel="icon" type="image/webp" href="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     {% block page_styles %}{% endblock %}
