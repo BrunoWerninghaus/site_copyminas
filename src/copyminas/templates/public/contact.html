@@ -1,10 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Contato — Copy Minas{% endblock %}
-{% block body_class %}paper-page{% endblock %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">{% endblock %}
+{% block body_class %}paper-page contact-page{% endblock %}
+{% block page_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/contact.css') }}">
+{% endblock %}
+
 {% block body %}
 <header class="paper-header">
-    <a class="paper-header__brand" href="{{ url_for('public.home') }}" aria-label="Copy Minas — Home"><img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas"></a>
+    <a class="paper-header__brand" href="{{ url_for('public.home') }}" aria-label="Copy Minas — Home">
+        <img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas">
+    </a>
+
     <nav class="paper-nav" aria-label="Navegação principal">
         <a href="{{ url_for('public.home') }}">Home</a>
         <a href="{{ url_for('public.solutions') }}">Soluções</a>
@@ -13,35 +20,144 @@
         <a href="{{ url_for('public.contact') }}" aria-current="page">Contato</a>
     </nav>
 </header>
-<main class="paper-stage">
-    <section class="paper-sheet" data-sheet="CONTATO / 03">
-        <p class="paper-kicker">Contato</p>
-        <h1 class="paper-title">Fale com a Copy Minas.</h1>
-        <p class="paper-lead">Canais públicos cadastrados e localização da empresa.</p>
 
-        <dl class="paper-contact-grid">
-            {% for phone in contact.phones %}
-            <div class="paper-contact-item">
-                <dt>{{ phone.label }}</dt>
-                <dd><a href="tel:{{ phone.href }}">{{ phone.display }}</a></dd>
-            </div>
-            {% endfor %}
-            <div class="paper-contact-item"><dt>E-mail</dt><dd><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></dd></div>
-            <div class="paper-contact-item"><dt>Endereço</dt><dd>{{ copyminas_location.address }}</dd></div>
-            <div class="paper-contact-item"><dt>CNPJ</dt><dd>{{ contact.cnpj }}</dd></div>
-            <div class="paper-contact-item"><dt>Horário</dt><dd>A confirmar</dd></div>
-        </dl>
+<main class="paper-stage contact-stage">
+    <section class="paper-sheet contact-hero" data-sheet="CONTATO / 03">
+        <p class="paper-kicker">Contato / diretório</p>
+        <h1 class="paper-title">Contato & orçamento.</h1>
+        <p class="paper-lead">
+            Escolha um canal direto ou use o formulário para preparar sua mensagem no WhatsApp da Copy Minas.
+        </p>
 
-        <div class="paper-actions">
+        <div class="contact-channel-grid" aria-label="Canais principais">
             {% for phone in contact.phones %}
-            <a class="paper-action" href="{{ phone.whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp {{ "%02d"|format(loop.index) }}</a>
+            <article class="contact-channel" data-channel="WA / {{ "%02d"|format(loop.index) }}">
+                <span>WhatsApp / telefone</span>
+                <strong>{{ phone.display }}</strong>
+                <div>
+                    <a href="{{ phone.whatsapp }}" target="_blank" rel="noopener noreferrer">Abrir WhatsApp →</a>
+                    <a href="tel:{{ phone.href }}">Ligar →</a>
+                </div>
+            </article>
             {% endfor %}
-            <a class="paper-action paper-action--ghost" href="mailto:{{ contact.email }}">E-mail</a>
-            <a class="paper-action paper-action--ghost" href="{{ copyminas_location.maps_url }}" target="_blank" rel="noopener noreferrer">Google Maps</a>
+
+            <article class="contact-channel" data-channel="MAIL / 01">
+                <span>E-mail</span>
+                <strong>{{ contact.email }}</strong>
+                <div>
+                    <a href="mailto:{{ contact.email }}">Escrever e-mail →</a>
+                </div>
+            </article>
         </div>
-
-        <p class="contact-source-note">{{ contact.source_note }}</p>
     </section>
+
+    <div class="contact-layout">
+        <section class="paper-sheet contact-form-sheet" data-sheet="FORM / 01">
+            <p class="paper-kicker">Solicitação</p>
+            <h2>Solicitar contato.</h2>
+            <p class="contact-form-intro">
+                Preencha os dados abaixo. O site valida a mensagem e prepara o texto no WhatsApp escolhido; o envio final acontece no próprio WhatsApp.
+            </p>
+
+            {% if form_errors %}
+            <div class="contact-form-errors" role="alert" aria-live="polite">
+                <strong>Revise o formulário:</strong>
+                <ul>
+                    {% for error in form_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <form class="contact-form" method="post" action="{{ url_for('public.contact_submit') }}">
+                <div class="contact-form__grid">
+                    <label>
+                        <span>Nome *</span>
+                        <input type="text" name="name" value="{{ form_data.get('name', '') }}" maxlength="120" autocomplete="name" required>
+                    </label>
+
+                    <label>
+                        <span>Empresa</span>
+                        <input type="text" name="company" value="{{ form_data.get('company', '') }}" maxlength="160" autocomplete="organization">
+                    </label>
+
+                    <label>
+                        <span>Telefone, WhatsApp ou e-mail para retorno *</span>
+                        <input type="text" name="reply" value="{{ form_data.get('reply', '') }}" maxlength="160" autocomplete="email" required>
+                    </label>
+
+                    <label>
+                        <span>Assunto *</span>
+                        <select name="subject" required>
+                            <option value="">Selecione</option>
+                            {% for subject in contact_subjects %}
+                            <option value="{{ subject }}" {% if form_data.get('subject') == subject %}selected{% endif %}>{{ subject }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </div>
+
+                <label class="contact-form__message">
+                    <span>Mensagem *</span>
+                    <textarea name="message" rows="8" maxlength="2000" required>{{ form_data.get('message', '') }}</textarea>
+                </label>
+
+                <fieldset class="contact-form__targets">
+                    <legend>Preparar mensagem em</legend>
+                    {% for phone in contact.phones %}
+                    <button class="paper-action" type="submit" name="target" value="{{ loop.index0 }}">
+                        WhatsApp {{ "%02d"|format(loop.index) }}
+                    </button>
+                    {% endfor %}
+                </fieldset>
+
+                <p class="contact-form__privacy">
+                    Nenhuma mensagem é armazenada pelo site nesta etapa. O botão apenas prepara o conteúdo no WhatsApp selecionado para você revisar e enviar.
+                </p>
+            </form>
+        </section>
+
+        <aside class="contact-directory" aria-label="Ficha de contato da Copy Minas">
+            <span class="contact-directory__code">DIRECTORY / COPY MINAS</span>
+
+            <dl>
+                {% for phone in contact.phones %}
+                <div>
+                    <dt>WhatsApp {{ "%02d"|format(loop.index) }}</dt>
+                    <dd><a href="{{ phone.whatsapp }}" target="_blank" rel="noopener noreferrer">{{ phone.display }}</a></dd>
+                </div>
+                {% endfor %}
+                <div>
+                    <dt>E-mail</dt>
+                    <dd><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></dd>
+                </div>
+                <div>
+                    <dt>Endereço</dt>
+                    <dd>{{ copyminas_location.address }}</dd>
+                </div>
+                <div>
+                    <dt>CNPJ</dt>
+                    <dd>{{ contact.cnpj }}</dd>
+                </div>
+                <div>
+                    <dt>Horário</dt>
+                    <dd>{{ contact.hours or "A confirmar" }}</dd>
+                </div>
+            </dl>
+
+            <div class="contact-directory__actions">
+                <a class="contact-directory__link" href="{{ copyminas_location.maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Google Maps →</a>
+                <a class="contact-directory__link" href="{{ url_for('public.company') }}">Ficha da empresa →</a>
+            </div>
+
+            <p class="contact-source-note">{{ contact.source_note }}</p>
+        </aside>
+    </div>
 </main>
-<footer class="paper-footer"><span>Copy Minas / Elói Mendes — MG</span><a href="{{ url_for('public.products') }}">Produtos</a></footer>
+
+<footer class="paper-footer">
+    <span>Copy Minas / Elói Mendes — MG</span>
+    <a href="{{ url_for('public.products') }}">Produtos</a>
+</footer>
 {% endblock %}
