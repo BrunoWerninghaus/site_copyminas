@@ -50,6 +50,7 @@ def create_app() -> Flask:
         CATALOG_SOURCE=os.getenv("CATALOG_SOURCE", "database").lower(),
         ADMIN_USERNAME=os.getenv("ADMIN_USERNAME", ""),
         ADMIN_PASSWORD=os.getenv("ADMIN_PASSWORD", ""),
+        MAX_CONTENT_LENGTH=int(os.getenv("ADMIN_UPLOAD_MAX_MB", "25")) * 1024 * 1024,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
     )
