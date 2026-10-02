@@ -55,10 +55,11 @@ if (previewMount) {
         .then((data) => createGlobe(previewMount, data, {
             mode: "preview",
             interactive: false,
-            autoRotate: true,
+            autoRotate: false,
         }))
-        .then(() => {
+        .then((controller) => {
             previewMount.closest(".globe-card")?.classList.add("globe-card--ready");
+            observeGlobeVisibility(previewMount, controller);
         })
         .catch((error) => {
             console.error("Copy Minas globe preview:", error);
@@ -97,7 +98,6 @@ async function createGlobe(mount, points, options) {
     mount.replaceChildren(renderer.domElement);
 
     const earth = new THREE.Group();
-    earth.rotation.z = THREE.MathUtils.degToRad(-23.4);
     scene.add(earth);
 
     const materials = createMaterials();
@@ -112,6 +112,8 @@ async function createGlobe(mount, points, options) {
 
     const marker = createLocationMarker(location);
     earth.add(marker.group);
+
+    focusGlobeOnLocation(earth, location);
 
     const pinLabel = createPinLabel(mount, location.label);
     const clock = new THREE.Clock();
@@ -146,7 +148,15 @@ async function createGlobe(mount, points, options) {
     };
 
     resize();
-    window.addEventListener("resize", resize, { passive: true });
+
+    if ("ResizeObserver" in window) {
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(resize);
+        });
+        resizeObserver.observe(mount);
+    } else {
+        window.addEventListener("resize", resize, { passive: true });
+    }
 
     if (options.interactive) {
         const raycaster = new THREE.Raycaster();
@@ -291,7 +301,7 @@ function setupFullscreenGlobe() {
                 .then((data) => createGlobe(fullscreenMount, data, {
                     mode: "fullscreen",
                     interactive: true,
-                    autoRotate: true,
+                    autoRotate: false,
                 }))
                 .then((controller) => {
                     globeController = controller;
@@ -325,6 +335,47 @@ function setupFullscreenGlobe() {
         document.documentElement.classList.remove("globe-dialog-open");
         globeController?.stop();
     });
+}
+
+function focusGlobeOnLocation(earth, location) {
+    if (!Number.isFinite(location.lat) || !Number.isFinite(location.lon)) {
+        return;
+    }
+
+    const locationDirection = latLonToXYZ(
+        location.lat,
+        location.lon,
+        1,
+    ).normalize();
+
+    const cameraFacingDirection = new THREE.Vector3(0, 0, 1);
+
+    earth.quaternion.setFromUnitVectors(
+        locationDirection,
+        cameraFacingDirection,
+    );
+}
+
+function observeGlobeVisibility(mount, controller) {
+    if (!("IntersectionObserver" in window)) {
+        return;
+    }
+
+    const observer = new IntersectionObserver(
+        ([entry]) => {
+            if (entry.isIntersecting) {
+                controller.start();
+            } else {
+                controller.stop();
+            }
+        },
+        {
+            rootMargin: "180px 0px",
+            threshold: 0.01,
+        },
+    );
+
+    observer.observe(mount);
 }
 
 function createMaterials() {
@@ -443,9 +494,37 @@ function updatePinLabel(label, pin, earth, camera, renderer) {
 
     const projected = pinPosition.clone().project(camera);
     const rect = renderer.domElement.getBoundingClientRect();
+    const rawX = (projected.x * 0.5 + 0.5) * rect.width + 14;
+    const rawY = (-projected.y * 0.5 + 0.5) * rect.height - label.offsetHeight / 2;
+    const clamped = clampPinLabelPosition(
+        rawX,
+        rawY,
+        label.offsetWidth,
+        label.offsetHeight,
+        rect.width,
+        rect.height,
+    );
 
-    label.style.left = ((projected.x * 0.5 + 0.5) * rect.width) + "px";
-    label.style.top = ((-projected.y * 0.5 + 0.5) * rect.height) + "px";
+    label.style.left = clamped.x + "px";
+    label.style.top = clamped.y + "px";
+}
+
+function clampPinLabelPosition(
+    x,
+    y,
+    labelWidth,
+    labelHeight,
+    mountWidth,
+    mountHeight,
+) {
+    const inset = 12;
+    const maxX = Math.max(inset, mountWidth - labelWidth - inset);
+    const maxY = Math.max(inset, mountHeight - labelHeight - inset);
+
+    return {
+        x: THREE.MathUtils.clamp(x, inset, maxX),
+        y: THREE.MathUtils.clamp(y, inset, maxY),
+    };
 }
 
 function setRayFromPointer(event, canvas, camera, raycaster, pointer) {

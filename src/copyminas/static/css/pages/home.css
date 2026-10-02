@@ -58,6 +58,14 @@ html.globe-dialog-open body { overflow: hidden; }
     padding-bottom: clamp(2rem,6vw,6rem);
 }
 
+.home-hero > *,
+.paper-grid > *,
+.product-strip > *,
+.company-callout > *,
+.location-section > * {
+    min-width: 0;
+}
+
 .paper-panel {
     position: relative;
     border: 1px solid #bbb5aa;
@@ -81,20 +89,26 @@ html.globe-dialog-open body { overflow: hidden; }
 .paper-panel--hero h1 {
     max-width: 11ch;
     margin: 0;
-    font-size: clamp(3rem,7vw,7.4rem);
-    line-height: .91;
-    letter-spacing: -.075em;
+    font-size: clamp(2.75rem, min(6vw, 5.8rem), 5.8rem);
+    line-height: .94;
+    letter-spacing: -.065em;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
     text-transform: uppercase;
 }
 
 .paper-panel .lead { color: var(--paper-muted); }
 
 .section-kicker {
-    color: var(--red);
-    font-size: .7rem;
+    color: var(--red-text);
+    font-size: .76rem;
     font-weight: 800;
     letter-spacing: .15em;
     text-transform: uppercase;
+}
+
+.paper-panel .section-kicker {
+    color: #a80f16;
 }
 
 .button--ink {
@@ -125,8 +139,8 @@ html.globe-dialog-open body { overflow: hidden; }
 }
 
 .registry-card__code {
-    color: #87919a;
-    font-size: .68rem;
+    color: #aab3bb;
+    font-size: .72rem;
     letter-spacing: .14em;
 }
 
@@ -138,7 +152,7 @@ html.globe-dialog-open body { overflow: hidden; }
     padding: .9rem 0;
     border-bottom: 1px solid var(--line);
 }
-.registry-card dt { color: #7f8991; font-size: .72rem; text-transform: uppercase; }
+.registry-card dt { color: #aab3bb; font-size: .74rem; text-transform: uppercase; }
 .registry-card dd { margin: 0; color: white; }
 .registry-card > a,
 .section-link {
@@ -162,9 +176,11 @@ html.globe-dialog-open body { overflow: hidden; }
 .company-callout h2,
 .location-section h2 {
     margin: 0;
-    font-size: clamp(2.6rem,5vw,5.5rem);
-    line-height: .96;
-    letter-spacing: -.06em;
+    font-size: clamp(2.25rem, min(4.5vw, 4.8rem), 4.8rem);
+    line-height: .98;
+    letter-spacing: -.05em;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
     text-transform: uppercase;
 }
 .section-heading > p:last-child,
@@ -184,7 +200,7 @@ html.globe-dialog-open body { overflow: hidden; }
 
 .solution-card:nth-child(even) { transform: translateY(10px); }
 .solution-card__number { color: #a80f16; font-size: .72rem; font-weight: 800; }
-.solution-card h3 { margin: 2rem 0 .75rem; font-size: 1.3rem; text-transform: uppercase; }
+.solution-card h3 { margin: 2rem 0 .75rem; font-size: 1.3rem; overflow-wrap: anywhere; text-wrap: balance; text-transform: uppercase; }
 .solution-card p { color: var(--paper-muted); font-size: .86rem; line-height: 1.65; }
 .content-section > .section-link { display: inline-block; margin-top: 2rem; }
 
@@ -212,9 +228,9 @@ html.globe-dialog-open body { overflow: hidden; }
     text-decoration: none;
 }
 
-.home-product__copy { padding: 1.25rem; }
+.home-product__copy { min-width: 0; padding: 1.25rem; }
 .home-product__copy > span { color: #a80f16; font-size: .67rem; text-transform: uppercase; }
-.home-product h3 { min-height: 4.2em; margin: .65rem 0 1rem; font-size: 1.05rem; line-height: 1.4; text-transform: uppercase; }
+.home-product h3 { min-height: 4.2em; margin: .65rem 0 1rem; font-size: 1.05rem; line-height: 1.4; overflow-wrap: anywhere; text-wrap: balance; text-transform: uppercase; }
 .home-product__copy a { color: var(--paper-ink); font-size: .72rem; font-weight: 800; text-transform: uppercase; }
 
 .company-callout {
@@ -236,8 +252,8 @@ html.globe-dialog-open body { overflow: hidden; }
         linear-gradient(135deg,transparent 49.8%,rgba(255,255,255,.08) 50%,transparent 50.2%),
         linear-gradient(45deg,transparent 49.8%,rgba(255,255,255,.08) 50%,transparent 50.2%),
         #10151a;
-    color: #68737c;
-    font-size: .72rem;
+    color: #aeb7bf;
+    font-size: .76rem;
     line-height: 1.7;
     letter-spacing: .14em;
     text-align: center;
@@ -249,7 +265,7 @@ html.globe-dialog-open body { overflow: hidden; }
     gap: clamp(2rem,6vw,6rem);
     align-items: center;
 }
-.location-address { margin-top: 2rem; color: white; font-style: normal; line-height: 1.7; }
+.location-address { margin-top: 2rem; color: white; font-style: normal; line-height: 1.7; overflow-wrap: anywhere; }
 .location-note { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .82rem; }
 
 .globe-card {
@@ -286,13 +302,15 @@ html.globe-dialog-open body { overflow: hidden; }
     position:absolute; z-index:3; right:1.5rem; bottom:1.5rem; left:1.5rem;
     display:flex; justify-content:space-between; gap:1rem; align-items:flex-end;
 }
-.globe-card__caption small { color:var(--muted); }
+.globe-card__caption small { color:#b6c0c9; line-height:1.45; overflow-wrap:anywhere; }
 
 .globe-pin-label {
-    position:absolute; z-index:4; transform:translate(14px,-50%);
-    padding:.42rem .65rem; border:1px solid rgba(21,149,255,.45);
-    background:rgba(3,5,8,.82); color:#bfe1ff; font-size:.72rem; font-weight:800;
-    letter-spacing:.08em; pointer-events:none; text-transform:uppercase; white-space:nowrap;
+    position:absolute; z-index:4;
+    max-width:calc(100% - 24px);
+    padding:.42rem .65rem; border:1px solid rgba(21,149,255,.62);
+    background:rgba(3,5,8,.94); color:#d8edff; font-size:.72rem; font-weight:800;
+    letter-spacing:.06em; line-height:1.3; overflow-wrap:anywhere; pointer-events:none;
+    text-transform:uppercase;
 }
 
 .globe-dialog { width:100vw; max-width:none; height:100dvh; max-height:none; margin:0; padding:0; border:0; background:#030405; color:white; }
@@ -315,19 +333,34 @@ html.globe-dialog-open body { overflow: hidden; }
 .globe-legend {
     position:absolute; z-index:3; top:1.5rem; left:1.5rem; display:grid; gap:.65rem;
     padding:.9rem 1rem; border:1px solid var(--line); background:rgba(3,5,8,.72);
-    color:var(--muted); font-size:.78rem;
+    color:#b6c0c9; font-size:.78rem;
 }
 .globe-legend span { display:flex; align-items:center; gap:.55rem; }
 .legend-dot { width:.58rem; height:.58rem; border-radius:50%; background:white; box-shadow:0 0 10px currentColor; }
 .legend-dot--world{color:#dfe4e8;background:#dfe4e8}.legend-dot--brazil{color:#f01d27;background:#f01d27}.legend-dot--minas{color:#ffd447;background:#ffd447}.legend-dot--eloi{color:#1595ff;background:#1595ff}
-.globe-dialog__help { position:absolute; z-index:3; right:1.5rem; bottom:1.5rem; margin:0; color:rgba(255,255,255,.52); font-size:.76rem; }
+.globe-dialog__help { position:absolute; z-index:3; right:1.5rem; bottom:1.5rem; max-width:min(42rem,calc(100% - 3rem)); margin:0; color:#b6c0c9; font-size:.78rem; line-height:1.5; text-align:right; }
 .globe-dialog__footer { border-top:1px solid var(--line); }
 .globe-dialog__footer address { max-width:680px; color:var(--muted); font-style:normal; line-height:1.55; }
 
 .site-footer {
     display:flex; justify-content:space-between; gap:1rem;
     padding:1.5rem var(--page-x); border-top:1px solid var(--line);
-    color:#89929a; font-size:.72rem; text-transform:uppercase;
+    color:#aeb7bf; font-size:.74rem; line-height:1.5; text-transform:uppercase;
+}
+
+.paper-panel--hero .lead,
+.section-heading > p:last-child,
+.location-copy > p:not(.section-kicker),
+.registry-card dd,
+.registry-card > a,
+.section-link,
+.site-footer span,
+.site-footer a {
+    overflow-wrap: anywhere;
+}
+
+#localizacao {
+    scroll-margin-top: 7rem;
 }
 
 @media(max-width:980px){
@@ -338,8 +371,9 @@ html.globe-dialog-open body { overflow: hidden; }
     .home-product__media{min-height:220px;border-right:1px solid #aaa59c;border-bottom:0}
 }
 @media(max-width:720px){
-    .site-header{align-items:flex-start;flex-direction:column}
+    .site-header{position:relative;align-items:flex-start;flex-direction:column}
     .site-nav{justify-content:flex-start}
+    .site-nav a{font-size:.74rem}
     .paper-grid{grid-template-columns:1fr}
     .solution-card:nth-child(even){transform:none}
     .home-product{display:block}
@@ -347,7 +381,10 @@ html.globe-dialog-open body { overflow: hidden; }
     .globe-dialog__footer{align-items:flex-start;flex-direction:column}
 }
 @media(max-width:520px){
+    .paper-panel::after{position:static;display:block;margin-bottom:1rem}
     .paper-panel--hero{padding:1.5rem}
+    .paper-panel--hero h1{font-size:clamp(2.45rem,12vw,3.65rem)}
+    .section-heading h2,.company-callout h2,.location-section h2{font-size:clamp(2rem,10vw,3rem)}
     .registry-card dl div{grid-template-columns:1fr}
     .globe-card{min-height:400px}
     .globe-card__caption{align-items:flex-start;flex-direction:column}
