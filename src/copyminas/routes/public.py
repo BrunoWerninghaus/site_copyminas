@@ -53,11 +53,17 @@ def intro():
 
 @public_bp.get("/home")
 def home():
+    try:
+        featured_products = get_public_products(limit=3)
+    except DatabaseUnavailable as exc:
+        current_app.logger.error("Catalog unavailable on Home: %s", exc)
+        featured_products = []
+
     return render_template(
         "public/home.html",
         company=COPY_MINAS_COMPANY,
         copyminas_location=COPY_MINAS_LOCATION,
-        featured_products=get_public_products(limit=3),
+        featured_products=featured_products,
     )
 
 
@@ -80,16 +86,43 @@ def company():
 
 @public_bp.get("/produtos")
 def products():
+    try:
+        catalog_products = get_public_products()
+    except DatabaseUnavailable as exc:
+        current_app.logger.error("Catalog unavailable: %s", exc)
+        return (
+            render_template(
+                "public/products.html",
+                products=[],
+                categories=[],
+                catalog_unavailable=True,
+            ),
+            503,
+        )
+
     return render_template(
         "public/products.html",
-        products=get_public_products(),
-        categories=get_public_categories(),
+        products=catalog_products,
+        categories=get_public_categories(catalog_products),
+        catalog_unavailable=False,
     )
 
 
 @public_bp.get("/produtos/<slug>")
 def product_detail(slug):
-    product = get_product_by_slug(slug)
+    try:
+        product = get_product_by_slug(slug)
+    except DatabaseUnavailable as exc:
+        current_app.logger.error("Catalog product unavailable: %s", exc)
+        return (
+            render_template(
+                "public/products.html",
+                products=[],
+                categories=[],
+                catalog_unavailable=True,
+            ),
+            503,
+        )
 
     if product is None:
         abort(404)
