@@ -183,6 +183,19 @@ def _possible_duplicates(name, exclude_id=None):
     ]
 
 
+def _image_previews(data):
+    previews = {}
+    for index in range(1, 6):
+        key = f"imagem{index}"
+        value = data.get(key, "")
+        previews[key] = (
+            normalize_static_path(value)
+            if static_asset_exists(value)
+            else None
+        )
+    return previews
+
+
 def _parse_product_form():
     raw_quantity = request.form.get("qtd", "").strip()
     raw_category = request.form.get("categoria_id", "").strip()
@@ -454,6 +467,7 @@ def product_new():
             form_errors=errors,
             duplicates=duplicates,
             public_slug=None,
+            image_previews=_image_previews(form_data),
             csrf_token=_csrf_token(),
         ),
         422 if errors else 200,
@@ -546,6 +560,7 @@ def product_edit(product_id):
             form_errors=errors,
             duplicates=duplicates,
             public_slug=public_slug,
+            image_previews=_image_previews(form_data),
             csrf_token=_csrf_token(),
         ),
         422 if errors else 200,
