@@ -20,8 +20,4 @@ COPY_MINAS_CONTACT = {
     "email": "copyminas@hotmail.com",
     "cnpj": "97.537.200/0001-10",
     "hours": None,
-    "source_note": (
-        "Telefones móveis e e-mail constam em bases cadastrais públicas recentes. "
-        "Horário de atendimento ainda precisa de confirmação do proprietário."
-    ),
 }
