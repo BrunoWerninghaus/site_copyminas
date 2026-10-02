@@ -21,35 +21,59 @@
             .toLowerCase()
             .trim();
 
+    const pluralize = (value) =>
+        value === 1 ? "1 produto" : `${value} produtos`;
+
     const apply = () => {
         const term = normalize(search.value);
         let visibleCount = 0;
 
+        const matchesSearch = new Map();
+
         items.forEach((item) => {
+            const haystack = normalize(item.dataset.search || "");
+            const matches = !term || haystack.includes(term);
+            matchesSearch.set(item, matches);
+
             const matchesCategory =
                 activeCategory === "all" ||
                 item.dataset.category === activeCategory;
 
-            const haystack = normalize(item.dataset.search || "");
-            const matchesSearch = !term || haystack.includes(term);
-            const visible = matchesCategory && matchesSearch;
-
+            const visible = matchesCategory && matches;
             item.hidden = !visible;
-            if (visible) visibleCount += 1;
+
+            if (visible) {
+                visibleCount += 1;
+            }
+        });
+
+        filters.forEach((button) => {
+            const category = button.dataset.categoryFilter || "all";
+            const label = button.dataset.categoryLabel || "Categoria";
+
+            const matchingCount = items.filter((item) => {
+                if (!matchesSearch.get(item)) return false;
+                return category === "all" || item.dataset.category === category;
+            }).length;
+
+            button.textContent = `${label} / ${matchingCount}`;
         });
 
         sections.forEach((section) => {
-            const visibleCards = section.querySelectorAll(
-                "[data-catalog-item]:not([hidden])"
-            );
+            const visibleCards = Array.from(
+                section.querySelectorAll("[data-catalog-item]")
+            ).filter((item) => !item.hidden);
+
             section.hidden = visibleCards.length === 0;
+
+            const sectionCount = section.querySelector("[data-category-count]");
+            if (sectionCount) {
+                sectionCount.textContent = pluralize(visibleCards.length);
+            }
         });
 
         if (count) {
-            count.textContent =
-                visibleCount === 1
-                    ? "1 produto"
-                    : `${visibleCount} produtos`;
+            count.textContent = pluralize(visibleCount);
         }
 
         if (empty) {
@@ -72,4 +96,6 @@
             apply();
         });
     });
+
+    apply();
 })();
