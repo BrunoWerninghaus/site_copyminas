@@ -34,11 +34,7 @@
         Monaco,
         Consolas,
         monospace;
-    --font-display:
-        "Segoe UI",
-        Arial,
-        Helvetica,
-        sans-serif;
+    --font-display: var(--font-mono);
 
     --radius-sm: 0;
     --radius-md: 0;
