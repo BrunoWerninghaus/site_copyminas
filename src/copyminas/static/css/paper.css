@@ -1215,3 +1215,11 @@
         flex: 1 1 140px;
     }
 }
+
+
+/* Native hidden state must win over component display declarations. */
+.product-card[hidden],
+.catalog-category[hidden],
+.catalog-empty[hidden] {
+    display: none !important;
+}
