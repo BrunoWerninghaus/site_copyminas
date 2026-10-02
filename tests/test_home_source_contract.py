@@ -61,6 +61,13 @@ class HomeSourceContractTestCase(unittest.TestCase):
         self.assertIn("overflow-wrap: anywhere;", source)
         self.assertIn("text-wrap: balance;", source)
 
+    def test_visual_contract_keeps_typewriter_typography(self):
+        base = BASE_CSS.read_text(encoding="utf-8")
+
+        self.assertIn("--font-display: var(--font-mono);", base)
+        self.assertNotIn('"Segoe UI"', base)
+        self.assertNotIn("sans-serif", base)
+
     def test_small_red_text_uses_readable_accent_token(self):
         base = BASE_CSS.read_text(encoding="utf-8")
         home = HOME_CSS.read_text(encoding="utf-8")
