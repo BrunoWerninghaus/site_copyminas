@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}{{ "Nova categoria" if mode == "new" else "Editar categoria" }} — Copy Minas Admin{% endblock %}
+{% block meta_description %}Edição interna de categoria da Copy Minas.{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block page_styles %}
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+{% set admin_page = "categories" %}
+{% include "admin/_header.html" %}
+
+<main id="main-content" class="admin-stage admin-stage--form">
+    {% with messages = get_flashed_messages(category_filter=["admin-success"]) %}
+        {% if messages %}
+        <div class="admin-alert admin-alert--success" role="status">
+            {% for message in messages %}<strong>{{ message }}</strong>{% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="admin-form-heading">
+        <a href="{{ url_for('admin.categories') }}">← Categorias</a>
+        <span>{{ "NOVA / CATEGORIA" if mode == "new" else "EDIÇÃO / CATEGORIA" }}</span>
+        <h1>{{ "Nova categoria" if mode == "new" else form_data.nome }}</h1>
+        {% if category %}
+        <p>Registro #{{ category.id }} · {{ category.product_count }} produto{% if category.product_count != 1 %}s{% endif %} vinculado{% if category.product_count != 1 %}s{% endif %}.</p>
+        {% else %}
+        <p>Cria um novo registro na tabela <code>categorias</code>.</p>
+        {% endif %}
+    </div>
+
+    {% if form_errors %}
+    <div class="admin-alert admin-alert--error" role="alert">
+        <strong>Revise o formulário:</strong>
+        <ul>{% for error in form_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    <form class="admin-product-form" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <section class="admin-form-section">
+            <header>
+                <span>01</span>
+                <div><strong>Categoria</strong><small>Identificação e publicação</small></div>
+            </header>
+
+            <div class="admin-form-grid">
+                <label class="admin-field admin-field--wide">
+                    <span>Nome *</span>
+                    <input type="text" name="nome" value="{{ form_data.nome }}" maxlength="120" required>
+                </label>
+
+                <label class="admin-switch">
+                    <input type="checkbox" name="ativo" value="1" {% if form_data.ativo %}checked{% endif %}>
+                    <span>
+                        <strong>Categoria ativa</strong>
+                        <small>Categorias inativas preservam seus produtos, mas eles não aparecem no catálogo público.</small>
+                    </span>
+                </label>
+            </div>
+        </section>
+
+        <div class="admin-form-actions">
+            <button class="admin-button" type="submit">{{ "Criar categoria" if mode == "new" else "Salvar alterações" }}</button>
+            <a href="{{ url_for('admin.categories') }}">Cancelar</a>
+        </div>
+    </form>
+</main>
+{% endblock %}
