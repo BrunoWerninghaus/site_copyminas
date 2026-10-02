@@ -23,7 +23,7 @@
 </header>
 
 <main>
-    <section class="home-hero section-shell">
+    <section class="home-hero section-shell" data-section="00 / HOME">
         <article class="paper-panel paper-panel--hero" data-sheet="HOME / 03">
             <p class="section-kicker">Copy Minas · Elói Mendes / MG</p>
             <h1>{{ company.headline }}</h1>
@@ -47,7 +47,7 @@
         </aside>
     </section>
 
-    <section class="content-section section-shell">
+    <section class="content-section section-shell" data-section="01 / SOLUÇÕES">
         <header class="section-heading">
             <p class="section-kicker">Soluções / índice</p>
             <h2>Áreas de atuação</h2>
@@ -67,14 +67,14 @@
         <a class="section-link" href="{{ url_for('public.solutions') }}">Abrir todas as soluções →</a>
     </section>
 
-    <section class="content-section section-shell">
+    <section class="content-section section-shell" data-section="02 / PRODUTOS">
         <header class="section-heading">
             <p class="section-kicker">Produtos / Site 2 → Site 3</p>
             <h2>Produtos em destaque</h2>
             <p>Registros ativos do catálogo original, agora organizados em fichas individuais.</p>
         </header>
 
-        <div class="product-strip">
+        <div class="product-strip" data-register="CATÁLOGO / DESTAQUES">
             {% for product in featured_products %}
             <article class="home-product">
                 <a class="home-product__media" href="{{ url_for('public.product_detail', slug=product.slug) }}">
@@ -92,7 +92,7 @@
         <a class="section-link" href="{{ url_for('public.products') }}">Abrir catálogo completo →</a>
     </section>
 
-    <section class="company-callout section-shell">
+    <section class="company-callout section-shell" data-section="03 / EMPRESA">
         <article class="paper-panel" data-sheet="EMPRESA / 03">
             <p class="section-kicker">Empresa</p>
             <h2>Copy Minas em Elói Mendes.</h2>
@@ -107,8 +107,8 @@
         </div>
     </section>
 
-    <section class="location-section section-shell" id="localizacao">
-        <div class="location-copy">
+    <section class="location-section section-shell" id="localizacao" data-section="04 / LOCALIZAÇÃO">
+        <div class="location-copy" data-register="LOC / {{ copyminas_location.latitude }}, {{ copyminas_location.longitude }}">
             <p class="section-kicker">Localização / 21°S</p>
             <h2>Elói Mendes, Minas Gerais.</h2>
             <address class="location-address">{{ copyminas_location.address }}</address>
