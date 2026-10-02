@@ -89,6 +89,12 @@ class PublicRoutesTestCase(unittest.TestCase):
         self.assert_page("/produtos", "Catálogo Copy Minas")
         response = self.client.get("/produtos")
         self.assertIn(b"Brother DCP-8157DN", response.data)
+        self.assertIn(b'id="categoria-1"', response.data)
+        self.assertIn(b'id="categoria-2"', response.data)
+        self.assertIn(b'id="categoria-8"', response.data)
+        self.assertIn("Impressoras / 6".encode("utf-8"), response.data)
+        self.assertIn("Computadores / 3".encode("utf-8"), response.data)
+        self.assertIn("Redes / 1".encode("utf-8"), response.data)
 
     def test_product_detail(self):
         self.assert_page(
