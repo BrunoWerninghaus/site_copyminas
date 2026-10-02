@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Empresa — Copy Minas{% endblock %}
+{% block body_class %}paper-page{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">{% endblock %}
+{% block body %}
+<header class="paper-header">
+    <a class="paper-header__brand" href="{{ url_for('public.home') }}" aria-label="Copy Minas — Home"><img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas"></a>
+    <nav class="paper-nav" aria-label="Navegação principal">
+        <a href="{{ url_for('public.home') }}">Home</a>
+        <a href="{{ url_for('public.solutions') }}">Soluções</a>
+        <a href="{{ url_for('public.products') }}">Produtos</a>
+        <a href="{{ url_for('public.company') }}" aria-current="page">Empresa</a>
+        <a href="{{ url_for('public.contact') }}">Contato</a>
+    </nav>
+</header>
+<main class="paper-stage">
+    <section class="paper-sheet" data-sheet="EMPRESA / 03">
+        <p class="paper-kicker">Copy Minas / ficha institucional</p>
+        <h1 class="paper-title">Desde 2011 em Elói Mendes.</h1>
+        <p class="paper-lead">{{ company.summary }}</p>
+
+        <dl class="paper-contact-grid company-register">
+            <div class="paper-contact-item"><dt>Nome fantasia</dt><dd>{{ company.name }}</dd></div>
+            <div class="paper-contact-item"><dt>Razão social</dt><dd>{{ company.legal_name }}</dd></div>
+            <div class="paper-contact-item"><dt>CNPJ</dt><dd>{{ company.cnpj }}</dd></div>
+            <div class="paper-contact-item"><dt>Início das atividades</dt><dd>{{ company.founded_on }}</dd></div>
+            <div class="paper-contact-item"><dt>Situação cadastral</dt><dd>{{ company.status }}</dd></div>
+            <div class="paper-contact-item"><dt>Sede</dt><dd>{{ copyminas_location.city }} / {{ company.state }}</dd></div>
+        </dl>
+
+        <hr class="paper-rule">
+        <p class="paper-kicker">Identidade / conteúdo em evolução</p>
+        <p class="paper-lead">
+            História detalhada, equipe, estrutura, área efetiva de atendimento, parceiros e diferenciais comerciais serão acrescentados quando forem confirmados pelo proprietário. O Site 3 não inventa esses dados.
+        </p>
+
+        <div class="paper-actions">
+            <a class="paper-action" href="{{ url_for('public.solutions') }}">Soluções</a>
+            <a class="paper-action paper-action--ghost" href="{{ url_for('public.contact') }}">Contato</a>
+        </div>
+    </section>
+</main>
+<footer class="paper-footer"><span>{{ copyminas_location.address }}</span><a href="{{ url_for('public.products') }}">Produtos</a></footer>
+{% endblock %}

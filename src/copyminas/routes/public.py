@@ -5,6 +5,7 @@ from src.copyminas.catalog import (
     get_public_categories,
     get_public_products,
 )
+from src.copyminas.company import COPY_MINAS_COMPANY
 from src.copyminas.contact import COPY_MINAS_CONTACT
 from src.copyminas.location import COPY_MINAS_LOCATION
 
@@ -24,8 +25,26 @@ def intro():
 def home():
     return render_template(
         "public/home.html",
+        company=COPY_MINAS_COMPANY,
         copyminas_location=COPY_MINAS_LOCATION,
         featured_products=get_public_products(limit=3),
+    )
+
+
+@public_bp.get("/solucoes")
+def solutions():
+    return render_template(
+        "public/solutions.html",
+        company=COPY_MINAS_COMPANY,
+    )
+
+
+@public_bp.get("/empresa")
+def company():
+    return render_template(
+        "public/company.html",
+        company=COPY_MINAS_COMPANY,
+        copyminas_location=COPY_MINAS_LOCATION,
     )
 
 

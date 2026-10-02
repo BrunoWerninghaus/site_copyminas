@@ -1,69 +1,47 @@
 {% extends "base.html" %}
-
 {% block title %}Contato — Copy Minas{% endblock %}
 {% block body_class %}paper-page{% endblock %}
-
-{% block page_styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">
-{% endblock %}
-
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">{% endblock %}
 {% block body %}
 <header class="paper-header">
-    <a class="paper-header__brand" href="{{ url_for('public.home') }}" aria-label="Copy Minas — Home">
-        <img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas">
-    </a>
+    <a class="paper-header__brand" href="{{ url_for('public.home') }}" aria-label="Copy Minas — Home"><img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas"></a>
     <nav class="paper-nav" aria-label="Navegação principal">
         <a href="{{ url_for('public.home') }}">Home</a>
+        <a href="{{ url_for('public.solutions') }}">Soluções</a>
         <a href="{{ url_for('public.products') }}">Produtos</a>
+        <a href="{{ url_for('public.company') }}">Empresa</a>
         <a href="{{ url_for('public.contact') }}" aria-current="page">Contato</a>
     </nav>
 </header>
-
 <main class="paper-stage">
     <section class="paper-sheet" data-sheet="CONTATO / 03">
         <p class="paper-kicker">Contato</p>
-        <h1 class="paper-title">Fale com a Copy Minas</h1>
-        <p class="paper-lead">
-            Atendimento, localização e canais públicos da empresa reunidos em uma página própria.
-        </p>
+        <h1 class="paper-title">Fale com a Copy Minas.</h1>
+        <p class="paper-lead">Canais públicos cadastrados e localização da empresa.</p>
 
         <dl class="paper-contact-grid">
+            {% for phone in contact.phones %}
             <div class="paper-contact-item">
-                <dt>Telefone</dt>
-                <dd><a href="tel:{{ contact.phone_href }}">{{ contact.phone_display }}</a></dd>
+                <dt>{{ phone.label }}</dt>
+                <dd><a href="tel:{{ phone.href }}">{{ phone.display }}</a></dd>
             </div>
-            <div class="paper-contact-item">
-                <dt>E-mail</dt>
-                <dd><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></dd>
-            </div>
-            <div class="paper-contact-item">
-                <dt>Endereço</dt>
-                <dd>{{ copyminas_location.address }}</dd>
-            </div>
-            <div class="paper-contact-item">
-                <dt>Atendimento</dt>
-                <dd>{{ contact.hours }}</dd>
-            </div>
-            <div class="paper-contact-item">
-                <dt>CNPJ</dt>
-                <dd>{{ contact.cnpj }}</dd>
-            </div>
-            <div class="paper-contact-item">
-                <dt>Localização</dt>
-                <dd>Elói Mendes / Minas Gerais</dd>
-            </div>
+            {% endfor %}
+            <div class="paper-contact-item"><dt>E-mail</dt><dd><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></dd></div>
+            <div class="paper-contact-item"><dt>Endereço</dt><dd>{{ copyminas_location.address }}</dd></div>
+            <div class="paper-contact-item"><dt>CNPJ</dt><dd>{{ contact.cnpj }}</dd></div>
+            <div class="paper-contact-item"><dt>Horário</dt><dd>A confirmar</dd></div>
         </dl>
 
         <div class="paper-actions">
-            <a class="paper-action" href="tel:{{ contact.phone_href }}">Ligar</a>
-            <a class="paper-action paper-action--ghost" href="mailto:{{ contact.email }}">Enviar e-mail</a>
-            <a class="paper-action paper-action--ghost" href="{{ copyminas_location.maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a>
+            {% for phone in contact.phones %}
+            <a class="paper-action" href="{{ phone.whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp {{ "%02d"|format(loop.index) }}</a>
+            {% endfor %}
+            <a class="paper-action paper-action--ghost" href="mailto:{{ contact.email }}">E-mail</a>
+            <a class="paper-action paper-action--ghost" href="{{ copyminas_location.maps_url }}" target="_blank" rel="noopener noreferrer">Google Maps</a>
         </div>
+
+        <p class="contact-source-note">{{ contact.source_note }}</p>
     </section>
 </main>
-
-<footer class="paper-footer">
-    <span>Copy Minas / Elói Mendes — MG</span>
-    <a href="{{ url_for('public.products') }}">Produtos</a>
-</footer>
+<footer class="paper-footer"><span>Copy Minas / Elói Mendes — MG</span><a href="{{ url_for('public.products') }}">Produtos</a></footer>
 {% endblock %}

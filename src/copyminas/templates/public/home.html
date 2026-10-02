@@ -10,236 +10,162 @@
 {% block body %}
 <header class="site-header">
     <a class="site-brand" href="{{ url_for('public.home') }}" aria-label="Copy Minas — Home">
-        <img
-            src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}"
-            alt="Copy Minas"
-        >
+        <img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas">
     </a>
 
     <nav class="site-nav" aria-label="Navegação principal">
-        <a href="#inicio">Início</a>
-        <a href="#solucoes">Soluções</a>
+        <a href="{{ url_for('public.solutions') }}">Soluções</a>
         <a href="{{ url_for('public.products') }}">Produtos</a>
-        <a href="#empresa">Empresa</a>
+        <a href="{{ url_for('public.company') }}">Empresa</a>
         <a href="#localizacao">Localização</a>
         <a href="{{ url_for('public.contact') }}">Contato</a>
     </nav>
 </header>
 
 <main>
-    <section class="home-hero section-shell" id="inicio">
-        <div class="home-hero__copy">
-            <p class="section-kicker">Copy Minas</p>
-            <h1 data-content-key="home.hero.title">Título principal a definir</h1>
-            <p class="lead" data-content-key="home.hero.description">
-                Descrição principal da empresa a definir.
-            </p>
+    <section class="home-hero section-shell">
+        <article class="paper-panel paper-panel--hero" data-sheet="HOME / 03">
+            <p class="section-kicker">Copy Minas · Elói Mendes / MG</p>
+            <h1>{{ company.headline }}</h1>
+            <p class="lead">{{ company.summary }}</p>
 
-            <div class="action-row" aria-label="Ações principais">
-                <a class="button button--primary" href="{{ url_for('public.products') }}">Ver produtos</a>
-                <a class="button button--secondary" href="{{ url_for('public.contact') }}">Contato</a>
+            <div class="action-row">
+                <a class="button button--ink" href="{{ url_for('public.solutions') }}">Conhecer soluções</a>
+                <a class="button button--paper" href="{{ url_for('public.products') }}">Ver produtos</a>
             </div>
-        </div>
+        </article>
 
-        <div class="media-slot media-slot--hero" data-asset-slot="home.hero.image">
-            <span>Espaço para imagem principal</span>
-        </div>
+        <aside class="registry-card" aria-label="Ficha institucional resumida">
+            <span class="registry-card__code">ARQUIVO / COPY MINAS</span>
+            <dl>
+                <div><dt>Base</dt><dd>Elói Mendes / MG</dd></div>
+                <div><dt>Desde</dt><dd>2011</dd></div>
+                <div><dt>Status</dt><dd>Ativa</dd></div>
+                <div><dt>Catálogo</dt><dd>{{ featured_products|length }} destaques / 10 ativos</dd></div>
+            </dl>
+            <a href="{{ url_for('public.company') }}">Abrir ficha da empresa →</a>
+        </aside>
     </section>
 
-    <section class="content-section section-shell" id="solucoes">
+    <section class="content-section section-shell">
         <header class="section-heading">
-            <p class="section-kicker">Soluções</p>
-            <h2 data-content-key="home.solutions.title">Título da seção de soluções</h2>
-            <p data-content-key="home.solutions.description">Descrição da seção a definir.</p>
+            <p class="section-kicker">Soluções / índice</p>
+            <h2>Áreas de atuação</h2>
+            <p>Um resumo das frentes relacionadas ao cadastro e ao catálogo atual da Copy Minas.</p>
         </header>
 
-        <div class="placeholder-grid placeholder-grid--three">
-            {% for index in range(1, 4) %}
-            <article class="placeholder-card">
-                <div class="media-slot" data-asset-slot="home.solutions.{{ index }}.image">
-                    <span>Imagem da solução {{ index }}</span>
-                </div>
-                <p class="placeholder-card__eyebrow">Solução {{ "%02d"|format(index) }}</p>
-                <h3>Título da solução</h3>
-                <p>Descrição da solução a definir.</p>
+        <div class="paper-grid">
+            {% for solution in company.solutions[:4] %}
+            <article class="paper-panel solution-card" data-sheet="{{ solution.code }}">
+                <span class="solution-card__number">[{{ solution.code }}]</span>
+                <h3>{{ solution.title }}</h3>
+                <p>{{ solution.description }}</p>
             </article>
             {% endfor %}
         </div>
+
+        <a class="section-link" href="{{ url_for('public.solutions') }}">Abrir todas as soluções →</a>
     </section>
 
-    <section class="content-section section-shell" id="produtos">
+    <section class="content-section section-shell">
         <header class="section-heading">
-            <p class="section-kicker">Produtos</p>
-            <h2 data-content-key="home.products.title">Título da seção de produtos</h2>
-            <p data-content-key="home.products.description">Descrição da seleção de produtos a definir.</p>
+            <p class="section-kicker">Produtos / Site 2 → Site 3</p>
+            <h2>Produtos em destaque</h2>
+            <p>Registros ativos do catálogo original, agora organizados em fichas individuais.</p>
         </header>
 
-        {% if featured_products %}
-        <div class="placeholder-grid placeholder-grid--three">
+        <div class="product-strip">
             {% for product in featured_products %}
-            <article class="placeholder-card placeholder-card--product">
-                <div class="media-slot media-slot--product" data-asset-slot="product.{{ product.id }}.image">
-                    <span>Imagem do produto</span>
+            <article class="home-product">
+                <a class="home-product__media" href="{{ url_for('public.product_detail', slug=product.slug) }}">
+                    <span>IMG / {{ "%04d"|format(product.id) }}</span>
+                </a>
+                <div class="home-product__copy">
+                    <span>{{ product.category }} / {{ "%04d"|format(product.id) }}</span>
+                    <h3>{{ product.name }}</h3>
+                    <a href="{{ url_for('public.product_detail', slug=product.slug) }}">Abrir ficha →</a>
                 </div>
-                <p class="placeholder-card__eyebrow">{{ product.category }}</p>
-                <h3>{{ product.name }}</h3>
-                <p>{{ product.summary }}</p>
             </article>
             {% endfor %}
         </div>
-        {% else %}
-        <div class="contact-placeholder">
-            <span>O catálogo real será publicado após a migração dos produtos do Site 2.</span>
-        </div>
-        {% endif %}
 
-        <div class="action-row">
-            <a class="button button--primary" href="{{ url_for('public.products') }}">Abrir página de produtos</a>
-        </div>
+        <a class="section-link" href="{{ url_for('public.products') }}">Abrir catálogo completo →</a>
     </section>
 
-    <section class="split-section section-shell" id="empresa">
-        <div>
+    <section class="company-callout section-shell">
+        <article class="paper-panel" data-sheet="EMPRESA / 03">
             <p class="section-kicker">Empresa</p>
-            <h2 data-content-key="home.company.title">Título institucional</h2>
-            <p class="lead" data-content-key="home.company.description">
-                Texto institucional da Copy Minas a definir.
+            <h2>Copy Minas em Elói Mendes.</h2>
+            <p class="lead">
+                Nome fantasia de {{ company.legal_name }}, CNPJ {{ company.cnpj }}, com início de atividades em {{ company.founded_on }}.
             </p>
-        </div>
+            <a class="section-link section-link--dark" href="{{ url_for('public.company') }}">Conhecer a empresa →</a>
+        </article>
 
-        <div class="media-slot media-slot--wide" data-asset-slot="home.company.image">
-            <span>Espaço para imagem institucional</span>
+        <div class="image-sheet" data-asset-slot="home.company.image">
+            <span>FOTO / EMPRESA<br>ESPAÇO RESERVADO</span>
         </div>
     </section>
 
     <section class="location-section section-shell" id="localizacao">
         <div class="location-copy">
-            <p class="section-kicker">Localização</p>
-            <h2 data-content-key="home.location.title">Título da seção de localização</h2>
-            <p data-content-key="home.location.description">
-                Texto de localização a definir.
-            </p>
-
-            <address class="location-address">
-                {{ copyminas_location.address }}
-            </address>
-
+            <p class="section-kicker">Localização / 21°S</p>
+            <h2>Elói Mendes, Minas Gerais.</h2>
+            <address class="location-address">{{ copyminas_location.address }}</address>
             <p class="location-note">
-                No globo: mundo em prata, Brasil em vermelho, Minas em dourado e Elói Mendes em azul.
+                Abra o globo para explorar a localização. O ponto azul representa Elói Mendes em escala planetária.
             </p>
+            <a class="section-link" href="{{ url_for('public.contact') }}">Dados de contato →</a>
         </div>
 
-        <button
-            class="globe-card"
-            type="button"
-            data-globe-open
-            aria-haspopup="dialog"
-            aria-controls="copyminas-globe-dialog"
-            aria-label="Abrir globo interativo em tela cheia"
-        >
+        <button class="globe-card" type="button" data-globe-open aria-haspopup="dialog" aria-controls="copyminas-globe-dialog" aria-label="Abrir globo interativo em tela cheia">
             <span class="globe-card__fallback" aria-hidden="true"></span>
-
-            <span
-                class="globe-card__mount"
-                data-globe-mount="home-preview"
-                data-location-lat="{{ copyminas_location.latitude }}"
-                data-location-lon="{{ copyminas_location.longitude }}"
-                data-location-label="{{ copyminas_location.city }}"
-                aria-hidden="true"
-            ></span>
-
+            <span class="globe-card__mount" data-globe-mount="home-preview" data-location-lat="{{ copyminas_location.latitude }}" data-location-lon="{{ copyminas_location.longitude }}" data-location-label="{{ copyminas_location.city }}" aria-hidden="true"></span>
             <span class="globe-card__caption">
                 <strong>Explorar localização</strong>
                 <small>Mundo · Brasil · Minas · Elói Mendes</small>
             </span>
         </button>
     </section>
-
-    <section class="contact-section section-shell" id="contato">
-        <p class="section-kicker">Contato</p>
-        <h2 data-content-key="home.contact.title">Título da área de contato</h2>
-        <p data-content-key="home.contact.description">Descrição do atendimento a definir.</p>
-
-        <div class="contact-placeholder">
-            <span>Os dados de atendimento ficam na página dedicada de contato.</span>
-        </div>
-
-        <div class="action-row">
-            <a class="button button--primary" href="{{ url_for('public.contact') }}">Abrir contato</a>
-        </div>
-    </section>
 </main>
 
 <footer class="site-footer">
-    <p>Copy Minas</p>
-    <p>Conteúdo institucional em construção.</p>
+    <span>Copy Minas / Soluções em tecnologia</span>
+    <nav aria-label="Rodapé">
+        <a href="{{ url_for('public.products') }}">Produtos</a>
+        <a href="{{ url_for('public.contact') }}">Contato</a>
+    </nav>
 </footer>
 
-<dialog
-    class="globe-dialog"
-    id="copyminas-globe-dialog"
-    data-globe-dialog
-    aria-labelledby="globe-dialog-title"
->
+<dialog class="globe-dialog" id="copyminas-globe-dialog" data-globe-dialog aria-labelledby="globe-dialog-title">
     <div class="globe-dialog__shell">
         <header class="globe-dialog__header">
             <div>
                 <p class="section-kicker">Localização</p>
                 <h2 id="globe-dialog-title">Copy Minas · Elói Mendes</h2>
             </div>
-
-            <button
-                class="globe-dialog__close"
-                type="button"
-                data-globe-close
-                aria-label="Fechar globo"
-            >
-                ×
-            </button>
+            <button class="globe-dialog__close" type="button" data-globe-close aria-label="Fechar globo">×</button>
         </header>
 
         <div class="globe-dialog__stage">
-            <div
-                class="globe-fullscreen"
-                data-globe-mount="fullscreen"
-                data-location-lat="{{ copyminas_location.latitude }}"
-                data-location-lon="{{ copyminas_location.longitude }}"
-                data-location-label="{{ copyminas_location.city }}"
-                data-maps-url="{{ copyminas_location.maps_url }}"
-                aria-label="Globo 3D interativo com Elói Mendes destacado em azul"
-            ></div>
-
+            <div class="globe-fullscreen" data-globe-mount="fullscreen" data-location-lat="{{ copyminas_location.latitude }}" data-location-lon="{{ copyminas_location.longitude }}" data-location-label="{{ copyminas_location.city }}" data-maps-url="{{ copyminas_location.maps_url }}" aria-label="Globo 3D interativo com Elói Mendes destacado em azul"></div>
             <div class="globe-legend" aria-label="Legenda do globo">
                 <span><i class="legend-dot legend-dot--world"></i>Mundo</span>
                 <span><i class="legend-dot legend-dot--brazil"></i>Brasil</span>
                 <span><i class="legend-dot legend-dot--minas"></i>Minas Gerais</span>
                 <span><i class="legend-dot legend-dot--eloi"></i>Elói Mendes</span>
             </div>
-
-            <p class="globe-dialog__help">
-                Arraste para girar · use a roda para aproximar · clique no ponto azul para abrir no Google Maps
-            </p>
+            <p class="globe-dialog__help">Arraste para girar · use a roda para aproximar · clique no ponto azul para abrir no Google Maps</p>
         </div>
 
         <footer class="globe-dialog__footer">
             <address>{{ copyminas_location.address }}</address>
-
-            <a
-                class="button button--primary"
-                href="{{ copyminas_location.maps_url }}"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Abrir no Google Maps
-            </a>
+            <a class="button button--primary" href="{{ copyminas_location.maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a>
         </footer>
     </div>
 </dialog>
 {% endblock %}
 
 {% block page_scripts %}
-<script
-    type="module"
-    src="{{ url_for('static', filename='js/globe.js') }}"
-></script>
+<script type="module" src="{{ url_for('static', filename='js/globe.js') }}"></script>
 {% endblock %}

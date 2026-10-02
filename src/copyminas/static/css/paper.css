@@ -469,3 +469,17 @@
         gap: .25rem;
     }
 }
+
+
+.contact-source-note {
+    margin: 2rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--paper-line);
+    color: var(--paper-muted);
+    font-size: .7rem;
+    line-height: 1.6;
+}
+
+.company-register .paper-contact-item dd {
+    text-transform: none;
+}

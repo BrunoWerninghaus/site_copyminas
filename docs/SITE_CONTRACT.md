@@ -92,12 +92,13 @@ Página institucional principal.
 
 A Home nasce com áreas independentes e substituíveis:
 1. hero institucional;
-2. soluções;
+2. chamada para Soluções;
 3. produtos em destaque;
-4. bloco institucional;
+4. chamada institucional;
 5. localização/globo;
-6. contato/orçamento;
-7. rodapé.
+6. rodapé.
+
+A Home funciona como capa editorial. Conteúdo completo de Soluções, Produtos, Empresa e Contato vive em rotas próprias.
 
 Nenhum desses blocos depende do conteúdo definitivo para existir.
 
@@ -161,10 +162,12 @@ A interface deve evitar excesso de efeitos. Logo e globo são os elementos tecno
 ## 7. Rotas públicas
 
 - `/`: entrada imersiva.
-- `/home`: Home institucional.
+- `/home`: Home institucional / capa editorial.
+- `/solucoes`: áreas de atuação e soluções.
 - `/produtos`: catálogo em página própria.
+- `/produtos/<slug>`: ficha individual do produto.
+- `/empresa`: ficha institucional.
 - `/contato`: contato em página própria.
-- produto individual: entra junto da migração real do catálogo do Site 2.
 - administração: etapa posterior.
 
 A Home pode exibir chamadas e produtos em destaque, mas não substitui as páginas dedicadas de Produtos e Contato.
@@ -180,3 +183,31 @@ Regras:
 - normalizar categorias, imagens e relacionamentos para o modelo do Site 3;
 - segredos, credenciais e configuração de desenvolvimento do Site 2 não entram no repositório;
 - pesquisa pública pode validar categorias e informações institucionais, mas não substitui a fonte real dos produtos.
+
+
+## 9. Conteúdo institucional verificado
+
+Informações cadastrais públicas consultadas em 2026 sustentam:
+- nome fantasia: Copy Minas;
+- razão social: Cristovao Mendes Quintino;
+- CNPJ: 97.537.200/0001-10;
+- início das atividades: 12/07/2011;
+- situação cadastral: ativa;
+- sede em Elói Mendes/MG;
+- atividade principal cadastrada: fotocópias;
+- atividades secundárias relevantes ao Site 3: equipamentos e suprimentos de informática, recarga de cartuchos, equipamentos para escritório, aluguel de máquinas/equipamentos para escritório e reparação/manutenção de computadores e periféricos.
+
+Canais públicos recentes encontrados:
+- (35) 98877-6969;
+- (35) 99927-9922;
+- copyminas@hotmail.com.
+
+Há fontes que ainda exibem o telefone (35) 3491-0201. Ele é mantido como dado legado interno, mas não é apresentado como canal principal no Site 3 até confirmação do proprietário.
+
+O horário de atendimento não foi verificado e deve permanecer como "A confirmar".
+
+Conflito de grafia de bairro:
+- endereço informado pelo proprietário: Ludovico Pavoni;
+- bases cadastrais públicas: Ludovico Pavone.
+
+O Site 3 preserva o endereço informado diretamente pelo proprietário como fonte prioritária.
