@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Produtos — Copy Minas Admin{% endblock %}
+{% block meta_description %}Gestão interna de produtos da Copy Minas.{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block page_styles %}
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+{% set admin_page = "products" %}
+{% include "admin/_header.html" %}
+
+<main id="main-content" class="admin-stage">
+    {% with messages = get_flashed_messages(category_filter=["admin-success"]) %}
+        {% if messages %}
+        <div class="admin-alert admin-alert--success" role="status">
+            {% for message in messages %}<strong>{{ message }}</strong>{% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <section class="admin-page-heading">
+        <div>
+            <span>CATÁLOGO / GESTÃO</span>
+            <h1>Produtos</h1>
+            <p>Gerencie os registros existentes do <code>main_bd</code>. Desativar remove o item da publicação sem apagar o histórico.</p>
+        </div>
+        <a class="admin-button" href="{{ url_for('admin.product_new') }}">Novo produto</a>
+    </section>
+
+    <section class="admin-product-summary" aria-label="Resumo dos produtos">
+        <div><span>Total</span><strong>{{ products|length }}</strong></div>
+        <div><span>Ativos</span><strong>{{ active_count }}</strong></div>
+        <div><span>Inativos</span><strong>{{ inactive_count }}</strong></div>
+    </section>
+
+    <section class="admin-toolbar" aria-label="Filtro de produtos">
+        <label>
+            <span>Localizar produto</span>
+            <input type="search" placeholder="Nome, categoria ou ID..." autocomplete="off" data-admin-product-search>
+        </label>
+        <div class="admin-filter-group">
+            <button type="button" class="is-active" data-admin-status="all" aria-pressed="true">Todos</button>
+            <button type="button" data-admin-status="active" aria-pressed="false">Ativos</button>
+            <button type="button" data-admin-status="inactive" aria-pressed="false">Inativos</button>
+        </div>
+        <span class="admin-toolbar__count" data-admin-product-count>{{ products|length }} registro{% if products|length != 1 %}s{% endif %}</span>
+    </section>
+
+    <section class="admin-product-list" aria-label="Produtos cadastrados">
+        <div class="admin-product-row admin-product-row--head" aria-hidden="true">
+            <span>ID</span>
+            <span>Produto</span>
+            <span>Categoria</span>
+            <span>Qtd.</span>
+            <span>Status</span>
+            <span>Ação</span>
+        </div>
+
+        {% for product in products %}
+        <article
+            class="admin-product-row"
+            data-admin-product
+            data-status="{{ 'active' if product.ativo else 'inactive' }}"
+            data-search="{{ product.id }} {{ product.nome }} {{ product.categoria or '' }}"
+        >
+            <span class="admin-product-id">#{{ product.id }}</span>
+
+            <div class="admin-product-name">
+                <strong>{{ product.nome }}</strong>
+                {% if not product.categoria_ativa %}
+                <small>Categoria inativa</small>
+                {% endif %}
+            </div>
+
+            <span>{{ product.categoria or "Sem categoria" }}</span>
+            <span>{{ product.qtd if product.qtd is not none else "—" }}</span>
+
+            <span>
+                <span class="admin-status {{ 'admin-status--active' if product.ativo else 'admin-status--inactive' }}">
+                    {{ "Ativo" if product.ativo else "Inativo" }}
+                </span>
+            </span>
+
+            <div class="admin-product-actions">
+                <a href="{{ url_for('admin.product_edit', product_id=product.id) }}">Editar</a>
+                <form method="post" action="{{ url_for('admin.product_status', product_id=product.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="active" value="{{ '0' if product.ativo else '1' }}">
+                    <button type="submit">{{ "Desativar" if product.ativo else "Ativar" }}</button>
+                </form>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+
+    <div class="admin-empty" data-admin-product-empty hidden>
+        <strong>Nenhum produto encontrado.</strong>
+        <span>Altere a busca ou o filtro de status.</span>
+    </div>
+</main>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/admin-products.js') }}" defer></script>
+{% endblock %}
