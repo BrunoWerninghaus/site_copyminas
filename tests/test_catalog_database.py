@@ -47,6 +47,9 @@ class CatalogDatabaseTestCase(unittest.TestCase):
         with self.app.app_context(), patch(
             "src.copyminas.catalog.open_database",
             return_value=connection,
+        ), patch(
+            "src.copyminas.catalog.Path.is_file",
+            return_value=True,
         ):
             products = get_public_products()
             categories = get_public_categories(products)
@@ -71,6 +74,37 @@ class CatalogDatabaseTestCase(unittest.TestCase):
         self.assertIn("p.ativo = 1", sql)
         self.assertIn("c.ativo = 1", sql)
         connection.close.assert_called_once()
+
+    def test_missing_product_image_file_keeps_placeholder_contract(self):
+        rows = [
+            {
+                "id": 14,
+                "nome": "Computador Desktop",
+                "descricao": "Desktop.",
+                "imagem1": "images/products/missing.webp",
+                "imagem2": "",
+                "imagem3": "",
+                "imagem4": "",
+                "imagem5": "",
+                "espec": "",
+                "qtd": 1,
+                "categoria_id": 2,
+                "categoria": "Computadores",
+            }
+        ]
+        connection, _cursor = self._connection_for(rows)
+
+        with self.app.app_context(), patch(
+            "src.copyminas.catalog.open_database",
+            return_value=connection,
+        ), patch(
+            "src.copyminas.catalog.Path.is_file",
+            return_value=False,
+        ):
+            product = get_public_products()[0]
+
+        self.assertEqual(product["images"], [])
+        self.assertIsNone(product["image_url"])
 
     def test_product_slug_lookup_uses_database_content(self):
         rows = [
