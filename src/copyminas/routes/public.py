@@ -1,6 +1,4 @@
-from urllib.parse import urlencode
-
-from flask import Blueprint, abort, redirect, render_template, request
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 
 from src.copyminas.catalog import (
     get_product_by_slug,
@@ -9,17 +7,26 @@ from src.copyminas.catalog import (
 )
 from src.copyminas.company import COPY_MINAS_COMPANY
 from src.copyminas.contact import COPY_MINAS_CONTACT
+from src.copyminas.contact_store import create_contact_request
+from src.copyminas.db import DatabaseUnavailable
 from src.copyminas.location import COPY_MINAS_LOCATION
 
 
 public_bp = Blueprint("public", __name__)
 
-CONTACT_SUBJECTS = (
-    "Orçamento",
-    "Produtos",
-    "Suporte / manutenção",
-    "Locação",
-    "Outro assunto",
+CONTACT_SERVICE_TYPES = (
+    ("locacao_impressora", "Locação de impressora"),
+    ("locacao_computador", "Locação de computador"),
+    ("manutencao_impressora", "Manutenção de impressora"),
+    ("manutencao_computador", "Manutenção de computador"),
+    ("suporte", "Suporte"),
+    ("outro", "Outro"),
+)
+
+CONTACT_PREFERENCES = (
+    ("whatsapp", "WhatsApp"),
+    ("telefone", "Telefone"),
+    ("email", "E-mail"),
 )
 
 
@@ -86,7 +93,8 @@ def _render_contact(*, form_data=None, form_errors=None, status=200):
             "public/contact.html",
             contact=COPY_MINAS_CONTACT,
             copyminas_location=COPY_MINAS_LOCATION,
-            contact_subjects=CONTACT_SUBJECTS,
+            contact_service_types=CONTACT_SERVICE_TYPES,
+            contact_preferences=CONTACT_PREFERENCES,
             form_data=form_data or {},
             form_errors=form_errors or [],
         ),
@@ -101,7 +109,17 @@ def contact():
 
 @public_bp.post("/contato/enviar")
 def contact_submit():
-    fields = ("name", "company", "reply", "subject", "message")
+    fields = (
+        "name",
+        "company",
+        "email",
+        "phone",
+        "city",
+        "service_type",
+        "equipment_quantity",
+        "preferred_contact",
+        "message",
+    )
     form_data = {
         field: request.form.get(field, "").strip()
         for field in fields
@@ -114,30 +132,51 @@ def contact_submit():
     elif len(form_data["name"]) > 120:
         errors.append("O nome deve ter no máximo 120 caracteres.")
 
-    if not form_data["reply"]:
-        errors.append("Informe um telefone, WhatsApp ou e-mail para retorno.")
-    elif len(form_data["reply"]) > 160:
-        errors.append("O contato de retorno deve ter no máximo 160 caracteres.")
-
-    if form_data["subject"] not in CONTACT_SUBJECTS:
-        errors.append("Selecione um assunto válido.")
-
-    if not form_data["message"]:
-        errors.append("Escreva uma mensagem.")
-    elif len(form_data["message"]) > 2000:
-        errors.append("A mensagem deve ter no máximo 2000 caracteres.")
-
     if len(form_data["company"]) > 160:
         errors.append("O nome da empresa deve ter no máximo 160 caracteres.")
 
-    target_raw = request.form.get("target", "0")
-    try:
-        target_index = int(target_raw)
-    except ValueError:
-        target_index = 0
+    if not form_data["email"] or "@" not in form_data["email"]:
+        errors.append("Informe um e-mail válido.")
+    elif len(form_data["email"]) > 254:
+        errors.append("O e-mail deve ter no máximo 254 caracteres.")
 
-    if target_index < 0 or target_index >= len(COPY_MINAS_CONTACT["phones"]):
-        target_index = 0
+    if not form_data["phone"]:
+        errors.append("Informe um telefone ou WhatsApp.")
+    elif len(form_data["phone"]) > 20:
+        errors.append("O telefone deve ter no máximo 20 caracteres.")
+
+    if not form_data["city"]:
+        errors.append("Informe sua cidade.")
+    elif len(form_data["city"]) > 120:
+        errors.append("A cidade deve ter no máximo 120 caracteres.")
+
+    service_keys = {key for key, _ in CONTACT_SERVICE_TYPES}
+    if form_data["service_type"] not in service_keys:
+        errors.append("Selecione um tipo de serviço válido.")
+
+    preference_keys = {key for key, _ in CONTACT_PREFERENCES}
+    if form_data["preferred_contact"] not in preference_keys:
+        errors.append("Selecione uma preferência de contato válida.")
+
+    quantity = None
+    if form_data["equipment_quantity"]:
+        try:
+            quantity = int(form_data["equipment_quantity"])
+        except ValueError:
+            errors.append("A quantidade de equipamentos deve ser um número inteiro.")
+        else:
+            if quantity < 1 or quantity > 65535:
+                errors.append("A quantidade de equipamentos deve estar entre 1 e 65535.")
+
+    if not form_data["message"]:
+        errors.append("Escreva uma mensagem.")
+    elif len(form_data["message"]) > 5000:
+        errors.append("A mensagem deve ter no máximo 5000 caracteres.")
+
+    if request.form.get("consent_privacy") != "1":
+        errors.append("Confirme o consentimento para registrar a solicitação.")
+
+    form_data["equipment_quantity"] = quantity
 
     if errors:
         return _render_contact(
@@ -146,25 +185,20 @@ def contact_submit():
             status=422,
         )
 
-    message_lines = [
-        "Olá, Copy Minas.",
-        "",
-        f"Nome: {form_data['name']}",
-    ]
+    try:
+        protocol = create_contact_request(form_data)
+    except DatabaseUnavailable:
+        return _render_contact(
+            form_data=form_data,
+            form_errors=[
+                "Não foi possível registrar a solicitação no momento. "
+                "Use um dos canais diretos ao lado."
+            ],
+            status=503,
+        )
 
-    if form_data["company"]:
-        message_lines.append(f"Empresa: {form_data['company']}")
-
-    message_lines.extend(
-        [
-            f"Retorno: {form_data['reply']}",
-            f"Assunto: {form_data['subject']}",
-            "",
-            form_data["message"],
-        ]
+    flash(
+        f"Solicitação registrada no main_bd. Protocolo: {protocol}",
+        "contact-success",
     )
-
-    whatsapp = COPY_MINAS_CONTACT["phones"][target_index]["whatsapp"]
-    query = urlencode({"text": "\n".join(message_lines)})
-
-    return redirect(f"{whatsapp}?{query}", code=303)
+    return redirect(url_for("public.contact"), code=303)
