@@ -20,16 +20,30 @@
             <div>
                 <div class="product-sheet__media">
                     {% if product.image_url %}
-                    <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}">
+                    <img
+                        src="{{ url_for('static', filename=product.image_url) }}"
+                        alt="{{ product.name }}"
+                        data-product-main-image
+                    >
                     {% else %}
                     <span>IMAGEM DO PRODUTO<br>EM ATUALIZAÇÃO</span>
                     {% endif %}
                 </div>
 
                 {% if product.images|length > 1 %}
-                <div class="product-sheet__gallery" aria-label="Outras imagens do produto">
-                    {% for image in product.images[1:] %}
-                    <img src="{{ url_for('static', filename=image) }}" alt="{{ product.name }} — imagem {{ loop.index + 1 }}">
+                <div class="product-sheet__gallery" aria-label="Imagens do produto">
+                    {% for image in product.images %}
+                    <button
+                        type="button"
+                        class="product-thumb{% if loop.first %} is-active{% endif %}"
+                        data-product-thumb
+                        data-image-src="{{ url_for('static', filename=image) }}"
+                        data-image-alt="{{ product.name }} — imagem {{ loop.index }}"
+                        aria-label="Ver imagem {{ loop.index }} de {{ product.images|length }}"
+                        aria-pressed="{{ 'true' if loop.first else 'false' }}"
+                    >
+                        <img src="{{ url_for('static', filename=image) }}" alt="">
+                    </button>
                     {% endfor %}
                 </div>
                 {% endif %}
@@ -54,7 +68,7 @@
                 {% endif %}
 
                 <div class="paper-actions">
-                    <a class="paper-action" href="{{ url_for('public.contact') }}">Consultar</a>
+                    <a class="paper-action" href="{{ url_for('public.contact', product=product.slug) }}">Consultar este produto</a>
                     <a class="paper-action paper-action--ghost" href="{{ url_for('public.products') }}">Outros produtos</a>
                 </div>
             </div>
@@ -79,4 +93,9 @@
         {% endif %}
     </article>
 </main>
+{% endblock %}
+
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/product-detail.js') }}" defer></script>
 {% endblock %}
