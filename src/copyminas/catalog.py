@@ -8,7 +8,9 @@ from flask import current_app
 from src.copyminas.db import DatabaseUnavailable, open_database
 
 
-FIXTURE_PATH = Path(__file__).with_name("data") / "catalog_site2.json"
+DATA_DIR = Path(__file__).with_name("data")
+FIXTURE_PATH = DATA_DIR / "catalog_site2.json"
+PRESENTATION_PATH = DATA_DIR / "catalog_presentation.json"
 
 
 def _slugify(value):
@@ -64,14 +66,23 @@ def _image_list(row):
     return images
 
 
+def _presentation_for(product_id):
+    try:
+        data = json.loads(PRESENTATION_PATH.read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return {}
+    return data.get("products", {}).get(str(product_id), {})
+
+
 def _hydrate_database_product(row):
     images = _image_list(row)
     description = (row.get("descricao") or "").strip()
+    presentation = _presentation_for(row["id"])
 
     return {
         "id": row["id"],
         "source_id": row["id"],
-        "slug": _slugify(row["nome"]),
+        "slug": presentation.get("slug") or _slugify(row["nome"]),
         "name": row["nome"],
         "source_name": row["nome"],
         "category_id": row["categoria_id"],
@@ -82,7 +93,7 @@ def _hydrate_database_product(row):
         "images": images,
         "image_url": images[0] if images else None,
         "source_quantity": row.get("qtd"),
-        "featured": False,
+        "featured": bool(presentation.get("featured", False)),
     }
 
 
@@ -158,6 +169,7 @@ def get_public_products(limit=None):
     # invented "featured" flag: the first records follow category + id order.
     products.sort(
         key=lambda product: (
+            not product.get("featured", False),
             product["category"],
             product["id"],
         )
