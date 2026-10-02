@@ -134,6 +134,12 @@ class HomeSourceContractTestCase(unittest.TestCase):
         self.assertEqual(template.count('aria-label="Venda disponível"'), 3)
         self.assertEqual(template.count('aria-label="Manutenção disponível"'), 3)
 
+    def test_catalog_hidden_state_overrides_card_display(self):
+        source = (ROOT / "src/copyminas/static/css/paper.css").read_text(encoding="utf-8")
+        self.assertIn(".product-card[hidden]", source)
+        self.assertIn(".catalog-category[hidden]", source)
+        self.assertIn("display: none !important;", source)
+
     def test_home_never_masks_horizontal_overflow(self):
         source = HOME_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
 
