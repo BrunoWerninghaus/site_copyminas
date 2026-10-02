@@ -1,6 +1,7 @@
 import json
 import re
 import unicodedata
+from functools import lru_cache
 from pathlib import Path
 
 from flask import current_app
@@ -66,12 +67,16 @@ def _image_list(row):
     return images
 
 
-def _presentation_for(product_id):
+@lru_cache(maxsize=1)
+def _presentation_data():
     try:
-        data = json.loads(PRESENTATION_PATH.read_text(encoding="utf-8"))
+        return json.loads(PRESENTATION_PATH.read_text(encoding="utf-8"))
     except (OSError, ValueError, json.JSONDecodeError):
-        return {}
-    return data.get("products", {}).get(str(product_id), {})
+        return {"products": {}}
+
+
+def _presentation_for(product_id):
+    return _presentation_data().get("products", {}).get(str(product_id), {})
 
 
 def _hydrate_database_product(row):
@@ -181,9 +186,12 @@ def get_public_products(limit=None):
     return products
 
 
-def get_public_categories():
+def get_public_categories(products=None):
     categories = {}
-    for product in get_public_products():
+    if products is None:
+        products = get_public_products()
+
+    for product in products:
         categories[product["category_id"]] = {
             "id": product["category_id"],
             "name": product["category"],
