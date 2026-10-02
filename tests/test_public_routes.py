@@ -1,3 +1,4 @@
+import os
 import unittest
 from unittest.mock import patch
 
@@ -14,6 +15,66 @@ class PublicRoutesTestCase(unittest.TestCase):
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200, path)
         self.assertIn(expected_text.encode("utf-8"), response.data)
+
+    def test_existing_main_bd_defaults_are_compatible(self):
+        with patch.dict(
+            os.environ,
+            {
+                "DB_HOST": "",
+                "DB_PORT": "",
+                "DB_NAME": "",
+                "DB_USER": "",
+                "DB_PASSWORD": "",
+                "DATABASE_HOST": "",
+                "DATABASE_PORT": "",
+                "DATABASE_NAME": "",
+                "DATABASE_USER": "",
+                "DATABASE_PASSWORD": "",
+            },
+            clear=False,
+        ):
+            for key in (
+                "DB_HOST",
+                "DB_PORT",
+                "DB_NAME",
+                "DB_USER",
+                "DB_PASSWORD",
+                "DATABASE_HOST",
+                "DATABASE_PORT",
+                "DATABASE_NAME",
+                "DATABASE_USER",
+                "DATABASE_PASSWORD",
+            ):
+                os.environ.pop(key, None)
+
+            app = create_app()
+            self.assertEqual(app.config["DB_HOST"], "127.0.0.1")
+            self.assertEqual(app.config["DB_PORT"], 3306)
+            self.assertEqual(app.config["DB_NAME"], "main_bd")
+            self.assertEqual(app.config["DB_USER"], "root")
+            self.assertEqual(app.config["DB_PASSWORD"], "")
+
+    def test_legacy_database_environment_names_are_supported(self):
+        with patch.dict(
+            os.environ,
+            {
+                "DATABASE_HOST": "localhost",
+                "DATABASE_PORT": "3307",
+                "DATABASE_NAME": "main_bd",
+                "DATABASE_USER": "copyminas",
+                "DATABASE_PASSWORD": "secret",
+            },
+            clear=False,
+        ):
+            for key in ("DB_HOST", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASSWORD"):
+                os.environ.pop(key, None)
+
+            app = create_app()
+            self.assertEqual(app.config["DB_HOST"], "localhost")
+            self.assertEqual(app.config["DB_PORT"], 3307)
+            self.assertEqual(app.config["DB_NAME"], "main_bd")
+            self.assertEqual(app.config["DB_USER"], "copyminas")
+            self.assertEqual(app.config["DB_PASSWORD"], "secret")
 
     def test_intro(self):
         self.assert_page("/", "Copy Minas")
