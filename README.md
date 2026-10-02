@@ -14,9 +14,11 @@ O projeto está sendo reconstruído do zero.
 ## Rotas atuais
 
 - `/` — entrada imersiva Copy Minas;
-- `/home` — Home institucional;
+- `/home` — Home institucional / capa editorial;
+- `/solucoes` — áreas de atuação;
 - `/produtos` — catálogo migrado do Site 2;
 - `/produtos/<slug>` — ficha individual do produto;
+- `/empresa` — ficha institucional;
 - `/contato` — contato e localização.
 
 ## Contrato de conteúdo
@@ -50,3 +52,12 @@ A configuração local deve ficar em `.env`, nunca versionado.
 - **Site 3**: aplicação atual.
 
 A rastreabilidade da migração do catálogo está documentada em `docs/SITE2_CATALOG_MIGRATION.md`.
+
+
+## Testes rápidos
+
+Os testes públicos usam apenas `unittest` da biblioteca padrão:
+
+```bash
+python -m unittest discover -s tests -v
+```
