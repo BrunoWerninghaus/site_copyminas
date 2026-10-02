@@ -95,6 +95,23 @@ class HomeSourceContractTestCase(unittest.TestCase):
             r"\.location-copy\s*\{[^}]*container-type:\s*inline-size",
         )
 
+    def test_home_sections_have_document_register_labels(self):
+        template = (ROOT / "src/copyminas/templates/public/home.html").read_text(encoding="utf-8")
+        source = HOME_CSS.read_text(encoding="utf-8")
+
+        for marker in (
+            'data-section="00 / HOME"',
+            'data-section="01 / SOLUÇÕES"',
+            'data-section="02 / PRODUTOS"',
+            'data-section="03 / EMPRESA"',
+            'data-section="04 / LOCALIZAÇÃO"',
+        ):
+            self.assertIn(marker, template)
+
+        self.assertIn("[data-section]::after", source)
+        self.assertIn(".product-strip::before", source)
+        self.assertIn(".location-copy::before", source)
+
     def test_home_refinement_preserves_editorial_technical_language(self):
         source = HOME_CSS.read_text(encoding="utf-8")
 
