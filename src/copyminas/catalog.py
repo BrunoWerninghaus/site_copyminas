@@ -86,6 +86,11 @@ def _presentation_for(product_id):
     return _presentation_data().get("products", {}).get(str(product_id), {})
 
 
+def get_public_slug(product_id, name):
+    presentation = _presentation_for(product_id)
+    return presentation.get("slug") or _slugify(name)
+
+
 def _service_capabilities(name, category):
     normalized_name = (name or "").casefold()
     normalized_category = (category or "").casefold()
@@ -108,7 +113,7 @@ def _hydrate_database_product(row):
     return {
         "id": row["id"],
         "source_id": row["id"],
-        "slug": presentation.get("slug") or _slugify(row["nome"]),
+        "slug": get_public_slug(row["id"], row["nome"]),
         "name": row["nome"],
         "source_name": row["nome"],
         "category_id": row["categoria_id"],
