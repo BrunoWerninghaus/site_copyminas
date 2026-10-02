@@ -66,6 +66,7 @@ class CatalogDatabaseTestCase(unittest.TestCase):
         )
         self.assertEqual(product["slug"], "brother-dcp-8157dn")
         self.assertTrue(product["featured"])
+        self.assertEqual(product["services"], ["Venda", "Aluguel", "Manutenção"])
         self.assertEqual(categories, [{"id": 1, "name": "Impressoras", "active": True}])
 
         sql = cursor.execute.call_args.args[0]
