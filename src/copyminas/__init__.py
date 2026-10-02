@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, render_template
 
 
 def _env(primary, legacy, default=""):
@@ -52,5 +52,9 @@ def create_app() -> Flask:
     from .routes.public import public_bp
 
     app.register_blueprint(public_bp)
+
+    @app.errorhandler(404)
+    def not_found(_error):
+        return render_template("public/not_found.html"), 404
 
     return app
