@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import patch
 
 from src.copyminas import create_app
+from src.copyminas.db import DatabaseUnavailable
 
 
 class PublicRoutesTestCase(unittest.TestCase):
@@ -101,6 +102,27 @@ class PublicRoutesTestCase(unittest.TestCase):
             "/produtos/brother-dcp-8157dn",
             "Brother DCP-8157DN",
         )
+
+    @patch(
+        "src.copyminas.routes.public.get_public_products",
+        side_effect=DatabaseUnavailable("catalog offline"),
+    )
+    def test_catalog_database_outage_returns_branded_503(self, _products):
+        response = self.client.get("/produtos")
+
+        self.assertEqual(response.status_code, 503)
+        self.assertIn("temporariamente indispon".encode("utf-8"), response.data)
+        self.assertIn("Falar com a Copy Minas".encode("utf-8"), response.data)
+
+    @patch(
+        "src.copyminas.routes.public.get_public_products",
+        side_effect=DatabaseUnavailable("catalog offline"),
+    )
+    def test_home_survives_catalog_database_outage(self, _products):
+        response = self.client.get("/home")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Impressão, tecnologia e equipamentos".encode("utf-8"), response.data)
 
     def test_public_pages_do_not_expose_migration_or_storage_language(self):
         for path in ("/home", "/produtos", "/produtos/brother-dcp-8157dn", "/empresa", "/contato"):
