@@ -236,7 +236,8 @@ Formulário:
 - validação ocorre no servidor antes do INSERT;
 - cada solicitação recebe protocolo único compatível com `varchar(20)`;
 - o banco mantém `status = novo`, `source = site` e timestamps pelos defaults do schema existente;
-- após persistência, a interface apresenta o protocolo ao usuário;
+- após persistência, a interface confirma o recebimento em linguagem pública, sem expor nomes de banco, tabela, status interno ou protocolo técnico na página;
+- o protocolo é enviado ao cliente por e-mail e permanece disponível internamente para atendimento;
 - falha de conexão/persistência não deve fingir sucesso: a página retorna erro e preserva os canais diretos;
 - credenciais MySQL nunca são versionadas; conexão vem de `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` e `DB_PASSWORD`;
 - o catálogo continua temporariamente consumindo a fixture versionada do Site 2 até a migração controlada de Catalog/Admin para a persistência oficial.
@@ -257,3 +258,17 @@ Contrato:
 - falha SMTP não desfaz nem invalida um lead já persistido em `main_bd`;
 - falha SMTP deve ser registrada no log da aplicação;
 - o banco continua sendo a autoridade do contato; o e-mail é apenas notificação operacional.
+
+
+### Confirmação por e-mail ao cliente
+
+O e-mail informado no formulário é obrigatório e recebe uma confirmação automática após o registro.
+
+Contrato:
+- remetente: `ti.processos@copymina.com.br`;
+- destinatário: o e-mail informado pelo cliente;
+- o e-mail contém o protocolo de atendimento e o tipo de serviço solicitado;
+- a mensagem confirma o recebimento sem expor nomes de banco, tabela ou estados internos;
+- a mesma operação SMTP também envia a notificação interna para `ti.processos@copymina.com.br`;
+- a página pública nunca mostra `main_bd`, `contatos`, status interno ou identificadores de infraestrutura;
+- se a persistência funcionar e o SMTP falhar, o contato continua válido e a interface informa apenas que a confirmação por e-mail não pôde ser enviada naquele momento.
