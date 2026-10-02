@@ -87,6 +87,27 @@ a {
     outline-offset: 4px;
 }
 
+.skip-link {
+    position: fixed;
+    z-index: 1000;
+    top: .75rem;
+    left: .75rem;
+    transform: translateY(-160%);
+    padding: .7rem .9rem;
+    border: 1px solid var(--blue);
+    background: #050608;
+    color: white;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
 .section-shell {
     width: min(100%, var(--content-width));
     margin-inline: auto;
