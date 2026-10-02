@@ -33,6 +33,7 @@
         <div><span>Total</span><strong>{{ products|length }}</strong></div>
         <div><span>Ativos</span><strong>{{ active_count }}</strong></div>
         <div><span>Inativos</span><strong>{{ inactive_count }}</strong></div>
+        <div><span>Possíveis duplicidades</span><strong>{{ duplicate_count }}</strong></div>
     </section>
 
     <section class="admin-toolbar" aria-label="Filtro de produtos">
@@ -51,6 +52,7 @@
     <section class="admin-product-list" aria-label="Produtos cadastrados">
         <div class="admin-product-row admin-product-row--head" aria-hidden="true">
             <span>ID</span>
+            <span>Imagem</span>
             <span>Produto</span>
             <span>Categoria</span>
             <span>Qtd.</span>
@@ -67,11 +69,24 @@
         >
             <span class="admin-product-id">#{{ product.id }}</span>
 
+            <div class="admin-product-thumb">
+                {% if product.preview_image %}
+                <img src="{{ url_for('static', filename=product.preview_image) }}" alt="">
+                {% else %}
+                <span>SEM IMG</span>
+                {% endif %}
+            </div>
+
             <div class="admin-product-name">
                 <strong>{{ product.nome }}</strong>
-                {% if not product.categoria_ativa %}
-                <small>Categoria inativa</small>
-                {% endif %}
+                <div class="admin-product-flags">
+                    {% if product.duplicate_warning %}
+                    <span class="admin-flag admin-flag--warning">Possível duplicidade</span>
+                    {% endif %}
+                    {% if not product.categoria_ativa %}
+                    <span class="admin-flag">Categoria inativa</span>
+                    {% endif %}
+                </div>
             </div>
 
             <span>{{ product.categoria or "Sem categoria" }}</span>
@@ -85,6 +100,9 @@
 
             <div class="admin-product-actions">
                 <a href="{{ url_for('admin.product_edit', product_id=product.id) }}">Editar</a>
+                {% if product.public_slug %}
+                <a href="{{ url_for('public.product_detail', slug=product.public_slug) }}" target="_blank" rel="noopener noreferrer">Ficha ↗</a>
+                {% endif %}
                 <form method="post" action="{{ url_for('admin.product_status', product_id=product.id) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <input type="hidden" name="active" value="{{ '0' if product.ativo else '1' }}">
