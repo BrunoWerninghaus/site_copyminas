@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Administração — Copy Minas{% endblock %}
+{% block meta_description %}Área restrita da Copy Minas.{% endblock %}
+{% block body_class %}admin-page admin-login-page{% endblock %}
+{% block page_styles %}
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+<main id="main-content" class="admin-login-shell">
+    <section class="admin-login-card" aria-labelledby="admin-login-title">
+        <div class="admin-brand">
+            <img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas">
+            <span>ADMIN / ACESSO RESTRITO</span>
+        </div>
+
+        <h1 id="admin-login-title">Administração</h1>
+        <p>Área interna da Copy Minas. O acesso exige as credenciais configuradas no ambiente da aplicação.</p>
+
+        {% if admin_unconfigured %}
+        <div class="admin-alert admin-alert--error" role="alert">
+            <strong>Administração não configurada.</strong>
+            <span>Defina ADMIN_USERNAME e ADMIN_PASSWORD no arquivo .env antes de acessar esta área.</span>
+        </div>
+        {% else %}
+            {% if login_error %}
+            <div class="admin-alert admin-alert--error" role="alert">
+                <strong>{{ login_error }}</strong>
+            </div>
+            {% endif %}
+
+            <form class="admin-login-form" method="post" action="{{ url_for('admin.login') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <label>
+                    <span>Usuário</span>
+                    <input
+                        type="text"
+                        name="username"
+                        autocomplete="username"
+                        maxlength="120"
+                        required
+                        autofocus
+                        {% if locked_seconds %}disabled{% endif %}
+                    >
+                </label>
+
+                <label>
+                    <span>Senha</span>
+                    <input
+                        type="password"
+                        name="password"
+                        autocomplete="current-password"
+                        required
+                        {% if locked_seconds %}disabled{% endif %}
+                    >
+                </label>
+
+                <button class="admin-button" type="submit" {% if locked_seconds %}disabled{% endif %}>
+                    Entrar
+                </button>
+            </form>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}
