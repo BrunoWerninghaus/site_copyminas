@@ -20,6 +20,14 @@
             Produtos apresentados no catálogo da Copy Minas. Consulte a equipe para confirmar disponibilidade, condições e atendimento.
         </p>
 
+        {% if catalog_unavailable %}
+        <div class="catalog-unavailable" role="status">
+            <span class="paper-card__code">CATÁLOGO / TEMPORARIAMENTE INDISPONÍVEL</span>
+            <h2>Não foi possível consultar os produtos agora.</h2>
+            <p>O restante do site continua disponível. Para consultar equipamentos, disponibilidade ou atendimento, fale diretamente com a Copy Minas.</p>
+            <a class="paper-action" href="{{ url_for('public.contact') }}">Falar com a Copy Minas</a>
+        </div>
+        {% else %}
         <nav class="paper-index" aria-label="Categorias disponíveis">
             <a href="#catalogo">Todos / {{ products|length }}</a>
             {% for category in categories %}
@@ -65,6 +73,7 @@
                 {% endif %}
             {% endfor %}
         </div>
+        {% endif %}
     </section>
 </main>
 
