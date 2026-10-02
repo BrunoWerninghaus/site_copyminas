@@ -252,9 +252,16 @@ class PublicRoutesTestCase(unittest.TestCase):
                 },
             )
 
-    def test_unknown_product_returns_404(self):
+    def test_unknown_product_returns_branded_404(self):
         response = self.client.get("/produtos/produto-inexistente")
         self.assertEqual(response.status_code, 404)
+        self.assertIn("Página não encontrada".encode("utf-8"), response.data)
+        self.assertIn(b"/produtos", response.data)
+
+    def test_unknown_route_returns_branded_404(self):
+        response = self.client.get("/pagina-que-nao-existe")
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("Este endereço não existe".encode("utf-8"), response.data)
 
 
 if __name__ == "__main__":
