@@ -213,11 +213,11 @@ html.globe-dialog-open body { overflow: hidden; }
     transform: translate(-2px,-2px);
 }
 
-.registry-card {
+.service-matrix {
     position: relative;
     min-height: 70%;
     transform: translateY(clamp(0rem,2vw,1.25rem));
-    padding: clamp(1.5rem,3vw,2.5rem);
+    padding: clamp(1.35rem,2.6vw,2.2rem);
     border: 1px solid rgba(255,255,255,.18);
     border-left: 3px solid var(--red);
     background:
@@ -227,8 +227,8 @@ html.globe-dialog-open body { overflow: hidden; }
     box-shadow: 8px 8px 0 rgba(226,26,34,.12);
 }
 
-.registry-card::before {
-    content: "REG / 03";
+.service-matrix::before {
+    content: "SERVIÇOS / 03";
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -237,22 +237,71 @@ html.globe-dialog-open body { overflow: hidden; }
     letter-spacing: .14em;
 }
 
-.registry-card__code {
+.service-matrix__code {
     color: #aab3bb;
     font-size: .72rem;
     letter-spacing: .14em;
 }
 
-.registry-card dl { margin: 2rem 0; border-top: 1px solid var(--line); }
-.registry-card dl div {
-    display: grid;
-    grid-template-columns: .7fr 1.3fr;
-    gap: 1rem;
-    padding: .9rem 0;
-    border-bottom: 1px solid var(--line);
+.service-matrix__table {
+    margin: 2rem 0;
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
 }
-.registry-card dt { color: #aab3bb; font-size: .74rem; text-transform: uppercase; }
-.service-matrix__row { margin: 0; color: white; }
+
+.service-matrix__row {
+    display: grid;
+    grid-template-columns: minmax(118px,1.35fr) repeat(3,minmax(62px,.75fr));
+    min-width: 0;
+    color: white;
+}
+
+.service-matrix__row > * {
+    display: grid;
+    min-width: 0;
+    min-height: 54px;
+    place-items: center;
+    padding: .7rem .45rem;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    text-align: center;
+}
+
+.service-matrix__row > :first-child {
+    place-items: center start;
+    padding-left: .8rem;
+    text-align: left;
+}
+
+.service-matrix__row--head > * {
+    min-height: 46px;
+    color: #909ba4;
+    font-size: .62rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.service-matrix__row strong {
+    color: white;
+    font-size: .72rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.service-status {
+    font-size: 1.15rem;
+    font-weight: 900;
+}
+
+.service-status--yes {
+    color: #55d187;
+}
+
+.service-status--no {
+    color: #ff5a61;
+}
+
 .service-matrix > a,
 .section-link {
     color: white;
