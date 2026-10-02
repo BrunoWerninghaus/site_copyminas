@@ -13,10 +13,10 @@ class ContactNotificationTestCase(unittest.TestCase):
             SMTP_HOST="smtp.example.test",
             SMTP_PORT=587,
             SMTP_SECURITY="starttls",
-            SMTP_USER="ti.processos@copymina.com.br",
+            SMTP_USER="ti.processos@copyminas.com.br",
             SMTP_PASSWORD="test-password",
-            CONTACT_NOTIFICATION_FROM="ti.processos@copymina.com.br",
-            CONTACT_NOTIFICATION_TO="ti.processos@copymina.com.br",
+            CONTACT_NOTIFICATION_FROM="ti.processos@copyminas.com.br",
+            CONTACT_NOTIFICATION_TO="ti.processos@copyminas.com.br",
             CONTACT_SERVICE_LABELS={
                 "suporte": "Suporte",
             },
@@ -54,11 +54,11 @@ class ContactNotificationTestCase(unittest.TestCase):
         internal = smtp.send_message.call_args_list[0].args[0]
         customer = smtp.send_message.call_args_list[1].args[0]
 
-        self.assertEqual(internal["From"], "ti.processos@copymina.com.br")
-        self.assertEqual(internal["To"], "ti.processos@copymina.com.br")
+        self.assertEqual(internal["From"], "ti.processos@copyminas.com.br")
+        self.assertEqual(internal["To"], "ti.processos@copyminas.com.br")
         self.assertEqual(internal["Reply-To"], "cliente@example.com")
 
-        self.assertEqual(customer["From"], "ti.processos@copymina.com.br")
+        self.assertEqual(customer["From"], "ti.processos@copyminas.com.br")
         self.assertEqual(customer["To"], "cliente@example.com")
         self.assertIn("CM261002ABCDEF123456", customer.get_content())
         self.assertIn("Suporte", customer.get_content())
