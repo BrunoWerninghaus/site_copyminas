@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}{{ "Novo produto" if mode == "new" else "Editar produto" }} — Copy Minas Admin{% endblock %}
+{% block meta_description %}Edição interna de produto da Copy Minas.{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block page_styles %}
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+{% set admin_page = "products" %}
+{% include "admin/_header.html" %}
+
+<main id="main-content" class="admin-stage admin-stage--form">
+    {% with messages = get_flashed_messages(category_filter=["admin-success"]) %}
+        {% if messages %}
+        <div class="admin-alert admin-alert--success" role="status">
+            {% for message in messages %}<strong>{{ message }}</strong>{% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="admin-form-heading">
+        <a href="{{ url_for('admin.products') }}">← Produtos</a>
+        <span>{{ "NOVO / PRODUTO" if mode == "new" else "EDIÇÃO / PRODUTO" }}</span>
+        <h1>{{ "Novo produto" if mode == "new" else form_data.nome }}</h1>
+        {% if product %}
+        <p>Registro #{{ product.id }}{% if product.updated_at %} · atualizado em {{ product.updated_at }}{% endif %}</p>
+        {% else %}
+        <p>Cria um novo registro na tabela <code>produtos</code>.</p>
+        {% endif %}
+    </div>
+
+    {% if form_errors %}
+    <div class="admin-alert admin-alert--error" role="alert">
+        <strong>Revise o formulário:</strong>
+        <ul>{% for error in form_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    <form class="admin-product-form" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <section class="admin-form-section">
+            <header>
+                <span>01</span>
+                <div><strong>Cadastro</strong><small>Identificação e publicação</small></div>
+            </header>
+
+            <div class="admin-form-grid">
+                <label class="admin-field admin-field--wide">
+                    <span>Nome *</span>
+                    <input type="text" name="nome" value="{{ form_data.nome }}" maxlength="255" required>
+                </label>
+
+                <label class="admin-field">
+                    <span>Categoria *</span>
+                    <select name="categoria_id" required>
+                        <option value="">Selecione</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if form_data.categoria_id|string == category.id|string %}selected{% endif %}>
+                            {{ category.nome }}{% if not category.ativo %} — inativa{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="admin-field">
+                    <span>Quantidade</span>
+                    <input type="number" name="qtd" value="{{ form_data.qtd }}" min="0" inputmode="numeric">
+                </label>
+
+                <label class="admin-switch">
+                    <input type="checkbox" name="ativo" value="1" {% if form_data.ativo %}checked{% endif %}>
+                    <span>
+                        <strong>Produto ativo</strong>
+                        <small>Quando ativo e com categoria ativa, pode aparecer no catálogo público.</small>
+                    </span>
+                </label>
+            </div>
+        </section>
+
+        <section class="admin-form-section">
+            <header>
+                <span>02</span>
+                <div><strong>Conteúdo</strong><small>Descrição e ficha técnica</small></div>
+            </header>
+
+            <label class="admin-field">
+                <span>Descrição</span>
+                <textarea name="descricao" rows="7">{{ form_data.descricao }}</textarea>
+            </label>
+
+            <label class="admin-field">
+                <span>Especificações</span>
+                <textarea name="espec" rows="11" placeholder="Uma especificação por linha, por exemplo:&#10;Velocidade: 40 ppm&#10;Duplex: Automático">{{ form_data.espec }}</textarea>
+                <small>Pode usar texto em linhas ou o JSON já existente. O site público interpreta ambos.</small>
+            </label>
+        </section>
+
+        <section class="admin-form-section">
+            <header>
+                <span>03</span>
+                <div><strong>Imagens</strong><small>Caminhos já usados pelo catálogo</small></div>
+            </header>
+
+            <div class="admin-image-fields">
+                {% for index in range(1, 6) %}
+                {% set key = "imagem" ~ index %}
+                <label class="admin-field">
+                    <span>Imagem {{ index }}</span>
+                    <input type="text" name="{{ key }}" value="{{ form_data[key] }}" maxlength="500" placeholder="images/products/exemplo.webp">
+                </label>
+                {% endfor %}
+            </div>
+
+            <p class="admin-form-note">
+                O catálogo só publica o arquivo quando ele realmente existe dentro de <code>static</code>. Alterar o caminho aqui não faz upload do arquivo.
+            </p>
+        </section>
+
+        <div class="admin-form-actions">
+            <button class="admin-button" type="submit">{{ "Criar produto" if mode == "new" else "Salvar alterações" }}</button>
+            <a href="{{ url_for('admin.products') }}">Cancelar</a>
+        </div>
+    </form>
+</main>
+{% endblock %}
