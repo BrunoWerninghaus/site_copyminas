@@ -133,7 +133,7 @@ def product_detail(slug):
     )
 
 
-def _render_contact(*, form_data=None, form_errors=None, status=200):
+def _render_contact(*, form_data=None, form_errors=None, contact_context=None, status=200):
     return (
         render_template(
             "public/contact.html",
@@ -143,6 +143,7 @@ def _render_contact(*, form_data=None, form_errors=None, status=200):
             contact_preferences=CONTACT_PREFERENCES,
             form_data=form_data or {},
             form_errors=form_errors or [],
+            contact_context=contact_context,
         ),
         status,
     )
@@ -150,7 +151,32 @@ def _render_contact(*, form_data=None, form_errors=None, status=200):
 
 @public_bp.get("/contato")
 def contact():
-    return _render_contact()
+    product_slug = request.args.get("product", "").strip()
+    if not product_slug:
+        return _render_contact()
+
+    try:
+        product = get_product_by_slug(product_slug)
+    except DatabaseUnavailable as exc:
+        current_app.logger.error("Catalog unavailable for contact prefill: %s", exc)
+        return _render_contact()
+
+    if product is None:
+        return _render_contact()
+
+    return _render_contact(
+        form_data={
+            "message": (
+                f"Tenho interesse no produto {product['name']}. "
+                "Gostaria de consultar disponibilidade e condições."
+            )
+        },
+        contact_context={
+            "label": "Produto selecionado",
+            "name": product["name"],
+            "category": product["category"],
+        },
+    )
 
 
 @public_bp.post("/contato/enviar")
