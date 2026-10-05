@@ -59,6 +59,20 @@ from src.copyminas.catalog import (
     get_public_slug,
 )
 from src.copyminas.db import DatabaseUnavailable
+from src.copyminas.company import COPY_MINAS_COMPANY
+from src.copyminas.home_content import (
+    HomeContentError,
+    HomeContentNotInitialized,
+    create_home_news,
+    get_home_config,
+    get_home_news,
+    home_schema_ready,
+    initialize_home_schema,
+    list_home_news,
+    set_home_news_active,
+    update_home_config,
+    update_home_news,
+)
 
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -292,6 +306,172 @@ def _apply_product_uploads(data):
             saved.append(relative_path)
 
     return saved
+
+
+def _valid_home_url(value):
+    value = (value or "").strip()
+    if not value:
+        return True
+
+    lowered = value.casefold()
+    if lowered.startswith(("javascript:", "data:", "vbscript:")):
+        return False
+
+    if value.startswith("/") and not value.startswith("//"):
+        return True
+
+    return lowered.startswith(("https://", "http://", "mailto:", "tel:"))
+
+
+def _default_home_admin_config():
+    return {
+        "announcement_active": False,
+        "announcement_label": "AVISO",
+        "announcement_text": "",
+        "announcement_link_label": "",
+        "announcement_link_url": "",
+        "hero_kicker": "Copy Minas · Elói Mendes / MG",
+        "hero_title": COPY_MINAS_COMPANY["headline"],
+        "hero_summary": COPY_MINAS_COMPANY["summary"],
+        "primary_cta_label": "Conhecer soluções",
+        "primary_cta_url": "/solucoes",
+        "secondary_cta_label": "Ver produtos",
+        "secondary_cta_url": "/produtos",
+        "featured_product_ids": [],
+        "show_solutions": True,
+        "show_company": True,
+        "show_location": True,
+    }
+
+
+def _parse_home_config_form(public_product_ids):
+    data = {
+        "announcement_active": request.form.get("announcement_active") == "1",
+        "announcement_label": request.form.get("announcement_label", "").strip(),
+        "announcement_text": request.form.get("announcement_text", "").strip(),
+        "announcement_link_label": request.form.get("announcement_link_label", "").strip(),
+        "announcement_link_url": request.form.get("announcement_link_url", "").strip(),
+        "hero_kicker": request.form.get("hero_kicker", "").strip(),
+        "hero_title": request.form.get("hero_title", "").strip(),
+        "hero_summary": request.form.get("hero_summary", "").strip(),
+        "primary_cta_label": request.form.get("primary_cta_label", "").strip(),
+        "primary_cta_url": request.form.get("primary_cta_url", "").strip(),
+        "secondary_cta_label": request.form.get("secondary_cta_label", "").strip(),
+        "secondary_cta_url": request.form.get("secondary_cta_url", "").strip(),
+        "featured_product_ids": [],
+        "show_solutions": request.form.get("show_solutions") == "1",
+        "show_company": request.form.get("show_company") == "1",
+        "show_location": request.form.get("show_location") == "1",
+    }
+    errors = []
+
+    limits = (
+        ("announcement_label", 80, "O rótulo da mensagem"),
+        ("announcement_text", 255, "A mensagem"),
+        ("announcement_link_label", 80, "O texto do link da mensagem"),
+        ("announcement_link_url", 255, "O link da mensagem"),
+        ("hero_kicker", 180, "A linha superior do hero"),
+        ("hero_title", 255, "O título do hero"),
+        ("primary_cta_label", 80, "O texto do CTA principal"),
+        ("primary_cta_url", 255, "O link do CTA principal"),
+        ("secondary_cta_label", 80, "O texto do CTA secundário"),
+        ("secondary_cta_url", 255, "O link do CTA secundário"),
+    )
+
+    for key, limit, label in limits:
+        if len(data[key]) > limit:
+            errors.append(f"{label} deve ter no máximo {limit} caracteres.")
+
+    if not data["hero_kicker"]:
+        errors.append("Informe a linha superior do hero.")
+    if not data["hero_title"]:
+        errors.append("Informe o título principal da Home.")
+    if not data["hero_summary"]:
+        errors.append("Informe o texto principal da Home.")
+    elif len(data["hero_summary"]) > 5000:
+        errors.append("O texto principal deve ter no máximo 5000 caracteres.")
+
+    if not data["primary_cta_label"] or not data["primary_cta_url"]:
+        errors.append("Informe o CTA principal e seu link.")
+    if not data["secondary_cta_label"] or not data["secondary_cta_url"]:
+        errors.append("Informe o CTA secundário e seu link.")
+
+    for key in (
+        "announcement_link_url",
+        "primary_cta_url",
+        "secondary_cta_url",
+    ):
+        if data[key] and not _valid_home_url(data[key]):
+            errors.append(f"{key}: informe um link interno ou URL permitida.")
+
+    featured = []
+    for position in range(1, 7):
+        raw = request.form.get(f"featured_product_{position}", "").strip()
+        if not raw:
+            continue
+        try:
+            product_id = int(raw)
+        except ValueError:
+            errors.append(f"Destaque {position}: produto inválido.")
+            continue
+
+        if product_id not in public_product_ids:
+            errors.append(
+                f"Destaque {position}: selecione um produto atualmente publicável."
+            )
+            continue
+
+        if product_id in featured:
+            errors.append(
+                f"Destaque {position}: o mesmo produto não pode aparecer duas vezes."
+            )
+            continue
+
+        featured.append(product_id)
+
+    data["featured_product_ids"] = featured
+    return data, errors
+
+
+def _parse_home_news_form():
+    raw_order = request.form.get("sort_order", "0").strip()
+    data = {
+        "label": request.form.get("label", "").strip() or "NOVIDADE",
+        "title": request.form.get("title", "").strip(),
+        "body": request.form.get("body", "").strip(),
+        "link_label": request.form.get("link_label", "").strip(),
+        "link_url": request.form.get("link_url", "").strip(),
+        "active": request.form.get("active") == "1",
+        "sort_order": 0,
+    }
+    errors = []
+
+    if len(data["label"]) > 80:
+        errors.append("O rótulo deve ter no máximo 80 caracteres.")
+    if not data["title"]:
+        errors.append("Informe o título da novidade.")
+    elif len(data["title"]) > 180:
+        errors.append("O título deve ter no máximo 180 caracteres.")
+    if not data["body"]:
+        errors.append("Informe o conteúdo da novidade.")
+    elif len(data["body"]) > 5000:
+        errors.append("O conteúdo deve ter no máximo 5000 caracteres.")
+    if len(data["link_label"]) > 80:
+        errors.append("O texto do link deve ter no máximo 80 caracteres.")
+    if len(data["link_url"]) > 255:
+        errors.append("O link deve ter no máximo 255 caracteres.")
+    elif data["link_url"] and not _valid_home_url(data["link_url"]):
+        errors.append("Informe um link interno ou URL permitida.")
+
+    try:
+        data["sort_order"] = int(raw_order or "0")
+    except ValueError:
+        errors.append("A ordem deve ser um número inteiro.")
+    else:
+        if data["sort_order"] < 0 or data["sort_order"] > 65535:
+            errors.append("A ordem deve estar entre 0 e 65535.")
+
+    return data, errors
 
 
 def _parse_category_form():
@@ -685,6 +865,259 @@ def dashboard():
         service_labels=CONTACT_SERVICE_LABELS,
         csrf_token=_csrf_token(),
     )
+
+
+@admin_bp.route("/home", methods=["GET", "POST"])
+@login_required
+def home_manager():
+    try:
+        initialized = home_schema_ready()
+    except (DatabaseUnavailable, HomeContentError) as exc:
+        current_app.logger.error("Admin Home schema check failed: %s", exc)
+        return _admin_error(
+            "Home indisponível",
+            "Não foi possível consultar a configuração da Home.",
+            503,
+        )
+
+    if not initialized:
+        return render_template(
+            "admin/home.html",
+            initialized=False,
+            csrf_token=_csrf_token(),
+        )
+
+    try:
+        config = get_home_config()
+        news = list_home_news()
+        products = _decorate_products(list_products())
+    except (
+        DatabaseUnavailable,
+        HomeContentError,
+        AdminCatalogError,
+        AdminAssetError,
+    ) as exc:
+        current_app.logger.error("Admin Home unavailable: %s", exc)
+        return _admin_error(
+            "Home indisponível",
+            "Não foi possível consultar a configuração da Home.",
+            503,
+        )
+
+    public_products = [
+        product
+        for product in products
+        if product.get("ativo") and product.get("categoria_ativa")
+    ]
+    public_product_ids = {int(product["id"]) for product in public_products}
+    errors = []
+
+    if request.method == "POST":
+        if not _csrf_valid(request.form.get("csrf_token", "")):
+            return _admin_error(
+                "Sessão inválida",
+                "Recarregue a configuração da Home antes de salvar.",
+                400,
+            )
+
+        config, errors = _parse_home_config_form(public_product_ids)
+        if not errors:
+            try:
+                update_home_config(config)
+            except (DatabaseUnavailable, HomeContentError) as exc:
+                errors.append(str(exc))
+            else:
+                flash("Home atualizada com sucesso.", "admin-success")
+                return redirect(url_for("admin.home_manager"))
+
+    return (
+        render_template(
+            "admin/home.html",
+            initialized=True,
+            home_config=config,
+            news=news,
+            public_products=public_products,
+            form_errors=errors,
+            csrf_token=_csrf_token(),
+        ),
+        422 if errors else 200,
+    )
+
+
+@admin_bp.post("/home/inicializar")
+@login_required
+def home_initialize():
+    if not _csrf_valid(request.form.get("csrf_token", "")):
+        return _admin_error(
+            "Sessão inválida",
+            "Recarregue a página antes de inicializar a Home.",
+            400,
+        )
+
+    try:
+        products = list_products()
+        initial_ids = [
+            int(product["id"])
+            for product in products
+            if product.get("ativo") and product.get("categoria_ativa")
+        ][:3]
+        initialize_home_schema(
+            _default_home_admin_config(),
+            featured_product_ids=initial_ids,
+        )
+    except (
+        DatabaseUnavailable,
+        AdminCatalogError,
+        HomeContentError,
+    ) as exc:
+        current_app.logger.error("Admin Home initialization failed: %s", exc)
+        return _admin_error(
+            "Não foi possível inicializar a Home",
+            str(exc),
+            503 if isinstance(exc, DatabaseUnavailable) else 400,
+        )
+
+    flash("Módulo Home inicializado no main_bd.", "admin-success")
+    return redirect(url_for("admin.home_manager"))
+
+
+@admin_bp.route("/home/novidades/nova", methods=["GET", "POST"])
+@login_required
+def home_news_new():
+    form_data = {
+        "label": "NOVIDADE",
+        "title": "",
+        "body": "",
+        "link_label": "",
+        "link_url": "",
+        "active": True,
+        "sort_order": 0,
+    }
+    errors = []
+
+    try:
+        if not home_schema_ready():
+            return redirect(url_for("admin.home_manager"))
+    except (DatabaseUnavailable, HomeContentError) as exc:
+        return _admin_error("Home indisponível", str(exc), 503)
+
+    if request.method == "POST":
+        if not _csrf_valid(request.form.get("csrf_token", "")):
+            return _admin_error(
+                "Sessão inválida",
+                "Recarregue a novidade antes de salvar.",
+                400,
+            )
+
+        form_data, errors = _parse_home_news_form()
+        if not errors:
+            try:
+                news_id = create_home_news(form_data)
+            except (DatabaseUnavailable, HomeContentError) as exc:
+                errors.append(str(exc))
+            else:
+                flash("Novidade criada com sucesso.", "admin-success")
+                return redirect(
+                    url_for("admin.home_news_edit", news_id=news_id)
+                )
+
+    return (
+        render_template(
+            "admin/home_news_form.html",
+            mode="new",
+            news=None,
+            form_data=form_data,
+            form_errors=errors,
+            csrf_token=_csrf_token(),
+        ),
+        422 if errors else 200,
+    )
+
+
+@admin_bp.route("/home/novidades/<int:news_id>", methods=["GET", "POST"])
+@login_required
+def home_news_edit(news_id):
+    try:
+        news = get_home_news(news_id)
+    except (DatabaseUnavailable, HomeContentError) as exc:
+        return _admin_error("Novidade indisponível", str(exc), 503)
+
+    if news is None:
+        return _admin_error(
+            "Novidade não encontrada",
+            "O registro solicitado não existe.",
+            404,
+        )
+
+    form_data = {
+        "label": news["label"] or "NOVIDADE",
+        "title": news["title"] or "",
+        "body": news["body"] or "",
+        "link_label": news["link_label"] or "",
+        "link_url": news["link_url"] or "",
+        "active": bool(news["active"]),
+        "sort_order": news["sort_order"] or 0,
+    }
+    errors = []
+
+    if request.method == "POST":
+        if not _csrf_valid(request.form.get("csrf_token", "")):
+            return _admin_error(
+                "Sessão inválida",
+                "Recarregue a novidade antes de salvar.",
+                400,
+            )
+
+        form_data, errors = _parse_home_news_form()
+        if not errors:
+            try:
+                update_home_news(news_id, form_data)
+            except (DatabaseUnavailable, HomeContentError) as exc:
+                errors.append(str(exc))
+            else:
+                flash("Novidade atualizada com sucesso.", "admin-success")
+                return redirect(
+                    url_for("admin.home_news_edit", news_id=news_id)
+                )
+
+    return (
+        render_template(
+            "admin/home_news_form.html",
+            mode="edit",
+            news=news,
+            form_data=form_data,
+            form_errors=errors,
+            csrf_token=_csrf_token(),
+        ),
+        422 if errors else 200,
+    )
+
+
+@admin_bp.post("/home/novidades/<int:news_id>/status")
+@login_required
+def home_news_status(news_id):
+    if not _csrf_valid(request.form.get("csrf_token", "")):
+        return _admin_error(
+            "Sessão inválida",
+            "Não foi possível alterar esta novidade.",
+            400,
+        )
+
+    active = request.form.get("active") == "1"
+    try:
+        set_home_news_active(news_id, active)
+    except (DatabaseUnavailable, HomeContentError) as exc:
+        return _admin_error(
+            "Não foi possível alterar a novidade",
+            str(exc),
+            503 if isinstance(exc, DatabaseUnavailable) else 400,
+        )
+
+    flash(
+        "Novidade publicada." if active else "Novidade desativada.",
+        "admin-success",
+    )
+    return redirect(url_for("admin.home_manager"))
 
 
 @admin_bp.get("/produtos")
