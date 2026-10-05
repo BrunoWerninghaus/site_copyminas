@@ -2411,3 +2411,366 @@
         padding-inline: .85rem;
     }
 }
+
+
+/* Product Image Editor v1 */
+.admin-image-edit-link {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 38px;
+    align-items: center;
+    padding: .5rem .65rem;
+    border: 1px solid var(--line-strong);
+    color: white;
+    font-size: .64rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.admin-image-edit-link:hover,
+.admin-image-edit-link:focus-visible {
+    border-color: var(--blue);
+    background: rgba(21,149,255,.08);
+}
+
+.admin-image-edit-note {
+    color: #737e87;
+    font-size: .62rem;
+}
+
+.admin-image-editor-stage {
+    max-width: none;
+}
+
+.admin-image-editor-heading {
+    max-width: 1180px;
+}
+
+.admin-image-editor-shell {
+    display: grid;
+    grid-template-columns: 220px minmax(420px, 1fr) 260px;
+    gap: 1rem;
+    margin-top: 2rem;
+    align-items: start;
+}
+
+.admin-image-editor-tools,
+.admin-image-editor-settings {
+    display: grid;
+    gap: 1px;
+    border: 1px solid var(--line-strong);
+    background: var(--line-strong);
+}
+
+.admin-image-editor-tools > header,
+.admin-image-editor-settings > header {
+    display: grid;
+    gap: .3rem;
+    padding: .9rem 1rem;
+    background: #080b0f;
+}
+
+.admin-image-editor-tools > header span,
+.admin-image-editor-settings > header span {
+    color: #77828b;
+    font-size: .58rem;
+    font-weight: 800;
+    letter-spacing: .11em;
+}
+
+.admin-image-editor-tools > header strong,
+.admin-image-editor-settings > header strong {
+    font-size: .72rem;
+    text-transform: uppercase;
+}
+
+.admin-image-editor-tools > button,
+.admin-image-editor-tool-group button {
+    min-height: 44px;
+    padding: .65rem .75rem;
+    border: 0;
+    border-radius: 0;
+    background: #0d1116;
+    color: #c5cdd3;
+    cursor: pointer;
+    font: inherit;
+    font-size: .62rem;
+    font-weight: 800;
+    letter-spacing: .045em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.admin-image-editor-tools > button:hover,
+.admin-image-editor-tools > button:focus-visible,
+.admin-image-editor-tool-group button:hover,
+.admin-image-editor-tool-group button:focus-visible {
+    background: #131a21;
+    color: white;
+}
+
+.admin-image-editor-tools > button[data-editor-prepare] {
+    box-shadow: inset 3px 0 0 var(--red);
+    color: white;
+}
+
+.admin-image-editor-tool-group {
+    display: grid;
+    gap: 1px;
+    background: var(--line-strong);
+}
+
+.admin-image-editor-tool-group > span {
+    padding: .65rem .75rem;
+    background: #090c10;
+    color: #737e87;
+    font-size: .56rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.admin-image-editor-tool-group > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 1px;
+    background: var(--line-strong);
+}
+
+.admin-image-editor-workspace {
+    min-width: 0;
+}
+
+.admin-image-editor-canvas-frame {
+    display: grid;
+    width: min(100%, 760px);
+    aspect-ratio: 1;
+    margin-inline: auto;
+    overflow: hidden;
+    place-items: center;
+    border: 1px solid #4a555f;
+    background:
+        linear-gradient(45deg, #1b2026 25%, transparent 25%, transparent 75%, #1b2026 75%),
+        linear-gradient(45deg, #1b2026 25%, #0f1419 25%, #0f1419 75%, #1b2026 75%);
+    background-position: 0 0, 12px 12px;
+    background-size: 24px 24px;
+    box-shadow: 12px 12px 0 rgba(0,0,0,.22);
+    cursor: grab;
+    touch-action: none;
+}
+
+.admin-image-editor-canvas-frame.is-dragging {
+    cursor: grabbing;
+}
+
+.admin-image-editor-canvas-frame canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.admin-image-editor-workspace__hint {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: .5rem 1rem;
+    width: min(100%, 760px);
+    margin: .75rem auto 0;
+    color: #6f7a83;
+    font-size: .56rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+.admin-image-editor-settings > label {
+    display: grid;
+    gap: .65rem;
+    padding: .9rem 1rem;
+    background: #0d1116;
+}
+
+.admin-image-editor-settings > label > span {
+    display: flex;
+    justify-content: space-between;
+    gap: .75rem;
+    color: #9ba5ad;
+    font-size: .6rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.admin-image-editor-settings > label > span strong {
+    color: white;
+}
+
+.admin-image-editor-settings select {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid var(--line-strong);
+    border-radius: 0;
+    background: #080b0f;
+    color: white;
+    font: inherit;
+}
+
+.admin-image-editor-settings input[type="range"] {
+    width: 100%;
+    accent-color: var(--red);
+}
+
+.admin-image-editor-settings label small {
+    color: #727d86;
+    font-size: .58rem;
+    line-height: 1.5;
+}
+
+.admin-image-editor-info {
+    margin: 0;
+    background: #0d1116;
+}
+
+.admin-image-editor-info > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .7rem 1rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.admin-image-editor-info dt,
+.admin-image-editor-info dd {
+    margin: 0;
+    font-size: .58rem;
+    text-transform: uppercase;
+}
+
+.admin-image-editor-info dt {
+    color: #737e87;
+}
+
+.admin-image-editor-info dd {
+    color: #c9d0d6;
+}
+
+.admin-image-editor-version-note {
+    margin: 0;
+    padding: .85rem 1rem;
+    background: #0d1116;
+    color: #8fb9dc;
+    font-size: .6rem;
+    line-height: 1.55;
+}
+
+.admin-image-editor-status {
+    max-width: 1180px;
+    margin-top: 1rem;
+    padding: .8rem 1rem;
+    border: 1px solid var(--line);
+    border-left: 3px solid #69737c;
+    background: #0d1116;
+    color: #aeb7bf;
+    font-size: .66rem;
+}
+
+.admin-image-editor-status[data-kind="success"] {
+    border-left-color: #55d187;
+    color: #9ee2b8;
+}
+
+.admin-image-editor-status[data-kind="warning"] {
+    border-left-color: var(--gold);
+    color: #f4d97c;
+}
+
+.admin-image-editor-status[data-kind="error"] {
+    border-left-color: #ff6b72;
+    color: #ff9ca1;
+}
+
+.admin-image-editor-actions {
+    display: flex;
+    max-width: 1180px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .8rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+}
+
+.admin-image-editor-actions > a {
+    color: #aeb7bf;
+    font-size: .66rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+@media (max-width: 1180px) {
+    .admin-image-editor-shell {
+        grid-template-columns: 180px minmax(360px,1fr);
+    }
+
+    .admin-image-editor-settings {
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+    }
+
+    .admin-image-editor-settings > header {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 820px) {
+    .admin-image-editor-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-image-editor-tools,
+    .admin-image-editor-settings {
+        grid-column: auto;
+    }
+
+    .admin-image-editor-tools {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+    }
+
+    .admin-image-editor-tools > header,
+    .admin-image-editor-tool-group {
+        grid-column: 1 / -1;
+    }
+
+    .admin-image-editor-settings {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-image-editor-settings > header {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 520px) {
+    .admin-image-editor-tools {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-image-editor-tools > header,
+    .admin-image-editor-tool-group {
+        grid-column: auto;
+    }
+
+    .admin-image-editor-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .admin-image-editor-actions .admin-button,
+    .admin-image-editor-actions > a {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+}
