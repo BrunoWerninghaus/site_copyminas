@@ -163,6 +163,25 @@ class PublicRoutesTestCase(unittest.TestCase):
                 ):
                     self.assertNotIn(forbidden, response.data)
 
+
+    def test_public_pages_share_navigation_and_footer(self):
+        for path in (
+            "/home",
+            "/solucoes",
+            "/produtos",
+            "/produtos/brother-dcp-8157dn",
+            "/empresa",
+            "/contato",
+        ):
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(b'class="public-header"', response.data)
+                self.assertIn(b'data-public-menu-toggle', response.data)
+                self.assertIn(b'class="public-footer"', response.data)
+                self.assertIn("Falar com a Copy Minas".encode("utf-8"), response.data)
+                self.assertIn("Localização".encode("utf-8"), response.data)
+
     def test_company(self):
         self.assert_page("/empresa", "Desde 2011 em Elói Mendes")
 
