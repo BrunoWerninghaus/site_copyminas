@@ -33,6 +33,8 @@ Regras:
 - `GET|POST /admin/produtos/novo` — criação;
 - `GET|POST /admin/produtos/<id>` — edição;
 - `POST /admin/produtos/<id>/status` — ativação/desativação;
+- `GET /admin/produtos/<id>/imagem/<slot>/editar` — editor não destrutivo da imagem;
+- `POST /admin/produtos/<id>/imagem/<slot>/salvar` — salva a versão editada e aplica apenas ao slot escolhido;
 - `GET /admin/categorias` — listagem de categorias;
 - `GET|POST /admin/categorias/nova` — criação de categoria;
 - `GET|POST /admin/categorias/<id>` — edição de categoria;
@@ -305,3 +307,54 @@ Em telas menores:
 - um backdrop fecha a navegação;
 - `Escape` fecha drawer ou busca;
 - a busca global ocupa a tela inteira em celulares estreitos.
+
+
+## Editor de imagem de produto
+
+Produtos já salvos podem abrir um editor próprio para qualquer slot `imagem1` a `imagem5`.
+
+### Editor v1
+
+Ferramentas disponíveis:
+- canvas quadrado 1:1;
+- saída fixa de 1200 × 1200 pixels;
+- arrastar e reposicionar;
+- zoom;
+- rotação de 90°;
+- espelhamento horizontal e vertical;
+- fundo transparente ou branco;
+- visualização da original;
+- ajuste automático ao quadro;
+- remoção automática de fundo baseada nas cores conectadas às bordas, com sensibilidade configurável;
+- ação `Preparar para catálogo`.
+
+A remoção de fundo v1 é determinística e local no navegador. Ela não é um modelo de segmentação por IA. Fundos complexos podem exigir uma etapa futura de borracha/restauração manual ou segmentação especializada.
+
+### Preservação da original
+
+O editor é não destrutivo.
+
+Na primeira edição:
+- a imagem usada como fonte é copiada para `static/images/products/originals`;
+- a saída editada é criada em `static/images/products/edited`;
+- o banco passa a apontar apenas o slot escolhido para a versão editada;
+- a imagem original permanece preservada.
+
+Uma edição posterior de uma versão já editada volta a abrir a original preservada como fonte.
+
+Arquivos auxiliares de metadados registram a relação entre a versão editada e sua original. Eles não contêm credenciais nem dados pessoais.
+
+### Segurança e validação
+
+O salvamento:
+- exige autenticação administrativa;
+- exige CSRF;
+- aceita somente os cinco slots existentes;
+- valida a imagem resultante com Pillow;
+- exige saída 1200 × 1200;
+- limita dimensões e tamanho bruto;
+- grava o arquivo antes da atualização transacional do slot;
+- remove a nova saída editada se a atualização do banco falhar;
+- nunca altera os outros quatro slots do produto.
+
+O editor não cria tabela nem coluna nova no banco.
