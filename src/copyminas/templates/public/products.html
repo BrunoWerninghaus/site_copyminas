@@ -14,7 +14,7 @@
 
 <main id="main-content" class="paper-stage">
     <section class="paper-sheet" data-sheet="CATÁLOGO / 03" id="catalogo">
-        <p class="paper-kicker">Produtos / catálogo</p>
+        <p class="paper-kicker">Catálogo de produtos</p>
         <h1 class="paper-title">Catálogo Copy Minas</h1>
         <p class="paper-lead">
             Consulte os equipamentos cadastrados e use os filtros para localizar rapidamente o que procura.
@@ -23,7 +23,7 @@
 
         {% if catalog_unavailable %}
         <div class="catalog-unavailable" role="status">
-            <span class="paper-card__code">CATÁLOGO / TEMPORARIAMENTE INDISPONÍVEL</span>
+            <span class="paper-card__code">Catálogo temporariamente indisponível</span>
             <h2>Não foi possível consultar os produtos agora.</h2>
             <p>O restante do site continua disponível. Para consultar equipamentos, disponibilidade ou atendimento, fale diretamente com a Copy Minas.</p>
             <a class="paper-action" href="{{ url_for('public.contact') }}">Falar com a Copy Minas</a>
@@ -48,7 +48,7 @@
                     data-category-label="Todos"
                     aria-pressed="true"
                 >
-                    Todos / {{ products|length }}
+                    Todos ({{ products|length }})
                 </button>
                 {% for category in categories %}
                     {% set category_products = products | selectattr("category_id", "equalto", category.id) | list %}
@@ -59,7 +59,7 @@
                         data-category-label="{{ category.name }}"
                         aria-pressed="false"
                     >
-                        {{ category.name }} / {{ category_products|length }}
+                        {{ category.name }} ({{ category_products|length }})
                     </button>
                 {% endfor %}
             </div>
@@ -81,7 +81,7 @@
                 >
                     <header class="catalog-category__header">
                         <div>
-                            <span class="paper-card__code">Categoria / {{ "%02d"|format(loop.index) }}</span>
+                            <span class="paper-card__code">Categoria</span>
                             <h2 id="categoria-{{ category.id }}-titulo">{{ category.name }}</h2>
                         </div>
                         <span class="catalog-category__count" data-category-count>
@@ -123,7 +123,7 @@
                                 </div>
                                 {% endif %}
 
-                                <a class="paper-link" href="{{ url_for('public.product_detail', slug=product.slug) }}">Abrir ficha →</a>
+                                <a class="paper-link" href="{{ url_for('public.product_detail', slug=product.slug) }}">Ver produto →</a>
                             </div>
                         </article>
                         {% endfor %}
@@ -134,7 +134,7 @@
         </div>
 
         <div class="catalog-empty" data-catalog-empty hidden>
-            <span class="paper-card__code">CATÁLOGO / BUSCA</span>
+            <span class="paper-card__code">Busca no catálogo</span>
             <strong>Nenhum produto encontrado.</strong>
             <p>Altere o termo de busca ou selecione outra categoria.</p>
         </div>
