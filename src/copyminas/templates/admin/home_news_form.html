@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ "Nova novidade" if mode == "new" else "Editar novidade" }} — Copy Minas Admin{% endblock %}
+{% block meta_description %}Edição de novidade da Home da Copy Minas.{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block page_styles %}
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+{% set admin_page = "home" %}
+{% include "admin/_header.html" %}
+
+<main id="main-content" class="admin-stage admin-stage--form">
+    {% with messages = get_flashed_messages(category_filter=["admin-success"]) %}
+        {% if messages %}
+        <div class="admin-alert admin-alert--success" role="status">
+            {% for message in messages %}<strong>{{ message }}</strong>{% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="admin-form-heading">
+        <a href="{{ url_for('admin.home_manager') }}">← Home pública</a>
+        <span>NOVIDADE / HOME</span>
+        <h1>{{ "Nova novidade" if mode == "new" else form_data.title }}</h1>
+        <p>Conteúdo editorial exibido na Home quando estiver ativo.</p>
+    </div>
+
+    {% if form_errors %}
+    <div class="admin-alert admin-alert--error" role="alert">
+        <strong>Revise o formulário:</strong>
+        <ul>{% for error in form_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    <form class="admin-product-form" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <section class="admin-form-section">
+            <header>
+                <span>01</span>
+                <div><strong>Conteúdo</strong><small>Mensagem publicada na Home</small></div>
+            </header>
+
+            <div class="admin-form-grid">
+                <label class="admin-field">
+                    <span>Rótulo</span>
+                    <input type="text" name="label" maxlength="80" value="{{ form_data.label }}">
+                </label>
+                <label class="admin-field">
+                    <span>Ordem</span>
+                    <input type="number" name="sort_order" min="0" max="65535" value="{{ form_data.sort_order }}">
+                </label>
+                <label class="admin-field admin-field--wide">
+                    <span>Título *</span>
+                    <input type="text" name="title" maxlength="180" value="{{ form_data.title }}" required>
+                </label>
+                <label class="admin-field admin-field--wide">
+                    <span>Texto *</span>
+                    <textarea name="body" rows="8" required>{{ form_data.body }}</textarea>
+                </label>
+                <label class="admin-field">
+                    <span>Texto do link</span>
+                    <input type="text" name="link_label" maxlength="80" value="{{ form_data.link_label }}">
+                </label>
+                <label class="admin-field">
+                    <span>Link</span>
+                    <input type="text" name="link_url" maxlength="255" value="{{ form_data.link_url }}" placeholder="/produtos">
+                </label>
+            </div>
+
+            <label class="admin-switch">
+                <input type="checkbox" name="active" value="1" {% if form_data.active %}checked{% endif %}>
+                <span><strong>Publicar novidade</strong><small>Pode ser desativada depois sem apagar o registro.</small></span>
+            </label>
+        </section>
+
+        <div class="admin-form-actions">
+            <button class="admin-button" type="submit">{{ "Criar novidade" if mode == "new" else "Salvar novidade" }}</button>
+            <a href="{{ url_for('admin.home_manager') }}">Cancelar</a>
+        </div>
+    </form>
+</main>
+{% endblock %}
