@@ -140,6 +140,17 @@ class HomeSourceContractTestCase(unittest.TestCase):
         self.assertIn(".catalog-category[hidden]", source)
         self.assertIn("display: none !important;", source)
 
+    def test_catalog_product_media_is_square(self):
+        source = (ROOT / "src/copyminas/static/css/paper.css").read_text(encoding="utf-8")
+        self.assertRegex(
+            source,
+            r"\.product-card__media\s*\{[^}]*aspect-ratio:\s*1\s*/\s*1",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-products \.product-card\s*\{[^}]*grid-template-rows:\s*auto\s+1fr",
+        )
+
     def test_home_never_masks_horizontal_overflow(self):
         source = HOME_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
 
