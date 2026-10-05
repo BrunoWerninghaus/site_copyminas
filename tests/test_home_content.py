@@ -81,8 +81,8 @@ class HomeContentStoreTestCase(unittest.TestCase):
 
         sql, params = cursor.execute.call_args.args
         self.assertIn("UPDATE site_home_config", sql)
-        self.assertEqual(json.loads(params[13]), [25, 21, 19])
-        self.assertEqual(params[14:], (1, 0, 1))
+        self.assertEqual(json.loads(params[12]), [25, 21, 19])
+        self.assertEqual(params[13:], (1, 0, 1))
         connection.commit.assert_called_once()
 
     def test_news_is_archived_by_status_not_deleted(self):
