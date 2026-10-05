@@ -187,6 +187,110 @@ class AdminProductsRouteTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         update_product.assert_not_called()
 
+
+    @patch("src.copyminas.routes.admin.resolve_editor_source", return_value="images/products/originals/source.png")
+    @patch("src.copyminas.routes.admin.normalize_static_path", return_value="images/products/current.png")
+    @patch("src.copyminas.routes.admin.static_asset_exists", return_value=True)
+    @patch("src.copyminas.routes.admin.get_product")
+    def test_product_image_editor_is_available_for_existing_slot(
+        self,
+        get_product,
+        _asset_exists,
+        _normalize,
+        _resolve,
+    ):
+        get_product.return_value = {
+            "id": 21,
+            "nome": "Samsung M4070FR",
+            "imagem1": "images/products/current.png",
+        }
+
+        response = self.client.get("/admin/produtos/21/imagem/1/editar")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Editor / imagem 1".encode("utf-8"), response.data)
+        self.assertIn("Preparar para catálogo".encode("utf-8"), response.data)
+        self.assertIn(b"data-editor-canvas", response.data)
+        self.assertIn(b"admin-image-editor.js", response.data)
+
+    @patch("src.copyminas.routes.admin.update_product_image_slot")
+    @patch(
+        "src.copyminas.routes.admin.save_edited_product_image",
+        return_value=(
+            "images/products/edited/product-21-slot-1-test.png",
+            "images/products/originals/product-21-slot-1-source.png",
+        ),
+    )
+    @patch("src.copyminas.routes.admin.static_asset_exists", return_value=True)
+    @patch("src.copyminas.routes.admin.get_product")
+    def test_product_image_editor_save_updates_only_selected_slot(
+        self,
+        get_product,
+        _asset_exists,
+        save_edited,
+        update_slot,
+    ):
+        get_product.return_value = {
+            "id": 21,
+            "nome": "Samsung M4070FR",
+            "imagem1": "images/products/current.png",
+        }
+
+        page = self.client.get("/admin/produtos")
+        token = self._csrf(page)
+
+        response = self.client.post(
+            "/admin/produtos/21/imagem/1/salvar",
+            data={
+                "csrf_token": token,
+                "image_data": "data:image/png;base64,AAAA",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+        self.assertTrue(payload["ok"])
+        save_edited.assert_called_once_with(
+            "data:image/png;base64,AAAA",
+            "images/products/current.png",
+            21,
+            1,
+        )
+        update_slot.assert_called_once_with(
+            21,
+            1,
+            "images/products/edited/product-21-slot-1-test.png",
+        )
+
+    @patch("src.copyminas.routes.admin.update_product_image_slot")
+    @patch("src.copyminas.routes.admin.save_edited_product_image")
+    @patch("src.copyminas.routes.admin.static_asset_exists", return_value=True)
+    @patch("src.copyminas.routes.admin.get_product")
+    def test_product_image_editor_save_requires_csrf(
+        self,
+        get_product,
+        _asset_exists,
+        save_edited,
+        update_slot,
+    ):
+        get_product.return_value = {
+            "id": 21,
+            "nome": "Samsung M4070FR",
+            "imagem1": "images/products/current.png",
+        }
+
+        response = self.client.post(
+            "/admin/produtos/21/imagem/1/salvar",
+            data={
+                "csrf_token": "invalid",
+                "image_data": "data:image/png;base64,AAAA",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        save_edited.assert_not_called()
+        update_slot.assert_not_called()
+
     @patch("src.copyminas.routes.admin.list_categories")
     def test_categories_page_is_available(self, list_categories):
         list_categories.return_value = [
