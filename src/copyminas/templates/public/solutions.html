@@ -25,22 +25,7 @@
                 </div>
             </div>
 
-            <aside class="solutions-index" aria-label="Índice das soluções">
-                <header>
-                    <span>ÍNDICE / ATENDIMENTO</span>
-                    <strong>{{ company.solutions|length }} áreas</strong>
-                </header>
 
-                <nav>
-                    {% for solution in company.solutions %}
-                    <a href="#solucao-{{ solution.code }}">
-                        <span>{{ solution.code }}</span>
-                        <strong>{{ solution.title }}</strong>
-                        <i aria-hidden="true">↓</i>
-                    </a>
-                    {% endfor %}
-                </nav>
-            </aside>
         </div>
     </section>
 
