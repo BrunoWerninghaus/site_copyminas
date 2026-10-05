@@ -10,6 +10,7 @@ from flask import (
     Blueprint,
     current_app,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -377,6 +378,167 @@ def _record_datetime(record, *keys):
         if isinstance(value, datetime):
             return value
     return datetime.min
+
+
+@admin_bp.get("/busca")
+@login_required
+def global_search():
+    query = request.args.get("q", "").strip()
+    normalized_query = _normalized_name(query)
+
+    if not normalized_query:
+        return jsonify(
+            {
+                "query": query,
+                "results": [],
+                "sources": {
+                    "products": True,
+                    "categories": True,
+                    "contacts": True,
+                },
+            }
+        )
+
+    results = []
+    sources = {
+        "products": True,
+        "categories": True,
+        "contacts": True,
+    }
+
+    try:
+        products = list_products()
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        sources["products"] = False
+        current_app.logger.warning("Admin global search products unavailable: %s", exc)
+    else:
+        for product in products:
+            haystack = _normalized_name(
+                " ".join(
+                    str(value or "")
+                    for value in (
+                        product.get("id"),
+                        product.get("nome"),
+                        product.get("categoria"),
+                        product.get("descricao"),
+                    )
+                )
+            )
+            if normalized_query not in haystack:
+                continue
+
+            results.append(
+                {
+                    "kind": "product",
+                    "kind_label": "Produto",
+                    "title": product.get("nome") or f"Produto #{product['id']}",
+                    "meta": (
+                        f"#{product['id']} · "
+                        f"{product.get('categoria') or 'Sem categoria'} · "
+                        f"{'Ativo' if product.get('ativo') else 'Inativo'}"
+                    ),
+                    "href": url_for("admin.product_edit", product_id=product["id"]),
+                }
+            )
+            if sum(1 for item in results if item["kind"] == "product") >= 6:
+                break
+
+    try:
+        categories = list_categories()
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        sources["categories"] = False
+        current_app.logger.warning("Admin global search categories unavailable: %s", exc)
+    else:
+        for category in categories:
+            haystack = _normalized_name(
+                f"{category.get('id', '')} {category.get('nome', '')}"
+            )
+            if normalized_query not in haystack:
+                continue
+
+            results.append(
+                {
+                    "kind": "category",
+                    "kind_label": "Categoria",
+                    "title": category.get("nome") or f"Categoria #{category['id']}",
+                    "meta": (
+                        f"#{category['id']} · "
+                        f"{category.get('product_count', 0)} produto(s) · "
+                        f"{'Ativa' if category.get('ativo') else 'Inativa'}"
+                    ),
+                    "href": url_for(
+                        "admin.category_edit",
+                        category_id=category["id"],
+                    ),
+                }
+            )
+            if sum(1 for item in results if item["kind"] == "category") >= 6:
+                break
+
+    try:
+        contacts = list_contacts()
+    except (DatabaseUnavailable, AdminContactError) as exc:
+        sources["contacts"] = False
+        current_app.logger.warning("Admin global search contacts unavailable: %s", exc)
+    else:
+        for contact in contacts:
+            haystack = _normalized_name(
+                " ".join(
+                    str(value or "")
+                    for value in (
+                        contact.get("id"),
+                        contact.get("protocol"),
+                        contact.get("name"),
+                        contact.get("company"),
+                        contact.get("email"),
+                        contact.get("phone"),
+                        contact.get("city"),
+                        CONTACT_SERVICE_LABELS.get(
+                            contact.get("service_type"),
+                            contact.get("service_type"),
+                        ),
+                    )
+                )
+            )
+            if normalized_query not in haystack:
+                continue
+
+            results.append(
+                {
+                    "kind": "contact",
+                    "kind_label": "Contato",
+                    "title": contact.get("name") or contact.get("protocol"),
+                    "meta": " · ".join(
+                        part
+                        for part in (
+                            contact.get("protocol"),
+                            CONTACT_SERVICE_LABELS.get(
+                                contact.get("service_type"),
+                                contact.get("service_type"),
+                            ),
+                            CONTACT_STATUS_LABELS.get(
+                                contact.get("status"),
+                                contact.get("status"),
+                            ),
+                        )
+                        if part
+                    ),
+                    "href": url_for(
+                        "admin.contact_detail",
+                        contact_id=contact["id"],
+                    ),
+                }
+            )
+            if sum(1 for item in results if item["kind"] == "contact") >= 6:
+                break
+
+    return jsonify(
+        {
+            "query": query,
+            "results": results[:18],
+            "sources": sources,
+        }
+    )
 
 
 @admin_bp.get("")
