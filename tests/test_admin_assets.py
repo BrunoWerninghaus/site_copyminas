@@ -1,14 +1,19 @@
+import base64
 import io
 import tempfile
 import unittest
 from pathlib import Path
 
+from PIL import Image
 from werkzeug.datastructures import FileStorage
 
 from src.copyminas import create_app
 from src.copyminas.admin_assets import (
     AdminAssetError,
     normalize_static_path,
+    cleanup_editor_output,
+    resolve_editor_source,
+    save_edited_product_image,
     save_product_image,
     static_asset_exists,
 )
@@ -54,6 +59,70 @@ class AdminAssetsTestCase(unittest.TestCase):
         with self.app.app_context():
             with self.assertRaises(AdminAssetError):
                 save_product_image(upload)
+
+    def test_editor_preserves_original_and_writes_edited_version(self):
+        source_relative = "images/products/source.png"
+        source_path = Path(self.temp_dir.name) / source_relative
+        source_path.parent.mkdir(parents=True, exist_ok=True)
+        Image.new("RGBA", (64, 64), (255, 255, 255, 255)).save(source_path)
+
+        buffer = io.BytesIO()
+        Image.new("RGBA", (1200, 1200), (10, 20, 30, 0)).save(
+            buffer,
+            format="PNG",
+        )
+        data_url = (
+            "data:image/png;base64,"
+            + base64.b64encode(buffer.getvalue()).decode("ascii")
+        )
+
+        with self.app.app_context():
+            edited, original = save_edited_product_image(
+                data_url,
+                source_relative,
+                21,
+                1,
+            )
+
+            self.assertTrue(edited.startswith("images/products/edited/"))
+            self.assertTrue(original.startswith("images/products/originals/"))
+            self.assertTrue(static_asset_exists(edited))
+            self.assertTrue(static_asset_exists(original))
+            self.assertEqual(resolve_editor_source(edited), original)
+
+            edited_path = Path(self.temp_dir.name) / edited
+            metadata_path = edited_path.with_suffix(edited_path.suffix + ".json")
+            self.assertTrue(metadata_path.is_file())
+
+            cleanup_editor_output(edited)
+            self.assertFalse(edited_path.exists())
+            self.assertFalse(metadata_path.exists())
+            self.assertTrue((Path(self.temp_dir.name) / original).exists())
+
+    def test_editor_rejects_non_square_export(self):
+        source_relative = "images/products/source.png"
+        source_path = Path(self.temp_dir.name) / source_relative
+        source_path.parent.mkdir(parents=True, exist_ok=True)
+        Image.new("RGBA", (64, 64), (255, 255, 255, 255)).save(source_path)
+
+        buffer = io.BytesIO()
+        Image.new("RGBA", (800, 600), (10, 20, 30, 255)).save(
+            buffer,
+            format="PNG",
+        )
+        data_url = (
+            "data:image/png;base64,"
+            + base64.b64encode(buffer.getvalue()).decode("ascii")
+        )
+
+        with self.app.app_context():
+            with self.assertRaises(AdminAssetError):
+                save_edited_product_image(
+                    data_url,
+                    source_relative,
+                    21,
+                    1,
+                )
 
 
 if __name__ == "__main__":
