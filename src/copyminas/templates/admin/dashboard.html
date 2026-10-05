@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Painel administrativo — Copy Minas{% endblock %}
 {% block meta_description %}Painel administrativo interno da Copy Minas.{% endblock %}
-{% block body_class %}admin-page{% endblock %}
+{% block body_class %}admin-page admin-dashboard-page{% endblock %}
 {% block page_styles %}
 <meta name="robots" content="noindex,nofollow,noarchive">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
@@ -11,50 +11,193 @@
 {% set admin_page = "dashboard" %}
 {% include "admin/_header.html" %}
 
-<main id="main-content" class="admin-stage">
-    <section class="admin-hero">
-        <span>PAINEL / INTERNO</span>
-        <h1>Administração</h1>
-        <p>Gestão interna do Site 3. O catálogo público continua lendo o <code>main_bd</code>; este painel trabalha sobre os mesmos registros.</p>
+<main id="main-content" class="admin-stage admin-dashboard">
+    <section class="admin-dashboard-hero">
+        <div>
+            <span>PAINEL / OPERAÇÃO</span>
+            <h1>Visão geral</h1>
+            <p>Estado atual do catálogo, atendimento e pontos que precisam de atenção. Os dados abaixo vêm diretamente do <code>main_bd</code> e dos assets do Site 3.</p>
+        </div>
+
+        <div class="admin-dashboard-health" aria-label="Estado das fontes">
+            <div>
+                <span>Catálogo</span>
+                <strong class="{{ 'is-ok' if catalog_available else 'is-error' }}">
+                    {{ "Online" if catalog_available else "Indisponível" }}
+                </strong>
+            </div>
+            <div>
+                <span>Contatos</span>
+                <strong class="{{ 'is-ok' if contacts_available else 'is-error' }}">
+                    {{ "Online" if contacts_available else "Indisponível" }}
+                </strong>
+            </div>
+        </div>
     </section>
 
-    <section class="admin-summary" aria-label="Resumo do sistema">
-        <article><span>Catálogo</span><strong>{{ "Disponível" if catalog_available else "Indisponível" }}</strong><small>main_bd</small></article>
-        <article><span>Produtos publicados</span><strong>{{ product_count }}</strong><small>ativos no catálogo</small></article>
-        <article><span>Categorias</span><strong>{{ category_count }}</strong><small>com produtos publicados</small></article>
+    <section class="admin-dashboard-metrics" aria-label="Indicadores operacionais">
         <article>
+            <span>Produtos publicados</span>
+            <strong>{{ product_published if catalog_available else "—" }}</strong>
+            <small>{{ product_total if catalog_available else "—" }} registros no banco</small>
+        </article>
+        <article>
+            <span>Produtos inativos</span>
+            <strong>{{ product_inactive if catalog_available else "—" }}</strong>
+            <small>preservados no histórico</small>
+        </article>
+        <article>
+            <span>Categorias</span>
+            <strong>{{ category_total if catalog_available else "—" }}</strong>
+            <small>estrutura do catálogo</small>
+        </article>
+        <article class="admin-dashboard-metric--attention">
             <span>Contatos novos</span>
-            <strong>{{ contact_summary.novos if contacts_available else "—" }}</strong>
-            <small>{{ contact_summary.em_atendimento if contacts_available else "—" }} em atendimento</small>
+            <strong>{{ contact_counts.novo if contacts_available else "—" }}</strong>
+            <small>aguardando triagem</small>
+        </article>
+        <article>
+            <span>Em atendimento</span>
+            <strong>{{ contact_counts.em_atendimento if contacts_available else "—" }}</strong>
+            <small>solicitações em andamento</small>
+        </article>
+        <article>
+            <span>Convertidos</span>
+            <strong>{{ contact_counts.convertido if contacts_available else "—" }}</strong>
+            <small>{{ contact_counts.total if contacts_available else "—" }} contatos totais</small>
         </article>
     </section>
 
-    <section class="admin-modules">
-        <article class="admin-module">
+    <section class="admin-quick-actions" aria-label="Ações rápidas">
+        <a href="{{ url_for('admin.product_new') }}">
+            <span>NOVO / PRODUTO</span>
+            <strong>Cadastrar produto</strong>
+            <small>Adicionar registro ao catálogo</small>
+        </a>
+        <a href="{{ url_for('admin.category_new') }}">
+            <span>NOVA / CATEGORIA</span>
+            <strong>Criar categoria</strong>
+            <small>Organizar a estrutura do catálogo</small>
+        </a>
+        <a href="{{ url_for('admin.contacts') }}">
+            <span>ATENDIMENTO</span>
+            <strong>Abrir contatos</strong>
+            <small>Triagem e acompanhamento</small>
+        </a>
+        <a href="{{ url_for('public.products') }}" target="_blank" rel="noopener noreferrer">
+            <span>SITE / PÚBLICO</span>
+            <strong>Ver catálogo</strong>
+            <small>Conferir publicação atual ↗</small>
+        </a>
+    </section>
+
+    <section class="admin-dashboard-section" aria-labelledby="dashboard-alerts-title">
+        <header class="admin-dashboard-section__header">
             <div>
-                <span>MÓDULO / 01</span>
-                <h2>Produtos</h2>
-                <p>Crie, edite, faça upload de imagens, visualize a ficha pública e controle a publicação dos produtos.</p>
+                <span>ATENÇÃO / SISTEMA</span>
+                <h2 id="dashboard-alerts-title">Pendências detectadas</h2>
             </div>
-            <a href="{{ url_for('admin.products') }}">Gerenciar produtos →</a>
+            <strong>{{ alerts|length }}</strong>
+        </header>
+
+        {% if alerts %}
+        <div class="admin-dashboard-alerts">
+            {% for alert in alerts %}
+            <article class="admin-dashboard-alert admin-dashboard-alert--{{ alert.level }}">
+                <div>
+                    <span>{{ "ATENÇÃO" if alert.level == "warning" else "ATENDIMENTO" }}</span>
+                    <strong>{{ alert.title }}</strong>
+                    <p>{{ alert.detail }}</p>
+                </div>
+                <a href="{{ alert.href }}">{{ alert.action }} →</a>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="admin-dashboard-clear">
+            <strong>Nenhuma pendência detectada.</strong>
+            <span>Os checks atuais não encontraram alerta operacional.</span>
+        </div>
+        {% endif %}
+    </section>
+
+    <section class="admin-dashboard-columns">
+        <article class="admin-dashboard-section">
+            <header class="admin-dashboard-section__header">
+                <div>
+                    <span>ATIVIDADE / CONTATOS</span>
+                    <h2>Últimos contatos</h2>
+                </div>
+                <a href="{{ url_for('admin.contacts') }}">Ver todos →</a>
+            </header>
+
+            {% if contacts_available and recent_contacts %}
+            <div class="admin-dashboard-list">
+                {% for contact in recent_contacts %}
+                <a class="admin-dashboard-list__item" href="{{ url_for('admin.contact_detail', contact_id=contact.id) }}">
+                    <div>
+                        <strong>{{ contact.name }}</strong>
+                        <span>{{ service_labels.get(contact.service_type, contact.service_type) }}</span>
+                    </div>
+                    <div class="admin-dashboard-list__meta">
+                        <span class="admin-status admin-contact-status--{{ contact.status }}">
+                            {{ status_labels.get(contact.status, contact.status) }}
+                        </span>
+                        <small>{{ contact.created_at.strftime("%d/%m %H:%M") if contact.created_at else "—" }}</small>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% elif contacts_available %}
+            <div class="admin-dashboard-empty">Nenhum contato registrado ainda.</div>
+            {% else %}
+            <div class="admin-dashboard-empty admin-dashboard-empty--error">Contatos indisponíveis no momento.</div>
+            {% endif %}
         </article>
 
-        <article class="admin-module">
-            <div>
-                <span>MÓDULO / 02</span>
-                <h2>Categorias</h2>
-                <p>Organize a estrutura do catálogo sem apagar produtos já vinculados.</p>
-            </div>
-            <a href="{{ url_for('admin.categories') }}">Gerenciar categorias →</a>
-        </article>
+        <article class="admin-dashboard-section">
+            <header class="admin-dashboard-section__header">
+                <div>
+                    <span>ATIVIDADE / CATÁLOGO</span>
+                    <h2>Produtos recentes</h2>
+                </div>
+                <a href="{{ url_for('admin.products') }}">Ver todos →</a>
+            </header>
 
-        <article class="admin-module">
-            <div>
-                <span>MÓDULO / 03</span>
-                <h2>Contatos</h2>
-                <p>Consulte solicitações recebidas, acompanhe o atendimento e atualize o status sem apagar o histórico.</p>
+            {% if catalog_available and recent_products %}
+            <div class="admin-dashboard-list">
+                {% for product in recent_products %}
+                <a class="admin-dashboard-list__item" href="{{ url_for('admin.product_edit', product_id=product.id) }}">
+                    <div class="admin-dashboard-product">
+                        <span class="admin-dashboard-product__thumb">
+                            {% if product.preview_image %}
+                            <img src="{{ url_for('static', filename=product.preview_image) }}" alt="">
+                            {% else %}
+                            <span>SEM IMG</span>
+                            {% endif %}
+                        </span>
+                        <span>
+                            <strong>{{ product.nome }}</strong>
+                            <small>{{ product.categoria or "Sem categoria" }}</small>
+                        </span>
+                    </div>
+                    <div class="admin-dashboard-list__meta">
+                        <span class="admin-status {{ 'admin-status--active' if product.ativo else 'admin-status--inactive' }}">
+                            {{ "Ativo" if product.ativo else "Inativo" }}
+                        </span>
+                        <small>
+                            {% set stamp = product.updated_at or product.created_at %}
+                            {{ stamp.strftime("%d/%m %H:%M") if stamp else "—" }}
+                        </small>
+                    </div>
+                </a>
+                {% endfor %}
             </div>
-            <a href="{{ url_for('admin.contacts') }}">Gerenciar contatos →</a>
+            {% elif catalog_available %}
+            <div class="admin-dashboard-empty">Nenhum produto cadastrado ainda.</div>
+            {% else %}
+            <div class="admin-dashboard-empty admin-dashboard-empty--error">Catálogo indisponível no momento.</div>
+            {% endif %}
         </article>
     </section>
 </main>
