@@ -36,6 +36,17 @@ from src.copyminas.admin_catalog import (
     update_category,
     update_product,
 )
+from src.copyminas.admin_contacts import (
+    AdminContactError,
+    CONTACT_PREFERENCE_LABELS,
+    CONTACT_SERVICE_LABELS,
+    CONTACT_STATUS_LABELS,
+    CONTACT_STATUSES,
+    contact_summary,
+    get_contact,
+    list_contacts,
+    update_contact_status,
+)
 from src.copyminas.catalog import (
     get_public_categories,
     get_public_products,
@@ -363,8 +374,15 @@ def login():
 @login_required
 def dashboard():
     catalog_available = True
+    contacts_available = True
     products = []
     categories = []
+    contacts = {
+        "total": 0,
+        "novos": 0,
+        "em_atendimento": 0,
+        "convertidos": 0,
+    }
 
     try:
         products = get_public_products()
@@ -373,11 +391,19 @@ def dashboard():
         catalog_available = False
         current_app.logger.error("Admin catalog summary unavailable: %s", exc)
 
+    try:
+        contacts = contact_summary()
+    except (DatabaseUnavailable, AdminContactError) as exc:
+        contacts_available = False
+        current_app.logger.error("Admin contact summary unavailable: %s", exc)
+
     return render_template(
         "admin/dashboard.html",
         catalog_available=catalog_available,
+        contacts_available=contacts_available,
         product_count=len(products),
         category_count=len(categories),
+        contact_summary=contacts,
         csrf_token=_csrf_token(),
     )
 
@@ -744,9 +770,99 @@ def category_status(category_id):
     return redirect(url_for("admin.categories"))
 
 
+@admin_bp.get("/contatos")
+@login_required
+def contacts():
+    try:
+        rows = list_contacts()
+    except (DatabaseUnavailable, AdminContactError) as exc:
+        current_app.logger.error("Admin contacts unavailable: %s", exc)
+        return _admin_error(
+            "Contatos indisponíveis",
+            "Não foi possível consultar as solicitações no banco neste momento.",
+            503,
+        )
+
+    summary = {
+        "total": len(rows),
+        "novo": sum(1 for row in rows if row["status"] == "novo"),
+        "em_atendimento": sum(1 for row in rows if row["status"] == "em_atendimento"),
+        "convertido": sum(1 for row in rows if row["status"] == "convertido"),
+        "encerrado": sum(1 for row in rows if row["status"] == "encerrado"),
+        "spam": sum(1 for row in rows if row["status"] == "spam"),
+    }
+
+    return render_template(
+        "admin/contacts.html",
+        contacts=rows,
+        summary=summary,
+        status_labels=CONTACT_STATUS_LABELS,
+        service_labels=CONTACT_SERVICE_LABELS,
+        csrf_token=_csrf_token(),
+    )
+
+
+@admin_bp.get("/contatos/<int:contact_id>")
+@login_required
+def contact_detail(contact_id):
+    try:
+        contact = get_contact(contact_id)
+    except (DatabaseUnavailable, AdminContactError) as exc:
+        current_app.logger.error("Admin contact lookup unavailable: %s", exc)
+        return _admin_error(
+            "Contato indisponível",
+            "Não foi possível consultar esta solicitação.",
+            503,
+        )
+
+    if contact is None:
+        return _admin_error(
+            "Contato não encontrado",
+            "A solicitação informada não existe no banco.",
+            404,
+        )
+
+    return render_template(
+        "admin/contact_detail.html",
+        contact=contact,
+        status_labels=CONTACT_STATUS_LABELS,
+        service_labels=CONTACT_SERVICE_LABELS,
+        preference_labels=CONTACT_PREFERENCE_LABELS,
+        contact_statuses=CONTACT_STATUSES,
+        csrf_token=_csrf_token(),
+    )
+
+
+@admin_bp.post("/contatos/<int:contact_id>/status")
+@login_required
+def contact_status(contact_id):
+    if not _csrf_valid(request.form.get("csrf_token", "")):
+        return _admin_error(
+            "Sessão inválida",
+            "Não foi possível alterar o status com este formulário.",
+            400,
+        )
+
+    status = request.form.get("status", "").strip()
+
+    try:
+        update_contact_status(contact_id, status)
+    except (DatabaseUnavailable, AdminContactError) as exc:
+        current_app.logger.error("Admin contact status failed: %s", exc)
+        return _admin_error(
+            "Não foi possível alterar o contato",
+            str(exc),
+            503 if isinstance(exc, DatabaseUnavailable) else 400,
+        )
+
+    flash("Status do contato atualizado.", "admin-success")
+    return redirect(url_for("admin.contact_detail", contact_id=contact_id))
+
+
 @admin_bp.post("/logout")
 @login_required
 def logout():
+
     if not _csrf_valid(request.form.get("csrf_token", "")):
         return _admin_error(
             "Sessão inválida",
