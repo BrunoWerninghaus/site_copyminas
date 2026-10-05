@@ -59,5 +59,60 @@ class PublicMobileContractTestCase(unittest.TestCase):
         self.assertNotIn("overflow-x:clip", mobile)
 
 
+    def test_products_mobile_contract_compacts_catalog(self):
+        source = PAPER_CSS.read_text(encoding="utf-8")
+
+        self.assertIn("/* Products mobile contract */", source)
+        self.assertRegex(
+            source,
+            r"@media \(max-width: 720px\)[\s\S]*?\.page-products\s*\{[\s\S]*?--page-x:\s*1rem",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-products \.catalog-filter-group\s*\{[\s\S]*?display:\s*grid[\s\S]*?grid-template-columns:\s*repeat\(2",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-products \.product-card\s*\{[\s\S]*?grid-template-columns:\s*clamp\(116px, 35vw, 150px\)",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-products \.product-card__media\s*\{[\s\S]*?border-right:\s*1px solid var\(--paper-line\)[\s\S]*?border-bottom:\s*0",
+        )
+
+    def test_products_mobile_touch_targets_are_preserved(self):
+        source = PAPER_CSS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            source,
+            r"\.page-products \.catalog-search input\s*\{[\s\S]*?min-height:\s*50px",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-products \.catalog-filter\s*\{[\s\S]*?min-height:\s*46px",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-products \.catalog-unavailable \.paper-action\s*\{[\s\S]*?min-height:\s*50px",
+        )
+
+    def test_products_mobile_does_not_mask_overflow(self):
+        source = PAPER_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
+
+        mobile_start = source.index("/*productsmobilecontract*/")
+        mobile = source[mobile_start:]
+
+        self.assertNotIn("overflow-x:hidden", mobile)
+        self.assertNotIn("overflow-x:clip", mobile)
+
+    def test_catalog_script_keeps_customer_facing_filter_counts(self):
+        script = (
+            ROOT / "src/copyminas/static/js/products.js"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('button.textContent = \`${label} (${matchingCount})\`;', script)
+        self.assertNotIn('button.textContent = \`${label} / ${matchingCount}\`;', script)
+
+
 if __name__ == "__main__":
     unittest.main()
