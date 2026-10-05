@@ -792,3 +792,23 @@ html.globe-dialog-open body { overflow: hidden; }
     flex-direction: column;
     justify-content: center;
 }
+
+
+.home-product__media {
+    aspect-ratio: 1 / 1;
+    min-height: 0;
+}
+
+.home-product__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: clamp(.75rem, 2vw, 1.25rem);
+}
+
+@media (max-width: 980px) {
+    .home-product__media {
+        aspect-ratio: 1 / 1;
+        min-height: 0;
+    }
+}
