@@ -8,6 +8,7 @@
         <a href="{{ url_for('admin.dashboard') }}" {% if admin_page == "dashboard" %}aria-current="page"{% endif %}>Painel</a>
         <a href="{{ url_for('admin.products') }}" {% if admin_page == "products" %}aria-current="page"{% endif %}>Produtos</a>
         <a href="{{ url_for('admin.categories') }}" {% if admin_page == "categories" %}aria-current="page"{% endif %}>Categorias</a>
+        <a href="{{ url_for('admin.contacts') }}" {% if admin_page == "contacts" %}aria-current="page"{% endif %}>Contatos</a>
         <a href="{{ url_for('public.home') }}" target="_blank" rel="noopener noreferrer">Site ↗</a>
     </nav>
 
