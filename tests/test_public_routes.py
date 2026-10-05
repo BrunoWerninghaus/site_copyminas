@@ -85,6 +85,11 @@ class PublicRoutesTestCase(unittest.TestCase):
 
     def test_solutions(self):
         self.assert_page("/solucoes", "Tecnologia para a rotina de trabalho")
+        response = self.client.get("/solucoes")
+        self.assertGreaterEqual(
+            response.data.count("Consultar esta área".encode("utf-8")),
+            5,
+        )
 
     def test_products(self):
         self.assert_page("/produtos", "Catálogo Copy Minas")
@@ -184,12 +189,16 @@ class PublicRoutesTestCase(unittest.TestCase):
 
     def test_company(self):
         self.assert_page("/empresa", "Desde 2011 em Elói Mendes")
+        response = self.client.get("/empresa")
+        self.assertIn("Abrir no Google Maps".encode("utf-8"), response.data)
+        self.assertIn("Falar com a Copy Minas".encode("utf-8"), response.data)
 
     def test_contact(self):
         self.assert_page("/contato", "(35) 98877-6969")
         response = self.client.get("/contato")
         self.assertIn(b"copyminas@hotmail.com", response.data)
         self.assertIn(b"/contato/enviar", response.data)
+        self.assertIn("Enviar solicitação".encode("utf-8"), response.data)
         self.assertNotIn(b"main_bd", response.data)
         self.assertNotIn(b"main_bd.contatos", response.data)
         self.assertNotIn(b"STATUS INICIAL", response.data)
