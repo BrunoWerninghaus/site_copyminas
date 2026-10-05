@@ -1,5 +1,7 @@
 {% if admin_page == "dashboard" %}
     {% set admin_page_label = "Visão geral" %}
+{% elif admin_page == "home" %}
+    {% set admin_page_label = "Home pública" %}
 {% elif admin_page == "products" %}
     {% set admin_page_label = "Produtos" %}
 {% elif admin_page == "categories" %}
@@ -44,15 +46,24 @@
         </div>
 
         <div class="admin-sidebar__group">
+            <span class="admin-sidebar__group-label">Site</span>
+
+            <a href="{{ url_for('admin.home_manager') }}" {% if admin_page == "home" %}aria-current="page"{% endif %}>
+                <span class="admin-sidebar__symbol" aria-hidden="true">03</span>
+                <span class="admin-sidebar__label">Home pública</span>
+            </a>
+        </div>
+
+        <div class="admin-sidebar__group">
             <span class="admin-sidebar__group-label">Catálogo</span>
 
             <a href="{{ url_for('admin.products') }}" {% if admin_page == "products" %}aria-current="page"{% endif %}>
-                <span class="admin-sidebar__symbol" aria-hidden="true">03</span>
+                <span class="admin-sidebar__symbol" aria-hidden="true">04</span>
                 <span class="admin-sidebar__label">Produtos</span>
             </a>
 
             <a href="{{ url_for('admin.categories') }}" {% if admin_page == "categories" %}aria-current="page"{% endif %}>
-                <span class="admin-sidebar__symbol" aria-hidden="true">04</span>
+                <span class="admin-sidebar__symbol" aria-hidden="true">05</span>
                 <span class="admin-sidebar__label">Categorias</span>
             </a>
         </div>
