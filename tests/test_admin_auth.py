@@ -69,8 +69,9 @@ class AdminAuthTestCase(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Administração".encode("utf-8"), response.data)
+        self.assertIn("Visão geral".encode("utf-8"), response.data)
         self.assertIn("Produtos publicados".encode("utf-8"), response.data)
+        self.assertIn("Ações rápidas".encode("utf-8"), response.data)
         self.assertNotIn(b"test-only-long-password", response.data)
 
     def test_logout_requires_csrf_and_clears_session(self):
