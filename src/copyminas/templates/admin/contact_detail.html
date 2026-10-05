@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ contact.protocol }} — Copy Minas Admin{% endblock %}
+{% block meta_description %}Ficha interna de contato da Copy Minas.{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block page_styles %}
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+{% set admin_page = "contacts" %}
+{% include "admin/_header.html" %}
+
+<main id="main-content" class="admin-stage admin-stage--contact">
+    {% with messages = get_flashed_messages(category_filter=["admin-success"]) %}
+        {% if messages %}
+        <div class="admin-alert admin-alert--success" role="status">
+            {% for message in messages %}<strong>{{ message }}</strong>{% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="admin-form-heading">
+        <a href="{{ url_for('admin.contacts') }}">← Contatos</a>
+        <span>ATENDIMENTO / FICHA</span>
+        <h1>{{ contact.name }}</h1>
+        <p>{{ contact.protocol }}{% if contact.created_at %} · recebido em {{ contact.created_at.strftime("%d/%m/%Y às %H:%M") }}{% endif %}</p>
+    </div>
+
+    <section class="admin-contact-detail-grid">
+        <article class="admin-contact-sheet">
+            <header>
+                <span>DADOS / CLIENTE</span>
+                <strong>{{ contact.name }}</strong>
+            </header>
+
+            <dl>
+                <div><dt>Empresa</dt><dd>{{ contact.company or "Não informada" }}</dd></div>
+                <div><dt>E-mail</dt><dd><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></dd></div>
+                <div><dt>Telefone</dt><dd><a href="tel:{{ contact.phone }}">{{ contact.phone }}</a></dd></div>
+                <div><dt>Cidade</dt><dd>{{ contact.city }}</dd></div>
+                <div><dt>Preferência</dt><dd>{{ preference_labels.get(contact.preferred_contact, contact.preferred_contact) }}</dd></div>
+            </dl>
+        </article>
+
+        <article class="admin-contact-sheet">
+            <header>
+                <span>DADOS / SOLICITAÇÃO</span>
+                <strong>{{ service_labels.get(contact.service_type, contact.service_type) }}</strong>
+            </header>
+
+            <dl>
+                <div><dt>Quantidade</dt><dd>{{ contact.equipment_quantity if contact.equipment_quantity is not none else "Não informada" }}</dd></div>
+                <div><dt>Origem</dt><dd>{{ contact.source }}</dd></div>
+                <div><dt>Consentimento</dt><dd>{{ "Registrado" if contact.consent_privacy else "Não registrado" }}</dd></div>
+                <div><dt>Consentimento em</dt><dd>{{ contact.consent_at.strftime("%d/%m/%Y %H:%M") if contact.consent_at else "—" }}</dd></div>
+            </dl>
+        </article>
+    </section>
+
+    <section class="admin-contact-message">
+        <span>MENSAGEM / RECEBIDA</span>
+        <p>{{ contact.message }}</p>
+    </section>
+
+    <section class="admin-contact-workflow">
+        <div>
+            <span>STATUS / ATENDIMENTO</span>
+            <strong class="admin-status admin-contact-status--{{ contact.status }}">
+                {{ status_labels.get(contact.status, contact.status) }}
+            </strong>
+            {% if contact.updated_at %}
+            <small>Registro atualizado em {{ contact.updated_at.strftime("%d/%m/%Y às %H:%M") }}</small>
+            {% endif %}
+        </div>
+
+        <form method="post" action="{{ url_for('admin.contact_status', contact_id=contact.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <label>
+                <span>Novo status</span>
+                <select name="status" required>
+                    {% for status in contact_statuses %}
+                    <option value="{{ status }}" {% if status == contact.status %}selected{% endif %}>
+                        {{ status_labels.get(status, status) }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </label>
+            <button class="admin-button" type="submit">Atualizar status</button>
+        </form>
+    </section>
+
+    <div class="admin-contact-actions">
+        <a class="admin-button" href="mailto:{{ contact.email }}">Enviar e-mail</a>
+        <a class="admin-button admin-button--ghost" href="tel:{{ contact.phone }}">Ligar</a>
+    </div>
+</main>
+{% endblock %}
