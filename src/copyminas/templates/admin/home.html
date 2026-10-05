@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% block title %}Home — Copy Minas Admin{% endblock %}
+{% block meta_description %}Configuração interna da Home da Copy Minas.{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block page_styles %}
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+{% set admin_page = "home" %}
+{% include "admin/_header.html" %}
+
+<main id="main-content" class="admin-stage admin-stage--form admin-home-manager">
+    {% with messages = get_flashed_messages(category_filter=["admin-success"]) %}
+        {% if messages %}
+        <div class="admin-alert admin-alert--success" role="status">
+            {% for message in messages %}<strong>{{ message }}</strong>{% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="admin-form-heading">
+        <a href="{{ url_for('admin.dashboard') }}">← Visão geral</a>
+        <span>CONTEÚDO / HOME</span>
+        <h1>Home pública</h1>
+        <p>Controle mensagens, apresentação, produtos em destaque, seções e novidades exibidas ao cliente.</p>
+        <a class="admin-public-preview" href="{{ url_for('public.home') }}" target="_blank" rel="noopener noreferrer">Abrir Home pública ↗</a>
+    </div>
+
+    {% if not initialized %}
+    <section class="admin-home-setup">
+        <span>CONFIGURAÇÃO / PRIMEIRO USO</span>
+        <h2>Inicializar módulo Home</h2>
+        <p>
+            Esta operação cria <code>site_home_config</code> e <code>site_home_news</code>
+            dentro do <code>main_bd</code>. Produtos, categorias e contatos não são alterados.
+        </p>
+        <form method="post" action="{{ url_for('admin.home_initialize') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="admin-button" type="submit">Inicializar módulo Home</button>
+        </form>
+    </section>
+    {% else %}
+
+    {% if form_errors %}
+    <div class="admin-alert admin-alert--error" role="alert">
+        <strong>Revise a configuração:</strong>
+        <ul>{% for error in form_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    <form class="admin-product-form admin-home-form" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <section class="admin-form-section">
+            <header>
+                <span>01</span>
+                <div><strong>Mensagem superior</strong><small>Faixa opcional acima da Home</small></div>
+            </header>
+
+            <label class="admin-switch">
+                <input type="checkbox" name="announcement_active" value="1" {% if home_config.announcement_active %}checked{% endif %}>
+                <span><strong>Exibir mensagem</strong><small>Ativa ou oculta a faixa sem apagar seu conteúdo.</small></span>
+            </label>
+
+            <div class="admin-form-grid">
+                <label class="admin-field">
+                    <span>Rótulo</span>
+                    <input type="text" name="announcement_label" maxlength="80" value="{{ home_config.announcement_label }}">
+                </label>
+                <label class="admin-field admin-field--wide">
+                    <span>Mensagem</span>
+                    <input type="text" name="announcement_text" maxlength="255" value="{{ home_config.announcement_text }}">
+                </label>
+                <label class="admin-field">
+                    <span>Texto do link</span>
+                    <input type="text" name="announcement_link_label" maxlength="80" value="{{ home_config.announcement_link_label }}">
+                </label>
+                <label class="admin-field">
+                    <span>Link</span>
+                    <input type="text" name="announcement_link_url" maxlength="255" value="{{ home_config.announcement_link_url }}" placeholder="/produtos">
+                </label>
+            </div>
+        </section>
+
+        <section class="admin-form-section">
+            <header>
+                <span>02</span>
+                <div><strong>Apresentação</strong><small>Hero principal e chamadas</small></div>
+            </header>
+
+            <div class="admin-form-grid">
+                <label class="admin-field admin-field--wide">
+                    <span>Linha superior *</span>
+                    <input type="text" name="hero_kicker" maxlength="180" value="{{ home_config.hero_kicker }}" required>
+                </label>
+                <label class="admin-field admin-field--wide">
+                    <span>Título principal *</span>
+                    <input type="text" name="hero_title" maxlength="255" value="{{ home_config.hero_title }}" required>
+                </label>
+                <label class="admin-field admin-field--wide">
+                    <span>Resumo *</span>
+                    <textarea name="hero_summary" rows="6" required>{{ home_config.hero_summary }}</textarea>
+                </label>
+
+                <label class="admin-field">
+                    <span>CTA principal *</span>
+                    <input type="text" name="primary_cta_label" maxlength="80" value="{{ home_config.primary_cta_label }}" required>
+                </label>
+                <label class="admin-field">
+                    <span>Link principal *</span>
+                    <input type="text" name="primary_cta_url" maxlength="255" value="{{ home_config.primary_cta_url }}" required>
+                </label>
+                <label class="admin-field">
+                    <span>CTA secundário *</span>
+                    <input type="text" name="secondary_cta_label" maxlength="80" value="{{ home_config.secondary_cta_label }}" required>
+                </label>
+                <label class="admin-field">
+                    <span>Link secundário *</span>
+                    <input type="text" name="secondary_cta_url" maxlength="255" value="{{ home_config.secondary_cta_url }}" required>
+                </label>
+            </div>
+        </section>
+
+        <section class="admin-form-section">
+            <header>
+                <span>03</span>
+                <div><strong>Produtos em destaque</strong><small>Até seis produtos, na ordem escolhida</small></div>
+            </header>
+
+            <div class="admin-home-featured-grid">
+                {% for position in range(1, 7) %}
+                {% set selected_id = home_config.featured_product_ids[position - 1] if home_config.featured_product_ids|length >= position else "" %}
+                <label class="admin-field">
+                    <span>Destaque {{ position }}</span>
+                    <select name="featured_product_{{ position }}">
+                        <option value="">Sem produto</option>
+                        {% for product in public_products %}
+                        <option value="{{ product.id }}" {% if selected_id|string == product.id|string %}selected{% endif %}>
+                            #{{ product.id }} · {{ product.nome }} · {{ product.categoria }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                {% endfor %}
+            </div>
+            <p class="admin-form-note">Somente produtos ativos em categorias ativas podem ser escolhidos.</p>
+        </section>
+
+        <section class="admin-form-section">
+            <header>
+                <span>04</span>
+                <div><strong>Seções da Home</strong><small>Controle de visibilidade</small></div>
+            </header>
+
+            <div class="admin-home-section-switches">
+                <label class="admin-switch">
+                    <input type="checkbox" name="show_solutions" value="1" {% if home_config.show_solutions %}checked{% endif %}>
+                    <span><strong>Soluções</strong><small>Áreas de atuação.</small></span>
+                </label>
+                <label class="admin-switch">
+                    <input type="checkbox" name="show_company" value="1" {% if home_config.show_company %}checked{% endif %}>
+                    <span><strong>Empresa</strong><small>Resumo institucional.</small></span>
+                </label>
+                <label class="admin-switch">
+                    <input type="checkbox" name="show_location" value="1" {% if home_config.show_location %}checked{% endif %}>
+                    <span><strong>Localização + globo</strong><small>Mantém o globo dentro da Home.</small></span>
+                </label>
+            </div>
+        </section>
+
+        <div class="admin-form-actions">
+            <button class="admin-button" type="submit">Salvar configuração da Home</button>
+        </div>
+    </form>
+
+    <section class="admin-home-news-admin">
+        <header class="admin-home-news-admin__header">
+            <div>
+                <span>05 / NOVIDADES</span>
+                <h2>Mensagens editoriais</h2>
+                <p>Entradas ativas aparecem na Home na ordem configurada.</p>
+            </div>
+            <a class="admin-button" href="{{ url_for('admin.home_news_new') }}">Nova novidade</a>
+        </header>
+
+        {% if news %}
+        <div class="admin-home-news-list">
+            {% for item in news %}
+            <article>
+                <div>
+                    <span>{{ item.label }} · ordem {{ item.sort_order }}</span>
+                    <strong>{{ item.title }}</strong>
+                    <small>{{ "Publicada" if item.active else "Inativa" }}</small>
+                </div>
+                <div class="admin-product-actions">
+                    <a href="{{ url_for('admin.home_news_edit', news_id=item.id) }}">Editar</a>
+                    <form method="post" action="{{ url_for('admin.home_news_status', news_id=item.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="active" value="{{ 0 if item.active else 1 }}">
+                        <button type="submit">{{ "Desativar" if item.active else "Publicar" }}</button>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="admin-dashboard-empty">Nenhuma novidade cadastrada.</div>
+        {% endif %}
+    </section>
+    {% endif %}
+</main>
+{% endblock %}
