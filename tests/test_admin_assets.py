@@ -1,4 +1,3 @@
-import base64
 import io
 import tempfile
 import unittest
@@ -71,14 +70,16 @@ class AdminAssetsTestCase(unittest.TestCase):
             buffer,
             format="PNG",
         )
-        data_url = (
-            "data:image/png;base64,"
-            + base64.b64encode(buffer.getvalue()).decode("ascii")
+        buffer.seek(0)
+        edited_upload = FileStorage(
+            stream=buffer,
+            filename="produto-editado-1200x1200.png",
+            content_type="image/png",
         )
 
         with self.app.app_context():
             edited, original = save_edited_product_image(
-                data_url,
+                edited_upload,
                 source_relative,
                 21,
                 1,
@@ -110,15 +111,17 @@ class AdminAssetsTestCase(unittest.TestCase):
             buffer,
             format="PNG",
         )
-        data_url = (
-            "data:image/png;base64,"
-            + base64.b64encode(buffer.getvalue()).decode("ascii")
+        buffer.seek(0)
+        edited_upload = FileStorage(
+            stream=buffer,
+            filename="produto-editado.png",
+            content_type="image/png",
         )
 
         with self.app.app_context():
             with self.assertRaises(AdminAssetError):
                 save_edited_product_image(
-                    data_url,
+                    edited_upload,
                     source_relative,
                     21,
                     1,
