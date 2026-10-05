@@ -1040,3 +1040,15 @@ html.globe-dialog-open body { overflow: hidden; }
 .company-callout .paper-panel {
     width: min(100%, 920px);
 }
+
+
+/* Internal document markers remain in HTML but are not customer-facing */
+.page-home [data-section]::after,
+.page-home .paper-panel::after,
+.page-home .product-strip::before,
+.page-home .location-copy::before,
+.page-home .globe-card::before,
+.page-home .service-matrix::before,
+.page-home .image-sheet::before {
+    display: none;
+}
