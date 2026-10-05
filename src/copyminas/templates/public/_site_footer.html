@@ -1,0 +1,19 @@
+<footer class="public-footer">
+    <div class="public-footer__brand">
+        <img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas">
+        <span>Tecnologia, equipamentos e atendimento.</span>
+    </div>
+
+    <nav class="public-footer__nav" aria-label="Navegação do rodapé">
+        <a href="{{ url_for('public.solutions') }}">Soluções</a>
+        <a href="{{ url_for('public.products') }}">Produtos</a>
+        <a href="{{ url_for('public.company') }}">Empresa</a>
+        <a href="{{ url_for('public.home') }}#localizacao">Localização</a>
+        <a href="{{ url_for('public.contact') }}">Contato</a>
+    </nav>
+
+    <div class="public-footer__meta">
+        <span>Copy Minas</span>
+        <span>Elói Mendes / MG</span>
+    </div>
+</footer>
