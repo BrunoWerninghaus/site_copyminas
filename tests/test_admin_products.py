@@ -263,6 +263,49 @@ class AdminProductsRouteTestCase(unittest.TestCase):
             "images/products/edited/product-21-slot-1-test.png",
         )
 
+
+    @patch("src.copyminas.routes.admin.update_product_image_slot")
+    @patch(
+        "src.copyminas.routes.admin.save_edited_product_image",
+        return_value=(
+            "images/products/edited/product-21-slot-1-large.png",
+            "images/products/originals/product-21-slot-1-source.png",
+        ),
+    )
+    @patch("src.copyminas.routes.admin.static_asset_exists", return_value=True)
+    @patch("src.copyminas.routes.admin.get_product")
+    def test_product_image_editor_uses_file_part_instead_of_large_text_field(
+        self,
+        get_product,
+        _asset_exists,
+        _save_edited,
+        update_slot,
+    ):
+        get_product.return_value = {
+            "id": 21,
+            "nome": "Samsung M4070FR",
+            "imagem1": "images/products/current.png",
+        }
+
+        page = self.client.get("/admin/categorias/nova")
+        token = self._csrf(page)
+
+        response = self.client.post(
+            "/admin/produtos/21/imagem/1/salvar",
+            data={
+                "csrf_token": token,
+                "image_file": (
+                    io.BytesIO(b"x" * 750_000),
+                    "produto-editado-1200x1200.png",
+                ),
+            },
+            content_type="multipart/form-data",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.get_json()["ok"])
+        update_slot.assert_called_once()
+
     @patch("src.copyminas.routes.admin.update_product_image_slot")
     @patch("src.copyminas.routes.admin.save_edited_product_image")
     @patch("src.copyminas.routes.admin.static_asset_exists", return_value=True)
