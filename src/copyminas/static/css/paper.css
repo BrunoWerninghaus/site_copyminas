@@ -325,7 +325,7 @@
     transition:
         transform 150ms ease,
         box-shadow 150ms ease;
-    grid-template-rows: 220px 1fr;
+    grid-template-rows: auto 1fr;
     padding: 0;
 }
 
@@ -337,6 +337,8 @@
 
 .product-card__media {
     display: grid;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     overflow: hidden;
     place-items: center;
     border-bottom: 1px solid var(--paper-line);
@@ -643,12 +645,14 @@
 }
 
 .page-products .product-card {
-    min-height: 450px;
-    grid-template-rows: 210px 1fr;
+    min-height: 0;
+    grid-template-rows: auto 1fr;
 }
 
 .page-products .product-card__media {
     position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
 }
 
 .page-products .product-card__media::after {
