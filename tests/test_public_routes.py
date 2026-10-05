@@ -178,9 +178,9 @@ class PublicRoutesTestCase(unittest.TestCase):
         self.assertIn(b'id="categoria-1"', response.data)
         self.assertIn(b'id="categoria-2"', response.data)
         self.assertIn(b'id="categoria-8"', response.data)
-        self.assertIn("Impressoras / 6".encode("utf-8"), response.data)
-        self.assertIn("Computadores / 3".encode("utf-8"), response.data)
-        self.assertIn("Redes / 1".encode("utf-8"), response.data)
+        self.assertIn("Impressoras (6)".encode("utf-8"), response.data)
+        self.assertIn("Computadores (3)".encode("utf-8"), response.data)
+        self.assertIn("Redes (1)".encode("utf-8"), response.data)
         self.assertIn(b"data-catalog-search", response.data)
         self.assertIn(b'data-category-filter="all"', response.data)
         self.assertIn("Sob consulta".encode("utf-8"), response.data)
@@ -267,6 +267,49 @@ class PublicRoutesTestCase(unittest.TestCase):
                 self.assertIn("Falar com a Copy Minas".encode("utf-8"), response.data)
                 self.assertIn("Localização".encode("utf-8"), response.data)
 
+
+
+    def test_public_copy_avoids_internal_debug_labels(self):
+        pages = {
+            "/home": (
+                "Produtos / destaques",
+                "Localização / 21°S",
+            ),
+            "/solucoes": (
+                "Atendimento / catálogo de soluções",
+                "Área / 01",
+                "MODALIDADES / VISÃO GERAL",
+                "PRÓXIMO PASSO / ATENDIMENTO",
+            ),
+            "/produtos": (
+                "Categoria / 01",
+                "CATÁLOGO / BUSCA",
+            ),
+            "/empresa": (
+                "CONTINUE / INFORMAÇÕES RELACIONADAS",
+                "Esta página concentra a identidade",
+                "para evitar repetição",
+            ),
+            "/contato": (
+                "Contato / diretório",
+                "FICHA / COPY MINAS",
+                "CONFIRMAÇÃO POR E-MAIL",
+            ),
+        }
+
+        for path, forbidden_labels in pages.items():
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                for label in forbidden_labels:
+                    self.assertNotIn(label.encode("utf-8"), response.data)
+
+        contact = self.client.get("/contato").data
+        self.assertIn("Canais de atendimento".encode("utf-8"), contact)
+        self.assertIn(
+            "Você receberá uma confirmação por e-mail.".encode("utf-8"),
+            contact,
+        )
 
     def test_customer_pages_do_not_show_construction_placeholders(self):
         for path in (
