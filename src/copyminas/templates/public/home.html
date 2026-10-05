@@ -37,41 +37,7 @@
             </div>
         </article>
 
-        <aside class="service-matrix" aria-label="Matriz de atendimento da Copy Minas">
-            <span class="service-matrix__code">ATENDIMENTO / MATRIZ</span>
 
-            <div class="service-matrix__table" role="table" aria-label="Venda, aluguel e manutenção por tipo de equipamento">
-                <div class="service-matrix__row service-matrix__row--head" role="row">
-                    <span role="columnheader">Equipamento</span>
-                    <span role="columnheader">Venda</span>
-                    <span role="columnheader">Aluguel</span>
-                    <span role="columnheader">Manutenção</span>
-                </div>
-
-                <div class="service-matrix__row" role="row">
-                    <strong role="rowheader">Impressoras</strong>
-                    <span class="service-status service-status--yes" role="cell" aria-label="Venda disponível">✓</span>
-                    <span class="service-status service-status--yes" role="cell" aria-label="Aluguel disponível">✓</span>
-                    <span class="service-status service-status--yes" role="cell" aria-label="Manutenção disponível">✓</span>
-                </div>
-
-                <div class="service-matrix__row" role="row">
-                    <strong role="rowheader">Computadores</strong>
-                    <span class="service-status service-status--yes" role="cell" aria-label="Venda disponível">✓</span>
-                    <span class="service-status service-status--yes" role="cell" aria-label="Aluguel disponível">✓</span>
-                    <span class="service-status service-status--yes" role="cell" aria-label="Manutenção disponível">✓</span>
-                </div>
-
-                <div class="service-matrix__row" role="row">
-                    <strong role="rowheader">iPhones</strong>
-                    <span class="service-status service-status--yes" role="cell" aria-label="Venda disponível">✓</span>
-                    <span class="service-status service-status--no" role="cell" aria-label="Aluguel não disponível">×</span>
-                    <span class="service-status service-status--yes" role="cell" aria-label="Manutenção disponível">✓</span>
-                </div>
-            </div>
-
-            <a href="{{ url_for('public.solutions') }}">Ver áreas de atendimento →</a>
-        </aside>
     </section>
 
     {% if home_news %}
@@ -101,22 +67,11 @@
 {% if home_config.show_solutions %}
     <section class="content-section section-shell" data-section="01 / SOLUÇÕES">
         <header class="section-heading">
-            <p class="section-kicker">Soluções / índice</p>
-            <h2>Áreas de atuação</h2>
-            <p>Impressão, equipamentos, locação, manutenção e suporte reunidos em áreas de atendimento.</p>
+            <p class="section-kicker">Soluções</p>
+            <h2>Veja como podemos ajudar.</h2>
+            <p>O detalhamento das áreas e formas de atendimento fica concentrado na página de Soluções.</p>
         </header>
-
-        <div class="paper-grid">
-            {% for solution in company.solutions[:4] %}
-            <article class="paper-panel solution-card" data-sheet="{{ solution.code }}">
-                <span class="solution-card__number">[{{ solution.code }}]</span>
-                <h3>{{ solution.title }}</h3>
-                <p>{{ solution.description }}</p>
-            </article>
-            {% endfor %}
-        </div>
-
-        <a class="section-link" href="{{ url_for('public.solutions') }}">Abrir todas as soluções →</a>
+        <a class="section-link" href="{{ url_for('public.solutions') }}">Abrir soluções →</a>
     </section>
 {% endif %}
 
@@ -155,31 +110,10 @@
     <section class="company-callout section-shell" data-section="03 / EMPRESA">
         <article class="paper-panel" data-sheet="EMPRESA / 03">
             <p class="section-kicker">Empresa</p>
-            <h2>Copy Minas em Elói Mendes.</h2>
-            <p class="lead">
-                Nome fantasia de {{ company.legal_name }}, CNPJ {{ company.cnpj }}, com início de atividades em {{ company.founded_on }}.
-            </p>
-            <a class="section-link section-link--dark" href="{{ url_for('public.company') }}">Conhecer a empresa →</a>
+            <h2>Conheça a Copy Minas.</h2>
+            <p class="lead">Dados institucionais e identidade empresarial ficam reunidos em uma página própria.</p>
+            <a class="section-link section-link--dark" href="{{ url_for('public.company') }}">Abrir página da empresa →</a>
         </article>
-
-        <aside class="company-facts" aria-label="Resumo institucional da Copy Minas">
-            <span class="company-facts__code">EMPRESA / RESUMO</span>
-            <dl>
-                <div>
-                    <dt>Início</dt>
-                    <dd>{{ company.founded_on }}</dd>
-                </div>
-                <div>
-                    <dt>Sede</dt>
-                    <dd>{{ copyminas_location.city }} / {{ company.state }}</dd>
-                </div>
-                <div>
-                    <dt>Situação</dt>
-                    <dd>{{ company.status }}</dd>
-                </div>
-            </dl>
-            <a href="{{ url_for('public.company') }}">Abrir ficha institucional →</a>
-        </aside>
     </section>
 {% endif %}
 
@@ -188,11 +122,10 @@
         <div class="location-copy" data-register="LOC / {{ copyminas_location.latitude }}, {{ copyminas_location.longitude }}">
             <p class="section-kicker">Localização / 21°S</p>
             <h2>Elói Mendes, Minas Gerais.</h2>
-            <address class="location-address">{{ copyminas_location.address }}</address>
-            <p class="location-note">
-                Abra o globo para explorar a localização. O ponto azul representa Elói Mendes em escala planetária.
+                        <p class="location-note">
+                Abra o globo para explorar a localização. O endereço completo e os canais de atendimento ficam na página de Contato.
             </p>
-            <a class="section-link" href="{{ url_for('public.contact') }}">Dados de contato →</a>
+            <a class="section-link" href="{{ url_for('public.contact') }}">Ver endereço e contato →</a>
         </div>
 
         <button class="globe-card" type="button" data-globe-open aria-haspopup="dialog" aria-controls="copyminas-globe-dialog" aria-label="Abrir globo interativo em tela cheia">
