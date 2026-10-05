@@ -151,6 +151,19 @@ class HomeSourceContractTestCase(unittest.TestCase):
             r"\.page-products \.product-card\s*\{[^}]*grid-template-rows:\s*auto\s+1fr",
         )
 
+    def test_home_featured_products_use_real_images_when_available(self):
+        template = (ROOT / "src/copyminas/templates/public/home.html").read_text(encoding="utf-8")
+
+        self.assertIn("{% if product.image_url %}", template)
+        self.assertIn("filename=product.image_url", template)
+        self.assertIn('class="home-product__media"', template)
+
+    def test_public_shell_is_shared_from_home(self):
+        template = (ROOT / "src/copyminas/templates/public/home.html").read_text(encoding="utf-8")
+
+        self.assertIn('{% include "public/_site_header.html" %}', template)
+        self.assertIn('{% include "public/_site_footer.html" %}', template)
+
     def test_home_never_masks_horizontal_overflow(self):
         source = HOME_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
 
