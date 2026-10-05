@@ -1753,3 +1753,385 @@
 .page-solutions .solutions-hero__copy {
     max-width: 980px;
 }
+
+
+/* Company page — institutional layout */
+.page-company .company-stage {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    width: min(100%, 1440px);
+}
+
+.page-company .company-hero-sheet {
+    padding: clamp(1.5rem, 3.5vw, 3.75rem);
+    border-top: 4px solid var(--red);
+}
+
+.page-company .company-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: stretch;
+}
+
+.page-company .company-hero__copy {
+    align-self: center;
+}
+
+.page-company .company-hero .paper-title {
+    max-width: 11.5ch;
+    font-size: clamp(2.65rem, 6vw, 6.1rem);
+}
+
+.page-company .company-hero .paper-lead {
+    max-width: 66ch;
+    font-size: clamp(.98rem, 1.4vw, 1.14rem);
+}
+
+.page-company .company-hero__actions {
+    margin-top: clamp(1.8rem, 3vw, 2.5rem);
+}
+
+.page-company .company-identity-panel {
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+    border: 1px solid #303840;
+    border-left: 3px solid var(--blue);
+    background:
+        linear-gradient(rgba(255,255,255,.023) 1px, transparent 1px),
+        #0b0f13;
+    background-size: 100% 2rem;
+    box-shadow: 9px 9px 0 rgba(21,149,255,.08);
+    color: white;
+}
+
+.page-company .company-identity-panel > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.page-company .company-identity-panel > header span {
+    color: #8fb9dc;
+    font-size: .6rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.page-company .company-identity-panel > header strong {
+    color: #72d89d;
+    font-size: .62rem;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.page-company .company-identity-panel dl {
+    margin: auto 0 0;
+}
+
+.page-company .company-identity-panel dl > div {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.page-company .company-identity-panel dl > div:last-child {
+    border-bottom: 0;
+}
+
+.page-company .company-identity-panel dt {
+    color: #7e8992;
+    font-size: .6rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.page-company .company-identity-panel dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-size: .82rem;
+    line-height: 1.45;
+}
+
+.page-company .company-activity {
+    padding: clamp(1.5rem, 3.5vw, 3rem);
+    border: 1px solid var(--line-strong);
+    background:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        #090c10;
+    background-size: 100% 2rem;
+}
+
+.page-company .company-section-heading,
+.page-company .company-register-heading {
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(300px, 1.1fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: end;
+}
+
+.page-company .company-section-heading {
+    padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+    border-bottom: 1px solid var(--line);
+}
+
+.page-company .company-section-heading h2,
+.page-company .company-register-heading h2 {
+    max-width: 13ch;
+    margin: .45rem 0 0;
+    font-size: clamp(2rem, 4.6vw, 4.35rem);
+    line-height: .96;
+    letter-spacing: -.05em;
+    text-transform: uppercase;
+    text-wrap: balance;
+}
+
+.page-company .company-section-heading > p {
+    max-width: 66ch;
+    margin: 0;
+    color: #a8b1b8;
+    line-height: 1.7;
+}
+
+.page-company .company-activity-list {
+    display: grid;
+    margin-top: .25rem;
+}
+
+.page-company .company-activity-item {
+    display: grid;
+    grid-template-columns: 78px minmax(0, 1fr) auto;
+    gap: clamp(1rem, 3vw, 2rem);
+    align-items: center;
+    min-height: 132px;
+    padding: 1.15rem .25rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.page-company .company-activity-item:last-child {
+    border-bottom: 0;
+}
+
+.page-company .company-activity-item__number {
+    color: #6e7982;
+    font-size: clamp(1.65rem, 3vw, 2.5rem);
+    font-weight: 850;
+    letter-spacing: -.06em;
+}
+
+.page-company .company-activity-item h3 {
+    margin: 0 0 .45rem;
+    font-size: clamp(1rem, 1.7vw, 1.35rem);
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.page-company .company-activity-item p {
+    max-width: 72ch;
+    margin: 0;
+    color: #9ca6ae;
+    font-size: .76rem;
+    line-height: 1.65;
+}
+
+.page-company .company-activity-item > a {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    padding: .55rem .7rem;
+    border: 1px solid var(--line-strong);
+    color: white;
+    font-size: .62rem;
+    font-weight: 800;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.page-company .company-activity-item > a:hover,
+.page-company .company-activity-item > a:focus-visible {
+    border-color: white;
+    background: rgba(255,255,255,.04);
+}
+
+.page-company .company-register-sheet {
+    padding: clamp(1.5rem, 3.5vw, 3rem);
+}
+
+.page-company .company-register-heading > p {
+    max-width: 58ch;
+    margin: 0;
+    color: var(--paper-muted);
+    line-height: 1.65;
+}
+
+.page-company .company-register {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin: clamp(2rem, 4vw, 3rem) 0 0;
+    border: 1px solid var(--paper-line);
+    background: var(--paper-line);
+}
+
+.page-company .company-register__item {
+    min-height: 132px;
+    padding: 1.25rem;
+    background: var(--paper);
+}
+
+.page-company .company-register__item dt {
+    color: #a80f16;
+    font-size: .66rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.page-company .company-register__item dd {
+    margin: .85rem 0 0;
+    overflow-wrap: anywhere;
+    font-size: clamp(.95rem, 1.5vw, 1.18rem);
+    line-height: 1.45;
+}
+
+.page-company .company-presence {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: end;
+    padding: clamp(1.5rem, 3.5vw, 3rem);
+    border: 1px solid var(--line-strong);
+    border-left: 4px solid var(--red);
+    background:
+        linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+        #0d1116;
+    background-size: 100% 2rem;
+    box-shadow: 10px 10px 0 rgba(226,26,34,.08);
+}
+
+.page-company .company-presence__copy > span {
+    color: var(--red-text);
+    font-size: .62rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.page-company .company-presence h2 {
+    max-width: 16ch;
+    margin: .65rem 0 .85rem;
+    font-size: clamp(1.9rem, 4vw, 3.7rem);
+    line-height: .98;
+    letter-spacing: -.045em;
+    text-transform: uppercase;
+    text-wrap: balance;
+}
+
+.page-company .company-presence p {
+    max-width: 64ch;
+    margin: 0;
+    color: #a8b1b8;
+    line-height: 1.7;
+}
+
+.page-company .company-presence address {
+    max-width: 62ch;
+    margin-top: 1.25rem;
+    color: #d6dce1;
+    font-size: .76rem;
+    font-style: normal;
+    line-height: 1.65;
+}
+
+.page-company .company-presence__actions {
+    display: grid;
+    gap: .8rem;
+}
+
+.page-company .company-presence__actions .button {
+    width: 100%;
+}
+
+.page-company .company-presence__link {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line-strong);
+    color: white;
+    font-size: .66rem;
+    font-weight: 800;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.page-company .company-presence__link:hover,
+.page-company .company-presence__link:focus-visible {
+    border-color: white;
+    background: rgba(255,255,255,.04);
+}
+
+@media (max-width: 980px) {
+    .page-company .company-hero,
+    .page-company .company-section-heading,
+    .page-company .company-register-heading,
+    .page-company .company-presence {
+        grid-template-columns: 1fr;
+    }
+
+    .page-company .company-identity-panel {
+        min-height: 0;
+    }
+
+    .page-company .company-register {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .page-company .company-activity-item {
+        grid-template-columns: 54px minmax(0, 1fr);
+    }
+
+    .page-company .company-activity-item > a {
+        grid-column: 2;
+        width: fit-content;
+    }
+}
+
+@media (max-width: 580px) {
+    .page-company .company-hero-sheet,
+    .page-company .company-activity,
+    .page-company .company-register-sheet,
+    .page-company .company-presence {
+        padding: 1.25rem;
+    }
+
+    .page-company .company-hero .paper-title {
+        font-size: clamp(2.4rem, 12vw, 3.7rem);
+    }
+
+    .page-company .company-register {
+        grid-template-columns: 1fr;
+    }
+
+    .page-company .company-activity-item {
+        grid-template-columns: 1fr;
+        gap: .75rem;
+    }
+
+    .page-company .company-activity-item > a {
+        grid-column: 1;
+        width: 100%;
+        justify-content: center;
+    }
+}
