@@ -21,6 +21,15 @@
             <div class="paper-contact-item"><dt>Sede</dt><dd>{{ copyminas_location.city }} / {{ company.state }}</dd></div>
         </dl>
 
+        <section class="company-location-card" aria-label="Localização da Copy Minas">
+            <div>
+                <span class="paper-card__code">SEDE / ELÓI MENDES</span>
+                <h2>Atendimento em Elói Mendes, Minas Gerais.</h2>
+                <address>{{ copyminas_location.address }}</address>
+            </div>
+            <a class="paper-action paper-action--ghost" href="{{ copyminas_location.maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Google Maps ↗</a>
+        </section>
+
         <hr class="paper-rule">
         <p class="paper-kicker">Atendimento / informações</p>
         <p class="paper-lead">
@@ -28,8 +37,8 @@
         </p>
 
         <div class="paper-actions">
-            <a class="paper-action" href="{{ url_for('public.solutions') }}">Soluções</a>
-            <a class="paper-action paper-action--ghost" href="{{ url_for('public.contact') }}">Contato</a>
+            <a class="paper-action" href="{{ url_for('public.contact') }}">Falar com a Copy Minas</a>
+            <a class="paper-action paper-action--ghost" href="{{ url_for('public.solutions') }}">Ver soluções</a>
         </div>
     </section>
 </main>
