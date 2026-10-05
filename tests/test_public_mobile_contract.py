@@ -114,5 +114,60 @@ class PublicMobileContractTestCase(unittest.TestCase):
         self.assertNotIn('button.textContent = \`${label} / ${matchingCount}\`;', script)
 
 
+    def test_product_detail_mobile_contract_is_explicit(self):
+        source = PAPER_CSS.read_text(encoding="utf-8")
+
+        self.assertIn("/* Product detail mobile contract */", source)
+        self.assertRegex(
+            source,
+            r"@media \(max-width: 720px\)[\s\S]*?\.page-product-detail\s*\{[\s\S]*?--page-x:\s*1rem",
+        )
+
+    def test_product_detail_mobile_media_and_gallery_fit_screen(self):
+        source = PAPER_CSS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            source,
+            r"\.page-product-detail \.product-sheet__media\s*\{[\s\S]*?aspect-ratio:\s*1\s*/\s*1",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-product-detail \.product-sheet__gallery\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-product-detail \.product-thumb\s*\{[\s\S]*?min-height:\s*64px",
+        )
+
+    def test_product_detail_mobile_actions_and_specs_are_readable(self):
+        source = PAPER_CSS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            source,
+            r"\.page-product-detail \.paper-actions\s*\{[\s\S]*?grid-template-columns:\s*1fr",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-product-detail \.paper-actions \.paper-action\s*\{[\s\S]*?width:\s*100%[\s\S]*?min-height:\s*50px",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-product-detail \.spec-sheet dl > div\s*\{[\s\S]*?grid-template-columns:\s*1fr",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-product-detail \.spec-sheet__heading\s*\{[\s\S]*?position:\s*static",
+        )
+
+    def test_product_detail_mobile_does_not_mask_overflow(self):
+        source = PAPER_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
+
+        mobile_start = source.index("/*productdetailmobilecontract*/")
+        mobile = source[mobile_start:]
+
+        self.assertNotIn("overflow-x:hidden", mobile)
+        self.assertNotIn("overflow-x:clip", mobile)
+
+
 if __name__ == "__main__":
     unittest.main()
