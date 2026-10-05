@@ -110,8 +110,8 @@ class PublicMobileContractTestCase(unittest.TestCase):
             ROOT / "src/copyminas/static/js/products.js"
         ).read_text(encoding="utf-8")
 
-        self.assertIn('button.textContent = \`${label} (${matchingCount})\`;', script)
-        self.assertNotIn('button.textContent = \`${label} / ${matchingCount}\`;', script)
+        self.assertIn('button.textContent = `${label} (${matchingCount})`;', script)
+        self.assertNotIn('button.textContent = `${label} / ${matchingCount}`;', script)
 
 
     def test_product_detail_mobile_contract_is_explicit(self):
