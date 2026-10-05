@@ -37,6 +37,9 @@ Regras:
 - `GET|POST /admin/categorias/nova` — criação de categoria;
 - `GET|POST /admin/categorias/<id>` — edição de categoria;
 - `POST /admin/categorias/<id>/status` — ativação/desativação de categoria;
+- `GET /admin/contatos` — listagem administrativa de solicitações;
+- `GET /admin/contatos/<id>` — ficha interna do contato;
+- `POST /admin/contatos/<id>/status` — atualização do status de atendimento;
 - `POST /admin/logout` — encerra a sessão.
 
 ## Produtos
@@ -112,5 +115,65 @@ Disponível:
 Fora do escopo desta etapa:
 - delete físico;
 - limpeza automática de arquivos de imagem órfãos;
-- gerenciamento administrativo de contatos;
+- edição destrutiva do conteúdo original de uma solicitação;
 - múltiplos usuários administrativos ou permissões por papel.
+
+
+## Contatos
+
+O módulo Contatos opera diretamente a tabela existente `main_bd.contatos`.
+
+O painel administrativo pode ler:
+- protocolo;
+- nome;
+- empresa;
+- e-mail;
+- telefone;
+- cidade;
+- tipo de serviço;
+- quantidade informada;
+- preferência de contato;
+- mensagem;
+- consentimento;
+- origem;
+- status;
+- timestamps.
+
+Esses campos permanecem internos. A existência do módulo administrativo não altera a regra pública que esconde banco, tabela, origem e status técnico do visitante.
+
+### Workflow
+
+Estados aceitos:
+- `novo`;
+- `em_atendimento`;
+- `convertido`;
+- `encerrado`;
+- `spam`.
+
+O admin pode mover uma solicitação entre esses estados. A atualização:
+- exige sessão autenticada;
+- exige CSRF;
+- usa query parametrizada;
+- usa transação;
+- não exclui o registro;
+- preserva todos os dados originalmente recebidos.
+
+### Interface
+
+A listagem administrativa oferece:
+- busca por nome, protocolo, empresa, e-mail, telefone e cidade;
+- filtro por status;
+- filtro por serviço;
+- contadores por etapa do workflow.
+
+A ficha interna oferece:
+- dados do cliente;
+- dados da solicitação;
+- mensagem integral;
+- consentimento;
+- origem;
+- timestamps;
+- atualização de status;
+- atalhos para e-mail e telefone.
+
+O dashboard mostra também a quantidade de contatos novos e em atendimento.
