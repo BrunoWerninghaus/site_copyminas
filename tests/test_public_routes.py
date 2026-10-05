@@ -90,6 +90,12 @@ class PublicRoutesTestCase(unittest.TestCase):
             response.data.count("Consultar esta área".encode("utf-8")),
             5,
         )
+        self.assertIn(b"INDICE / ATENDIMENTO".replace(b"INDICE", "ÍNDICE".encode("utf-8")), response.data)
+        self.assertIn("Onde podemos ajudar.".encode("utf-8"), response.data)
+        self.assertIn("Não sabe qual solução se encaixa?".encode("utf-8"), response.data)
+        for code in ("01", "02", "03", "04", "05"):
+            self.assertIn(f'id="solucao-{code}"'.encode("utf-8"), response.data)
+            self.assertIn(f'href="#solucao-{code}"'.encode("utf-8"), response.data)
 
     def test_products(self):
         self.assert_page("/produtos", "Catálogo Copy Minas")
