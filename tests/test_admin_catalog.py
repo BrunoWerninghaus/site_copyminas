@@ -9,6 +9,7 @@ from src.copyminas.admin_catalog import (
     set_product_active,
     update_category,
     update_product,
+    update_product_image_slot,
 )
 
 
@@ -144,6 +145,32 @@ class AdminCatalogStoreTestCase(unittest.TestCase):
         connection.rollback.assert_called_once()
         connection.commit.assert_not_called()
         connection.close.assert_called_once()
+
+    def test_update_product_image_slot_updates_only_requested_column(self):
+        connection, cursor = self._connection()
+        cursor.rowcount = 1
+
+        with self.app.app_context(), patch(
+            "src.copyminas.admin_catalog.open_database",
+            return_value=connection,
+        ):
+            update_product_image_slot(
+                21,
+                3,
+                "images/products/edited/product-21-slot-3.png",
+            )
+
+        sql, params = cursor.execute.call_args.args
+        self.assertIn("UPDATE produtos SET imagem3 = %s", sql)
+        self.assertNotIn("imagem1 =", sql)
+        self.assertNotIn("imagem2 =", sql)
+        self.assertNotIn("imagem4 =", sql)
+        self.assertNotIn("imagem5 =", sql)
+        self.assertEqual(
+            params,
+            ("images/products/edited/product-21-slot-3.png", 21),
+        )
+        connection.commit.assert_called_once()
 
 
 if __name__ == "__main__":
