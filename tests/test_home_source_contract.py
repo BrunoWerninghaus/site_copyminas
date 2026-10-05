@@ -95,7 +95,7 @@ class HomeSourceContractTestCase(unittest.TestCase):
             r"\.location-copy\s*\{[^}]*container-type:\s*inline-size",
         )
 
-    def test_home_sections_have_document_register_labels(self):
+    def test_home_keeps_internal_register_metadata_without_showing_it(self):
         template = (ROOT / "src/copyminas/templates/public/home.html").read_text(encoding="utf-8")
         source = HOME_CSS.read_text(encoding="utf-8")
 
@@ -108,15 +108,14 @@ class HomeSourceContractTestCase(unittest.TestCase):
         ):
             self.assertIn(marker, template)
 
-        self.assertIn("[data-section]::after", source)
-        self.assertIn(".product-strip::before", source)
-        self.assertIn(".location-copy::before", source)
-
-    def test_home_refinement_preserves_editorial_technical_language(self):
-        source = HOME_CSS.read_text(encoding="utf-8")
-
-        self.assertIn('.paper-panel--hero::before', source)
-        self.assertIn('content: "GEO / 03";', source)
+        self.assertRegex(
+            source,
+            r"\.page-home \[data-section\]::after,[\s\S]{0,420}?display:\s*none",
+        )
+        self.assertIn(".page-home .paper-panel::after", source)
+        self.assertIn(".page-home .product-strip::before", source)
+        self.assertIn(".page-home .location-copy::before", source)
+        self.assertIn(".page-home .globe-card::before", source)
 
     def test_service_matrix_belongs_to_solutions_not_home(self):
         home = (ROOT / "src/copyminas/templates/public/home.html").read_text(encoding="utf-8")
@@ -124,7 +123,7 @@ class HomeSourceContractTestCase(unittest.TestCase):
 
         self.assertNotIn("ATENDIMENTO / MATRIZ", home)
         self.assertNotIn("service-matrix", home)
-        self.assertIn("MODALIDADES / VISÃO GERAL", solutions)
+        self.assertIn("Formas de atendimento", solutions)
         self.assertIn(">Impressoras<", solutions)
         self.assertIn(">Computadores<", solutions)
         self.assertIn(">iPhones<", solutions)
