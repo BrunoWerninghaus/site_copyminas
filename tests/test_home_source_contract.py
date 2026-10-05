@@ -116,23 +116,21 @@ class HomeSourceContractTestCase(unittest.TestCase):
         source = HOME_CSS.read_text(encoding="utf-8")
 
         self.assertIn('.paper-panel--hero::before', source)
-        self.assertIn('content: "SERVIÇOS / 03";', source)
         self.assertIn('content: "GEO / 03";', source)
-        self.assertRegex(
-            source,
-            r"\.service-matrix\s*\{[^}]*border-left:\s*3px solid var\(--red\)",
-        )
 
-    def test_home_service_matrix_matches_current_offering(self):
-        template = (ROOT / "src/copyminas/templates/public/home.html").read_text(encoding="utf-8")
+    def test_service_matrix_belongs_to_solutions_not_home(self):
+        home = (ROOT / "src/copyminas/templates/public/home.html").read_text(encoding="utf-8")
+        solutions = (ROOT / "src/copyminas/templates/public/solutions.html").read_text(encoding="utf-8")
 
-        self.assertIn("ATENDIMENTO / MATRIZ", template)
-        self.assertIn(">Impressoras<", template)
-        self.assertIn(">Computadores<", template)
-        self.assertIn(">iPhones<", template)
-        self.assertEqual(template.count('aria-label="Aluguel não disponível"'), 1)
-        self.assertEqual(template.count('aria-label="Venda disponível"'), 3)
-        self.assertEqual(template.count('aria-label="Manutenção disponível"'), 3)
+        self.assertNotIn("ATENDIMENTO / MATRIZ", home)
+        self.assertNotIn("service-matrix", home)
+        self.assertIn("MODALIDADES / VISÃO GERAL", solutions)
+        self.assertIn(">Impressoras<", solutions)
+        self.assertIn(">Computadores<", solutions)
+        self.assertIn(">iPhones<", solutions)
+        self.assertEqual(solutions.count('aria-label="Aluguel não disponível"'), 1)
+        self.assertEqual(solutions.count('aria-label="Venda disponível"'), 3)
+        self.assertEqual(solutions.count('aria-label="Manutenção disponível"'), 3)
 
     def test_catalog_hidden_state_overrides_card_display(self):
         source = (ROOT / "src/copyminas/static/css/paper.css").read_text(encoding="utf-8")
