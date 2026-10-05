@@ -1,19 +1,165 @@
-<header class="admin-header">
-    <a class="admin-header__brand" href="{{ url_for('admin.dashboard') }}" aria-label="Painel administrativo Copy Minas">
-        <img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas">
-        <span>ADMIN</span>
-    </a>
+{% if admin_page == "dashboard" %}
+    {% set admin_page_label = "Visão geral" %}
+{% elif admin_page == "products" %}
+    {% set admin_page_label = "Produtos" %}
+{% elif admin_page == "categories" %}
+    {% set admin_page_label = "Categorias" %}
+{% elif admin_page == "contacts" %}
+    {% set admin_page_label = "Contatos" %}
+{% else %}
+    {% set admin_page_label = "Administração" %}
+{% endif %}
 
-    <nav class="admin-nav" aria-label="Navegação administrativa">
-        <a href="{{ url_for('admin.dashboard') }}" {% if admin_page == "dashboard" %}aria-current="page"{% endif %}>Painel</a>
-        <a href="{{ url_for('admin.products') }}" {% if admin_page == "products" %}aria-current="page"{% endif %}>Produtos</a>
-        <a href="{{ url_for('admin.categories') }}" {% if admin_page == "categories" %}aria-current="page"{% endif %}>Categorias</a>
-        <a href="{{ url_for('admin.contacts') }}" {% if admin_page == "contacts" %}aria-current="page"{% endif %}>Contatos</a>
-        <a href="{{ url_for('public.home') }}" target="_blank" rel="noopener noreferrer">Site ↗</a>
+<aside class="admin-sidebar" data-admin-sidebar aria-label="Navegação administrativa">
+    <div class="admin-sidebar__top">
+        <a class="admin-sidebar__brand" href="{{ url_for('admin.dashboard') }}" aria-label="Copy Minas Admin — Visão geral">
+            <img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas">
+            <span>ADMIN / SITE 3</span>
+        </a>
+
+        <button
+            class="admin-sidebar__collapse"
+            type="button"
+            data-admin-sidebar-toggle
+            aria-label="Recolher navegação"
+            aria-expanded="true"
+        >
+            <span aria-hidden="true">‹</span>
+        </button>
+    </div>
+
+    <nav class="admin-sidebar__nav">
+        <div class="admin-sidebar__group">
+            <span class="admin-sidebar__group-label">Operação</span>
+
+            <a href="{{ url_for('admin.dashboard') }}" {% if admin_page == "dashboard" %}aria-current="page"{% endif %}>
+                <span class="admin-sidebar__symbol" aria-hidden="true">01</span>
+                <span class="admin-sidebar__label">Visão geral</span>
+            </a>
+
+            <a href="{{ url_for('admin.contacts') }}" {% if admin_page == "contacts" %}aria-current="page"{% endif %}>
+                <span class="admin-sidebar__symbol" aria-hidden="true">02</span>
+                <span class="admin-sidebar__label">Contatos</span>
+            </a>
+        </div>
+
+        <div class="admin-sidebar__group">
+            <span class="admin-sidebar__group-label">Catálogo</span>
+
+            <a href="{{ url_for('admin.products') }}" {% if admin_page == "products" %}aria-current="page"{% endif %}>
+                <span class="admin-sidebar__symbol" aria-hidden="true">03</span>
+                <span class="admin-sidebar__label">Produtos</span>
+            </a>
+
+            <a href="{{ url_for('admin.categories') }}" {% if admin_page == "categories" %}aria-current="page"{% endif %}>
+                <span class="admin-sidebar__symbol" aria-hidden="true">04</span>
+                <span class="admin-sidebar__label">Categorias</span>
+            </a>
+        </div>
+
+        <div class="admin-sidebar__group">
+            <span class="admin-sidebar__group-label">Externo</span>
+
+            <a href="{{ url_for('public.home') }}" target="_blank" rel="noopener noreferrer">
+                <span class="admin-sidebar__symbol" aria-hidden="true">↗</span>
+                <span class="admin-sidebar__label">Abrir Site 3</span>
+            </a>
+        </div>
     </nav>
 
-    <form method="post" action="{{ url_for('admin.logout') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-        <button class="admin-header__logout" type="submit">Sair</button>
-    </form>
+    <div class="admin-sidebar__footer">
+        <span class="admin-sidebar__environment">
+            <strong>Copy Minas</strong>
+            <small>Administração interna</small>
+        </span>
+
+        <form method="post" action="{{ url_for('admin.logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="admin-sidebar__logout">
+                <span aria-hidden="true">×</span>
+                <span class="admin-sidebar__label">Sair</span>
+            </button>
+        </form>
+    </div>
+</aside>
+
+<button
+    class="admin-sidebar-backdrop"
+    type="button"
+    data-admin-sidebar-backdrop
+    aria-label="Fechar navegação"
+    hidden
+></button>
+
+<header class="admin-shell-topbar">
+    <button
+        class="admin-shell-topbar__menu"
+        type="button"
+        data-admin-mobile-menu
+        aria-label="Abrir navegação"
+        aria-expanded="false"
+    >
+        <span aria-hidden="true">☰</span>
+    </button>
+
+    <div class="admin-shell-breadcrumb" aria-label="Localização atual">
+        <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+        <span>/</span>
+        <strong>{{ admin_page_label }}</strong>
+    </div>
+
+    <button
+        type="button"
+        class="admin-shell-search-trigger"
+        data-admin-search-open
+        aria-haspopup="dialog"
+    >
+        <span>Buscar em tudo</span>
+        <kbd>Ctrl K</kbd>
+    </button>
 </header>
+
+<section
+    class="admin-global-search"
+    data-admin-search-dialog
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="admin-global-search-title"
+    hidden
+>
+    <button
+        class="admin-global-search__backdrop"
+        type="button"
+        data-admin-search-close
+        aria-label="Fechar busca"
+    ></button>
+
+    <div class="admin-global-search__panel">
+        <header>
+            <div>
+                <span>BUSCA / GLOBAL</span>
+                <h2 id="admin-global-search-title">Encontrar no admin</h2>
+            </div>
+            <button type="button" data-admin-search-close aria-label="Fechar busca">ESC</button>
+        </header>
+
+        <label class="admin-global-search__field">
+            <span class="sr-only">Buscar produtos, categorias e contatos</span>
+            <input
+                type="search"
+                autocomplete="off"
+                placeholder="Produto, contato, protocolo, telefone, categoria..."
+                data-admin-global-search
+            >
+            <kbd>Ctrl K</kbd>
+        </label>
+
+        <div class="admin-global-search__status" data-admin-search-status aria-live="polite">
+            Digite para buscar em Produtos, Categorias e Contatos.
+        </div>
+
+        <div class="admin-global-search__results" data-admin-search-results></div>
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/admin-shell.js') }}" defer></script>
