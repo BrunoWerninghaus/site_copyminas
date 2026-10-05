@@ -208,7 +208,7 @@ class AdminProductsRouteTestCase(unittest.TestCase):
         response = self.client.get("/admin/produtos/21/imagem/1/editar")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Editor / imagem 1".encode("utf-8"), response.data)
+        self.assertIn("EDITOR / IMAGEM 1".encode("utf-8"), response.data)
         self.assertIn("Preparar para catálogo".encode("utf-8"), response.data)
         self.assertIn(b"data-editor-canvas", response.data)
         self.assertIn(b"admin-image-editor.js", response.data)
@@ -236,7 +236,7 @@ class AdminProductsRouteTestCase(unittest.TestCase):
             "imagem1": "images/products/current.png",
         }
 
-        page = self.client.get("/admin/produtos")
+        page = self.client.get("/admin/categorias/nova")
         token = self._csrf(page)
 
         response = self.client.post(
