@@ -176,5 +176,60 @@ class HomeSourceContractTestCase(unittest.TestCase):
         )
 
 
+    def test_home_mobile_contract_compacts_primary_sections(self):
+        source = HOME_CSS.read_text(encoding="utf-8")
+
+        self.assertIn("/* Home mobile contract */", source)
+        self.assertRegex(
+            source,
+            r"@media \(max-width: 720px\)[\s\S]*?\.page-home\s*\{[\s\S]*?--page-x:\s*1rem",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-home \.action-row\s*\{[\s\S]*?grid-template-columns:\s*1fr",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-home \.home-product\s*\{[\s\S]*?grid-template-columns:\s*clamp\(112px, 34vw, 150px\)",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-home \.globe-card\s*\{[\s\S]*?aspect-ratio:\s*1\s*/\s*1",
+        )
+
+    def test_home_mobile_globe_dialog_keeps_controls_reachable(self):
+        source = HOME_CSS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            source,
+            r"\.page-home \.globe-dialog__close\s*\{[\s\S]*?width:\s*44px[\s\S]*?height:\s*44px",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-home \.globe-legend\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-home \.globe-dialog__footer \.button\s*\{[\s\S]*?width:\s*100%",
+        )
+
+    def test_shared_mobile_shell_has_touch_targets_and_scrollable_menu(self):
+        base = BASE_CSS.read_text(encoding="utf-8")
+
+        self.assertIn("/* Shared mobile public shell */", base)
+        self.assertRegex(
+            base,
+            r"\.public-header__menu\s*\{[\s\S]*?min-height:\s*44px",
+        )
+        self.assertRegex(
+            base,
+            r"\.public-header\.is-open \.public-nav\s*\{[\s\S]*?max-height:\s*calc\(100dvh - 64px\)[\s\S]*?overflow-y:\s*auto",
+        )
+        self.assertRegex(
+            base,
+            r"@media \(max-width: 520px\)[\s\S]*?\.public-footer__nav\s*\{[\s\S]*?display:\s*grid[\s\S]*?grid-template-columns:\s*1fr 1fr",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
