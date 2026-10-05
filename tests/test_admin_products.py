@@ -243,19 +243,20 @@ class AdminProductsRouteTestCase(unittest.TestCase):
             "/admin/produtos/21/imagem/1/salvar",
             data={
                 "csrf_token": token,
-                "image_data": "data:image/png;base64,AAAA",
+                "image_file": (io.BytesIO(b"fake-png"), "produto-editado-1200x1200.png"),
             },
+            content_type="multipart/form-data",
         )
 
         self.assertEqual(response.status_code, 200)
         payload = response.get_json()
         self.assertTrue(payload["ok"])
-        save_edited.assert_called_once_with(
-            "data:image/png;base64,AAAA",
-            "images/products/current.png",
-            21,
-            1,
-        )
+        self.assertEqual(save_edited.call_count, 1)
+        upload_arg, source_arg, product_arg, slot_arg = save_edited.call_args.args
+        self.assertEqual(upload_arg.filename, "produto-editado-1200x1200.png")
+        self.assertEqual(source_arg, "images/products/current.png")
+        self.assertEqual(product_arg, 21)
+        self.assertEqual(slot_arg, 1)
         update_slot.assert_called_once_with(
             21,
             1,
@@ -283,8 +284,9 @@ class AdminProductsRouteTestCase(unittest.TestCase):
             "/admin/produtos/21/imagem/1/salvar",
             data={
                 "csrf_token": "invalid",
-                "image_data": "data:image/png;base64,AAAA",
+                "image_file": (io.BytesIO(b"fake-png"), "produto-editado-1200x1200.png"),
             },
+            content_type="multipart/form-data",
         )
 
         self.assertEqual(response.status_code, 400)
