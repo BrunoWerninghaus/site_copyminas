@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Contatos — Copy Minas Admin{% endblock %}
+{% block meta_description %}Gestão interna de contatos da Copy Minas.{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block page_styles %}
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+{% set admin_page = "contacts" %}
+{% include "admin/_header.html" %}
+
+<main id="main-content" class="admin-stage">
+    {% with messages = get_flashed_messages(category_filter=["admin-success"]) %}
+        {% if messages %}
+        <div class="admin-alert admin-alert--success" role="status">
+            {% for message in messages %}<strong>{{ message }}</strong>{% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <section class="admin-page-heading">
+        <div>
+            <span>ATENDIMENTO / GESTÃO</span>
+            <h1>Contatos</h1>
+            <p>Solicitações registradas em <code>main_bd.contatos</code>. O painel acompanha o atendimento sem excluir registros.</p>
+        </div>
+    </section>
+
+    <section class="admin-contact-summary" aria-label="Resumo dos contatos">
+        <div><span>Total</span><strong>{{ summary.total }}</strong></div>
+        <div><span>Novos</span><strong>{{ summary.novo }}</strong></div>
+        <div><span>Em atendimento</span><strong>{{ summary.em_atendimento }}</strong></div>
+        <div><span>Convertidos</span><strong>{{ summary.convertido }}</strong></div>
+        <div><span>Encerrados</span><strong>{{ summary.encerrado }}</strong></div>
+        <div><span>Spam</span><strong>{{ summary.spam }}</strong></div>
+    </section>
+
+    <section class="admin-toolbar admin-contact-toolbar" aria-label="Filtros dos contatos">
+        <label>
+            <span>Localizar contato</span>
+            <input type="search" placeholder="Nome, protocolo, cidade, e-mail..." autocomplete="off" data-admin-contact-search>
+        </label>
+
+        <label>
+            <span>Status</span>
+            <select data-admin-contact-status>
+                <option value="all">Todos</option>
+                {% for key, label in status_labels.items() %}
+                <option value="{{ key }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>
+            <span>Serviço</span>
+            <select data-admin-contact-service>
+                <option value="all">Todos</option>
+                {% for key, label in service_labels.items() %}
+                <option value="{{ key }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <span class="admin-toolbar__count" data-admin-contact-count>{{ contacts|length }} registro{% if contacts|length != 1 %}s{% endif %}</span>
+    </section>
+
+    <section class="admin-contact-list" aria-label="Solicitações recebidas">
+        <div class="admin-contact-row admin-contact-row--head" aria-hidden="true">
+            <span>Quando</span>
+            <span>Contato</span>
+            <span>Serviço</span>
+            <span>Cidade</span>
+            <span>Status</span>
+            <span>Ação</span>
+        </div>
+
+        {% for contact in contacts %}
+        <article
+            class="admin-contact-row"
+            data-admin-contact
+            data-status="{{ contact.status }}"
+            data-service="{{ contact.service_type }}"
+            data-search="{{ contact.protocol }} {{ contact.name }} {{ contact.company or '' }} {{ contact.email }} {{ contact.phone }} {{ contact.city }}"
+        >
+            <div class="admin-contact-date">
+                <strong>{{ contact.created_at.strftime("%d/%m/%Y") if contact.created_at else "—" }}</strong>
+                <span>{{ contact.created_at.strftime("%H:%M") if contact.created_at else "" }}</span>
+            </div>
+
+            <div class="admin-contact-name">
+                <strong>{{ contact.name }}</strong>
+                <span>{{ contact.protocol }}</span>
+                {% if contact.company %}<small>{{ contact.company }}</small>{% endif %}
+            </div>
+
+            <span>{{ service_labels.get(contact.service_type, contact.service_type) }}</span>
+            <span>{{ contact.city }}</span>
+
+            <span>
+                <span class="admin-status admin-contact-status--{{ contact.status }}">
+                    {{ status_labels.get(contact.status, contact.status) }}
+                </span>
+            </span>
+
+            <div class="admin-product-actions">
+                <a href="{{ url_for('admin.contact_detail', contact_id=contact.id) }}">Abrir ficha</a>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+
+    <div class="admin-empty" data-admin-contact-empty hidden>
+        <strong>Nenhum contato encontrado.</strong>
+        <span>Altere a busca ou os filtros.</span>
+    </div>
+</main>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/admin-contacts.js') }}" defer></script>
+{% endblock %}
