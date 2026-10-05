@@ -177,3 +177,56 @@ A ficha interna oferece:
 - atalhos para e-mail e telefone.
 
 O dashboard mostra também a quantidade de contatos novos e em atendimento.
+
+
+## Dashboard operacional
+
+A rota `GET /admin` apresenta uma visão operacional baseada exclusivamente em dados já existentes.
+
+Ela não cria trilha de auditoria e não inventa eventos.
+
+### Indicadores
+
+O painel mostra:
+- produtos publicados;
+- produtos inativos;
+- categorias;
+- contatos novos;
+- contatos em atendimento;
+- contatos convertidos;
+- disponibilidade das fontes de catálogo e contatos.
+
+### Alertas
+
+Os checks atuais podem sinalizar:
+- registros de produto com nome equivalente;
+- produtos publicados sem imagem válida no Site 3;
+- categorias inativas que ainda possuem produtos marcados como ativos;
+- contatos ainda com status `novo`.
+
+Esses alertas são informativos. Nenhuma correção é aplicada automaticamente.
+
+### Atividade recente
+
+`Produtos recentes` é ordenado por `updated_at` e, na ausência dele, `created_at`.
+
+`Últimos contatos` é ordenado por `created_at`.
+
+Essas listas são uma visualização temporal dos registros atuais e não substituem uma trilha de auditoria.
+
+### Ações rápidas
+
+O painel oferece atalhos para:
+- novo produto;
+- nova categoria;
+- contatos;
+- catálogo público.
+
+### Degradação parcial
+
+Catálogo e contatos são consultados de forma independente.
+
+Se uma dessas fontes estiver indisponível:
+- a outra parte do painel continua funcional;
+- indicadores indisponíveis aparecem sem valor;
+- o painel informa explicitamente qual fonte está offline.
