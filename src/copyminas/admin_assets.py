@@ -1,7 +1,13 @@
+import base64
+import binascii
+import io
+import json
+import shutil
 from pathlib import Path
 from uuid import uuid4
 
 from flask import current_app
+from PIL import Image, UnidentifiedImageError
 from werkzeug.utils import secure_filename
 
 
@@ -11,6 +17,13 @@ class AdminAssetError(RuntimeError):
 
 _ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 _ALLOWED_MIME_TYPES = {"image/png", "image/jpeg", "image/webp"}
+_EDITOR_SIZE = (1200, 1200)
+_EDITOR_MAX_RAW_BYTES = 20 * 1024 * 1024
+_EDITOR_MAX_DIMENSION = 4096
+
+
+def _static_root():
+    return Path(current_app.static_folder).resolve()
 
 
 def normalize_static_path(value):
@@ -21,7 +34,7 @@ def normalize_static_path(value):
     if not raw:
         return ""
 
-    static_root = Path(current_app.static_folder).resolve()
+    static_root = _static_root()
     candidate = (static_root / raw).resolve()
 
     try:
@@ -41,7 +54,7 @@ def static_asset_exists(value):
     if not relative:
         return False
 
-    return (Path(current_app.static_folder).resolve() / relative).is_file()
+    return (_static_root() / relative).is_file()
 
 
 def save_product_image(file_storage):
@@ -66,7 +79,7 @@ def save_product_image(file_storage):
     filename = f"{stem}-{uuid4().hex[:12]}{extension}"
 
     relative_dir = Path("images") / "products"
-    target_dir = Path(current_app.static_folder) / relative_dir
+    target_dir = _static_root() / relative_dir
     target_dir.mkdir(parents=True, exist_ok=True)
 
     target = target_dir / filename
@@ -79,8 +92,165 @@ def save_product_image(file_storage):
     return (relative_dir / filename).as_posix()
 
 
+def _editor_metadata_path(relative_path):
+    relative = normalize_static_path(relative_path)
+    target = _static_root() / relative
+    return target.with_suffix(target.suffix + ".json")
+
+
+def resolve_editor_source(value):
+    relative = normalize_static_path(value)
+    if not relative:
+        raise AdminAssetError("O slot não possui uma imagem para editar.")
+
+    target = _static_root() / relative
+    if not target.is_file():
+        raise AdminAssetError("A imagem deste slot não existe no armazenamento local.")
+
+    edited_root = (_static_root() / "images" / "products" / "edited").resolve()
+    try:
+        target.resolve().relative_to(edited_root)
+    except ValueError:
+        return relative
+
+    metadata_path = _editor_metadata_path(relative)
+    if not metadata_path.is_file():
+        return relative
+
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        original = normalize_static_path(metadata.get("original", ""))
+    except (OSError, ValueError, TypeError, json.JSONDecodeError, AdminAssetError):
+        return relative
+
+    if original and (_static_root() / original).is_file():
+        return original
+
+    return relative
+
+
+def _ensure_original_copy(source_path, product_id, slot):
+    source_relative = resolve_editor_source(source_path)
+    originals_root = (_static_root() / "images" / "products" / "originals").resolve()
+    source = (_static_root() / source_relative).resolve()
+
+    try:
+        source.relative_to(originals_root)
+    except ValueError:
+        extension = source.suffix.lower()
+        if extension not in _ALLOWED_EXTENSIONS:
+            extension = ".png"
+
+        originals_root.mkdir(parents=True, exist_ok=True)
+        filename = (
+            f"product-{int(product_id)}-slot-{int(slot)}-"
+            f"{uuid4().hex[:12]}{extension}"
+        )
+        target = originals_root / filename
+        shutil.copy2(source, target)
+        return target.relative_to(_static_root()).as_posix()
+
+    return source_relative
+
+
+def _decode_editor_image(data_url):
+    raw = (data_url or "").strip()
+    marker = ";base64,"
+    if not raw.startswith("data:image/") or marker not in raw:
+        raise AdminAssetError("A edição enviada não contém uma imagem válida.")
+
+    encoded = raw.split(marker, 1)[1]
+    try:
+        payload = base64.b64decode(encoded, validate=True)
+    except (binascii.Error, ValueError) as exc:
+        raise AdminAssetError("A edição enviada está corrompida.") from exc
+
+    if not payload:
+        raise AdminAssetError("A edição enviada está vazia.")
+    if len(payload) > _EDITOR_MAX_RAW_BYTES:
+        raise AdminAssetError("A imagem editada excede o limite permitido.")
+
+    try:
+        with Image.open(io.BytesIO(payload)) as image:
+            image.load()
+            if image.width > _EDITOR_MAX_DIMENSION or image.height > _EDITOR_MAX_DIMENSION:
+                raise AdminAssetError("A imagem editada possui dimensões excessivas.")
+            if image.size != _EDITOR_SIZE:
+                raise AdminAssetError(
+                    "A imagem editada precisa ser exportada em 1200 × 1200 pixels."
+                )
+            return image.convert("RGBA")
+    except AdminAssetError:
+        raise
+    except (UnidentifiedImageError, OSError, ValueError) as exc:
+        raise AdminAssetError("A edição enviada não pôde ser validada como imagem.") from exc
+
+
+def save_edited_product_image(data_url, source_path, product_id, slot):
+    if int(slot) not in range(1, 6):
+        raise AdminAssetError("Slot de imagem inválido.")
+
+    original_relative = _ensure_original_copy(source_path, product_id, slot)
+    image = _decode_editor_image(data_url)
+
+    relative_dir = Path("images") / "products" / "edited"
+    target_dir = _static_root() / relative_dir
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    filename = (
+        f"product-{int(product_id)}-slot-{int(slot)}-"
+        f"{uuid4().hex[:12]}.png"
+    )
+    target = target_dir / filename
+
+    try:
+        image.save(target, format="PNG", optimize=True)
+    except OSError as exc:
+        target.unlink(missing_ok=True)
+        raise AdminAssetError("Não foi possível salvar a versão editada.") from exc
+
+    relative = (relative_dir / filename).as_posix()
+    metadata = {
+        "original": original_relative,
+        "product_id": int(product_id),
+        "slot": int(slot),
+    }
+
+    try:
+        _editor_metadata_path(relative).write_text(
+            json.dumps(metadata, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+    except OSError:
+        target.unlink(missing_ok=True)
+        raise AdminAssetError("Não foi possível registrar a origem da imagem editada.")
+
+    return relative, original_relative
+
+
+def cleanup_editor_output(relative_path):
+    if not relative_path:
+        return
+
+    try:
+        relative = normalize_static_path(relative_path)
+    except AdminAssetError:
+        return
+
+    target = (_static_root() / relative).resolve()
+    edited_root = (_static_root() / "images" / "products" / "edited").resolve()
+
+    try:
+        target.relative_to(edited_root)
+    except ValueError:
+        return
+
+    target.unlink(missing_ok=True)
+    _editor_metadata_path(relative).unlink(missing_ok=True)
+
+
 def cleanup_new_uploads(relative_paths):
-    static_root = Path(current_app.static_folder).resolve()
+    static_root = _static_root()
 
     for value in relative_paths:
         try:
