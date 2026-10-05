@@ -2526,3 +2526,92 @@
         grid-template-columns: 1fr;
     }
 }
+
+
+/* Solutions owns service modality information */
+.page-solutions .solutions-matrix {
+    padding: clamp(1.5rem, 3.5vw, 3rem);
+    border: 1px solid var(--line-strong);
+    background: #0d1116;
+}
+
+.page-solutions .solutions-matrix > header {
+    display: grid;
+    grid-template-columns: minmax(0,.9fr) minmax(280px,1.1fr);
+    gap: clamp(2rem,5vw,5rem);
+    align-items: end;
+}
+
+.page-solutions .solutions-matrix > header span {
+    color: #78bfff;
+    font-size: .6rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.page-solutions .solutions-matrix > header h2 {
+    max-width: 13ch;
+    margin: .5rem 0 0;
+    font-size: clamp(1.8rem,4vw,3.5rem);
+    line-height: .98;
+    letter-spacing: -.04em;
+    text-transform: uppercase;
+}
+
+.page-solutions .solutions-matrix > header p {
+    margin: 0;
+    color: #9ca6ae;
+    line-height: 1.7;
+}
+
+.page-solutions .solutions-matrix__table {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+}
+
+.page-solutions .solutions-matrix__row {
+    display: grid;
+    grid-template-columns: minmax(140px,1.3fr) repeat(3,minmax(72px,.7fr));
+}
+
+.page-solutions .solutions-matrix__row > * {
+    display: grid;
+    min-height: 54px;
+    place-items: center;
+    padding: .7rem;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.page-solutions .solutions-matrix__row > :first-child {
+    place-items: center start;
+}
+
+.page-solutions .solutions-matrix__row--head > * {
+    color: #89949d;
+    font-size: .62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.page-solutions .solutions-matrix__row strong {
+    color: white;
+    font-size: .72rem;
+    text-transform: uppercase;
+}
+
+@media (max-width: 700px) {
+    .page-solutions .solutions-matrix > header {
+        grid-template-columns: 1fr;
+    }
+
+    .page-solutions .solutions-matrix {
+        overflow-x: auto;
+    }
+
+    .page-solutions .solutions-matrix__table {
+        min-width: 620px;
+    }
+}
