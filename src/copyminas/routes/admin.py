@@ -3,6 +3,7 @@ import re
 import secrets
 import time
 import unicodedata
+from datetime import datetime
 from functools import wraps
 
 from flask import (
@@ -370,6 +371,14 @@ def login():
     )
 
 
+def _record_datetime(record, *keys):
+    for key in keys:
+        value = record.get(key)
+        if isinstance(value, datetime):
+            return value
+    return datetime.min
+
+
 @admin_bp.get("")
 @login_required
 def dashboard():
@@ -377,33 +386,137 @@ def dashboard():
     contacts_available = True
     products = []
     categories = []
-    contacts = {
-        "total": 0,
-        "novos": 0,
-        "em_atendimento": 0,
-        "convertidos": 0,
-    }
+    contact_rows = []
 
     try:
-        products = get_public_products()
-        categories = get_public_categories(products)
-    except DatabaseUnavailable as exc:
+        products = _decorate_products(list_products())
+        categories = list_categories()
+    except (DatabaseUnavailable, AdminCatalogError, AdminAssetError) as exc:
         catalog_available = False
         current_app.logger.error("Admin catalog summary unavailable: %s", exc)
 
     try:
-        contacts = contact_summary()
+        contact_rows = list_contacts()
     except (DatabaseUnavailable, AdminContactError) as exc:
         contacts_available = False
         current_app.logger.error("Admin contact summary unavailable: %s", exc)
+
+    published_products = [
+        product
+        for product in products
+        if product.get("ativo") and product.get("categoria_ativa")
+    ]
+    inactive_products = [
+        product
+        for product in products
+        if not product.get("ativo")
+    ]
+
+    contact_counts = {
+        status: sum(1 for contact in contact_rows if contact.get("status") == status)
+        for status in CONTACT_STATUSES
+    }
+    contact_counts["total"] = len(contact_rows)
+
+    duplicate_records = [
+        product
+        for product in products
+        if product.get("duplicate_warning")
+    ]
+    published_without_image = [
+        product
+        for product in published_products
+        if not product.get("preview_image")
+    ]
+    inactive_categories_with_active_products = [
+        category
+        for category in categories
+        if not category.get("ativo")
+        and int(category.get("active_product_count") or 0) > 0
+    ]
+
+    alerts = []
+    if duplicate_records:
+        alerts.append(
+            {
+                "level": "warning",
+                "title": "Possíveis duplicidades",
+                "detail": (
+                    f"{len(duplicate_records)} registro(s) possuem nome equivalente "
+                    "a outro produto."
+                ),
+                "href": url_for("admin.products"),
+                "action": "Revisar produtos",
+            }
+        )
+
+    if published_without_image:
+        alerts.append(
+            {
+                "level": "warning",
+                "title": "Produtos publicados sem imagem",
+                "detail": (
+                    f"{len(published_without_image)} produto(s) publicado(s) não "
+                    "possuem uma imagem válida no Site 3."
+                ),
+                "href": url_for("admin.products"),
+                "action": "Revisar imagens",
+            }
+        )
+
+    if inactive_categories_with_active_products:
+        alerts.append(
+            {
+                "level": "warning",
+                "title": "Categoria inativa com produtos ativos",
+                "detail": (
+                    f"{len(inactive_categories_with_active_products)} categoria(s) "
+                    "inativa(s) ainda possuem produtos marcados como ativos."
+                ),
+                "href": url_for("admin.categories"),
+                "action": "Revisar categorias",
+            }
+        )
+
+    if contacts_available and contact_counts.get("novo", 0):
+        alerts.append(
+            {
+                "level": "info",
+                "title": "Novos contatos aguardando triagem",
+                "detail": (
+                    f"{contact_counts['novo']} solicitação(ões) ainda estão com "
+                    "status Novo."
+                ),
+                "href": url_for("admin.contacts"),
+                "action": "Abrir contatos",
+            }
+        )
+
+    recent_products = sorted(
+        products,
+        key=lambda product: _record_datetime(product, "updated_at", "created_at"),
+        reverse=True,
+    )[:5]
+    recent_contacts = sorted(
+        contact_rows,
+        key=lambda contact: _record_datetime(contact, "created_at", "updated_at"),
+        reverse=True,
+    )[:5]
 
     return render_template(
         "admin/dashboard.html",
         catalog_available=catalog_available,
         contacts_available=contacts_available,
-        product_count=len(products),
-        category_count=len(categories),
-        contact_summary=contacts,
+        product_total=len(products),
+        product_published=len(published_products),
+        product_inactive=len(inactive_products),
+        category_total=len(categories),
+        contact_counts=contact_counts,
+        recent_products=recent_products,
+        recent_contacts=recent_contacts,
+        alerts=alerts,
+        status_labels=CONTACT_STATUS_LABELS,
+        service_labels=CONTACT_SERVICE_LABELS,
         csrf_token=_csrf_token(),
     )
 
