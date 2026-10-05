@@ -1021,3 +1021,22 @@ html.globe-dialog-open body { overflow: hidden; }
         gap: .35rem;
     }
 }
+
+
+/* Home is an editorial entry point, not a duplicate data page */
+.home-hero {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+}
+
+.home-hero .paper-panel--hero {
+    width: min(100%, 1080px);
+}
+
+.company-callout {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.company-callout .paper-panel {
+    width: min(100%, 920px);
+}
