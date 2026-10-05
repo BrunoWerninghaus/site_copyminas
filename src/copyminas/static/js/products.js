@@ -56,7 +56,7 @@
                 return category === "all" || item.dataset.category === category;
             }).length;
 
-            button.textContent = `${label} / ${matchingCount}`;
+            button.textContent = `${label} (${matchingCount})`;
         });
 
         sections.forEach((section) => {
