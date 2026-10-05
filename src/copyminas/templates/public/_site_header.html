@@ -1,0 +1,25 @@
+<header class="public-header" data-public-header>
+    <a class="public-header__brand" href="{{ url_for('public.home') }}" aria-label="Copy Minas — Home">
+        <img src="{{ url_for('static', filename='images/brand/copy-minas-logo.webp') }}" alt="Copy Minas">
+    </a>
+
+    <button
+        class="public-header__menu"
+        type="button"
+        data-public-menu-toggle
+        aria-expanded="false"
+        aria-controls="public-main-nav"
+        aria-label="Abrir menu"
+    >
+        <span aria-hidden="true">MENU</span>
+    </button>
+
+    <nav class="public-nav" id="public-main-nav" data-public-nav aria-label="Navegação principal">
+        <a href="{{ url_for('public.home') }}" {% if active_page == "home" %}aria-current="page"{% endif %}>Home</a>
+        <a href="{{ url_for('public.solutions') }}" {% if active_page == "solutions" %}aria-current="page"{% endif %}>Soluções</a>
+        <a href="{{ url_for('public.products') }}" {% if active_page == "products" %}aria-current="page"{% endif %}>Produtos</a>
+        <a href="{{ url_for('public.company') }}" {% if active_page == "company" %}aria-current="page"{% endif %}>Empresa</a>
+        <a class="public-nav__contact" href="{{ url_for('public.contact') }}" {% if active_page == "contact" %}aria-current="page"{% endif %}>Falar com a Copy Minas</a>
+    </nav>
+</header>
+<script src="{{ url_for('static', filename='js/public-nav.js') }}" defer></script>
