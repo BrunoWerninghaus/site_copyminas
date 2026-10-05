@@ -340,6 +340,40 @@ def update_product(product_id, data):
         connection.close()
 
 
+
+def update_product_image_slot(product_id, slot, relative_path):
+    try:
+        slot = int(slot)
+    except (TypeError, ValueError) as exc:
+        raise AdminCatalogError("Slot de imagem inválido.") from exc
+
+    if slot not in range(1, 6):
+        raise AdminCatalogError("Slot de imagem inválido.")
+
+    column = f"imagem{slot}"
+    connection = open_database()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"UPDATE produtos SET {column} = %s WHERE id = %s",
+                (relative_path, product_id),
+            )
+            if cursor.rowcount == 0:
+                cursor.execute(
+                    "SELECT id FROM produtos WHERE id = %s LIMIT 1",
+                    (product_id,),
+                )
+                if cursor.fetchone() is None:
+                    raise AdminCatalogError("Produto não encontrado.")
+        connection.commit()
+    except Exception as exc:
+        connection.rollback()
+        if isinstance(exc, AdminCatalogError):
+            raise
+        raise _database_error(exc, "product image update") from exc
+    finally:
+        connection.close()
+
 def set_product_active(product_id, active):
     connection = open_database()
     try:
