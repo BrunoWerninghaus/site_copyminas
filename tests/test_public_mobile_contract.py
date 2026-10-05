@@ -169,5 +169,52 @@ class PublicMobileContractTestCase(unittest.TestCase):
         self.assertNotIn("overflow-x:clip", mobile)
 
 
+    def test_company_mobile_contract_is_explicit(self):
+        source = PAPER_CSS.read_text(encoding="utf-8")
+
+        self.assertIn("/* Company mobile contract */", source)
+        self.assertRegex(
+            source,
+            r"@media \(max-width: 720px\)[\s\S]*?\.page-company\s*\{[\s\S]*?--page-x:\s*1rem",
+        )
+
+    def test_company_mobile_register_is_compact_and_readable(self):
+        source = PAPER_CSS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            source,
+            r"\.page-company \.company-register__item\s*\{[\s\S]*?grid-template-columns:\s*minmax\(104px, \.42fr\) minmax\(0, 1\.58fr\)",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-company \.company-register__item\s*\{[\s\S]*?min-height:\s*0",
+        )
+        self.assertRegex(
+            source,
+            r"@media \(max-width: 380px\)[\s\S]*?\.page-company \.company-register__item\s*\{[\s\S]*?grid-template-columns:\s*1fr",
+        )
+
+    def test_company_mobile_directory_uses_single_column_touch_rows(self):
+        source = PAPER_CSS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            source,
+            r"\.page-company \.company-directory__links\s*\{[\s\S]*?grid-template-columns:\s*1fr",
+        )
+        self.assertRegex(
+            source,
+            r"\.page-company \.company-directory__links a\s*\{[\s\S]*?min-height:\s*74px",
+        )
+
+    def test_company_mobile_does_not_mask_overflow(self):
+        source = PAPER_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
+
+        mobile_start = source.index("/*companymobilecontract*/")
+        mobile = source[mobile_start:]
+
+        self.assertNotIn("overflow-x:hidden", mobile)
+        self.assertNotIn("overflow-x:clip", mobile)
+
+
 if __name__ == "__main__":
     unittest.main()
