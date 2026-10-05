@@ -29,6 +29,11 @@ Regras:
 
 - `GET|POST /admin/login` — autenticação;
 - `GET /admin` — painel;
+- `GET|POST /admin/home` — configuração da Home pública;
+- `POST /admin/home/inicializar` — inicialização explícita do módulo Home no main_bd;
+- `GET|POST /admin/home/novidades/nova` — criação de novidade;
+- `GET|POST /admin/home/novidades/<id>` — edição de novidade;
+- `POST /admin/home/novidades/<id>/status` — publicação/desativação de novidade;
 - `GET /admin/produtos` — listagem administrativa;
 - `GET|POST /admin/produtos/novo` — criação;
 - `GET|POST /admin/produtos/<id>` — edição;
@@ -358,3 +363,72 @@ O salvamento:
 - nunca altera os outros quatro slots do produto.
 
 O editor não cria tabela nem coluna nova no banco.
+
+
+## Home Manager
+
+A Home pública possui um módulo editorial próprio dentro do mesmo `main_bd`.
+
+Tabelas:
+- `site_home_config` — configuração singleton da Home;
+- `site_home_news` — novidades e mensagens editoriais.
+
+A criação dessas tabelas é explícita e autenticada através de `POST /admin/home/inicializar`. A aplicação não altera schema durante um GET público.
+
+A migration equivalente está documentada em:
+- `migrations/20261005_home_manager.sql`.
+
+### Configuração administrável
+
+O admin pode controlar:
+- faixa de mensagem superior;
+- rótulo e texto da mensagem;
+- link opcional da mensagem;
+- kicker, título e resumo do hero;
+- dois CTAs do hero;
+- até seis produtos em destaque, com ordem explícita;
+- visibilidade da seção Soluções;
+- visibilidade da seção Empresa;
+- visibilidade da seção Localização + globo.
+
+Somente produtos ativos associados a categorias ativas podem ser escolhidos como destaque.
+
+Links editoriais aceitos:
+- caminhos internos iniciados por `/`;
+- `http://`;
+- `https://`;
+- `mailto:`;
+- `tel:`.
+
+Esquemas de URL executáveis como `javascript:` e `data:` são rejeitados.
+
+### Novidades
+
+Novidades possuem:
+- rótulo;
+- título;
+- conteúdo;
+- link opcional;
+- ordem;
+- status ativo/inativo;
+- timestamps.
+
+Não existe delete físico no fluxo administrativo. Uma novidade deixa de aparecer publicamente por `active = 0`.
+
+### Fallback público
+
+Enquanto o Home Manager ainda não estiver inicializado, ou se a configuração editorial estiver indisponível, a Home continua renderizando com:
+- headline e resumo canônicos já existentes;
+- CTAs para Soluções e Produtos;
+- três primeiros produtos públicos como destaques;
+- seções Soluções, Empresa e Localização ativas.
+
+Isso evita que a adoção do Home Manager torne a página pública dependente de uma migration já aplicada.
+
+### Entrada pública
+
+A rota `/` não usa mais a antiga tela de entrada com globo.
+
+`/` e `/home` renderizam a Home diretamente.
+
+O globo permanece disponível dentro da seção de Localização da Home e em seu diálogo de exploração.
