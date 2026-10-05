@@ -1,46 +1,135 @@
 {% extends "base.html" %}
 {% block title %}Empresa — Copy Minas{% endblock %}
-{% block meta_description %}Conheça a Copy Minas, empresa sediada em Elói Mendes, Minas Gerais.{% endblock %}
+{% block meta_description %}Conheça a Copy Minas, empresa de impressão, tecnologia, equipamentos, locação e manutenção sediada em Elói Mendes, Minas Gerais.{% endblock %}
 {% block body_class %}paper-page page-company{% endblock %}
 {% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">{% endblock %}
+
 {% block body %}
 {% set active_page = "company" %}
 {% include "public/_paper_header.html" %}
-<main id="main-content" class="paper-stage">
-    <section class="paper-sheet" data-sheet="EMPRESA / 03">
-        <p class="paper-kicker">Copy Minas / ficha institucional</p>
-        <h1 class="paper-title">Desde 2011 em Elói Mendes.</h1>
-        <p class="paper-lead">{{ company.summary }}</p>
 
-        <dl class="paper-contact-grid company-register">
-            <div class="paper-contact-item"><dt>Nome fantasia</dt><dd>{{ company.name }}</dd></div>
-            <div class="paper-contact-item"><dt>Razão social</dt><dd>{{ company.legal_name }}</dd></div>
-            <div class="paper-contact-item"><dt>CNPJ</dt><dd>{{ company.cnpj }}</dd></div>
-            <div class="paper-contact-item"><dt>Início das atividades</dt><dd>{{ company.founded_on }}</dd></div>
-            <div class="paper-contact-item"><dt>Situação cadastral</dt><dd>{{ company.status }}</dd></div>
-            <div class="paper-contact-item"><dt>Sede</dt><dd>{{ copyminas_location.city }} / {{ company.state }}</dd></div>
-        </dl>
+<main id="main-content" class="paper-stage company-stage">
+    <section class="paper-sheet company-hero-sheet" data-sheet="EMPRESA / 03">
+        <div class="company-hero">
+            <div class="company-hero__copy">
+                <p class="paper-kicker">Copy Minas / Elói Mendes — MG</p>
+                <h1 class="paper-title">Desde 2011 trabalhando com tecnologia e impressão.</h1>
+                <p class="paper-lead">{{ company.summary }}</p>
 
-        <section class="company-location-card" aria-label="Localização da Copy Minas">
-            <div>
-                <span class="paper-card__code">SEDE / ELÓI MENDES</span>
-                <h2>Atendimento em Elói Mendes, Minas Gerais.</h2>
-                <address>{{ copyminas_location.address }}</address>
+                <div class="paper-actions company-hero__actions">
+                    <a class="paper-action" href="{{ url_for('public.contact') }}">Falar com a Copy Minas</a>
+                    <a class="paper-action paper-action--ghost" href="{{ url_for('public.solutions') }}">Conhecer soluções</a>
+                </div>
             </div>
-            <a class="paper-action paper-action--ghost" href="{{ copyminas_location.maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Google Maps ↗</a>
-        </section>
 
-        <hr class="paper-rule">
-        <p class="paper-kicker">Atendimento / informações</p>
-        <p class="paper-lead">
-            As informações desta página apresentam os dados institucionais já confirmados. Para consultar escopo, disponibilidade e condições de atendimento, fale diretamente com a equipe.
-        </p>
+            <aside class="company-identity-panel" aria-label="Identidade da empresa">
+                <header>
+                    <span>IDENTIDADE / REGISTRO</span>
+                    <strong>{{ company.status }}</strong>
+                </header>
 
-        <div class="paper-actions">
-            <a class="paper-action" href="{{ url_for('public.contact') }}">Falar com a Copy Minas</a>
-            <a class="paper-action paper-action--ghost" href="{{ url_for('public.solutions') }}">Ver soluções</a>
+                <dl>
+                    <div>
+                        <dt>Nome</dt>
+                        <dd>{{ company.name }}</dd>
+                    </div>
+                    <div>
+                        <dt>Início</dt>
+                        <dd>{{ company.founded_on }}</dd>
+                    </div>
+                    <div>
+                        <dt>Sede</dt>
+                        <dd>{{ copyminas_location.city }} / {{ company.state }}</dd>
+                    </div>
+                    <div>
+                        <dt>CNPJ</dt>
+                        <dd>{{ company.cnpj }}</dd>
+                    </div>
+                </dl>
+            </aside>
+        </div>
+    </section>
+
+    <section class="company-activity" aria-labelledby="company-activity-title">
+        <header class="company-section-heading">
+            <div>
+                <p class="paper-kicker">Atuação / atividades registradas</p>
+                <h2 id="company-activity-title">O que faz parte da Copy Minas.</h2>
+            </div>
+            <p>
+                As áreas abaixo refletem as atividades empresariais já confirmadas.
+                Escopo, disponibilidade e condições de cada atendimento são consultados diretamente com a equipe.
+            </p>
+        </header>
+
+        <div class="company-activity-list">
+            {% for solution in company.solutions %}
+            <article class="company-activity-item">
+                <span class="company-activity-item__number">{{ solution.code }}</span>
+                <div>
+                    <h3>{{ solution.title }}</h3>
+                    <p>{{ solution.description }}</p>
+                </div>
+                <a href="{{ url_for('public.solutions') }}">Ver solução →</a>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="paper-sheet company-register-sheet" data-sheet="REGISTRO / EMPRESA">
+        <header class="company-register-heading">
+            <div>
+                <p class="paper-kicker">Dados institucionais</p>
+                <h2>Identidade empresarial.</h2>
+            </div>
+            <p>Informações formais apresentadas de forma separada do conteúdo comercial.</p>
+        </header>
+
+        <dl class="company-register">
+            <div class="company-register__item">
+                <dt>Nome fantasia</dt>
+                <dd>{{ company.name }}</dd>
+            </div>
+            <div class="company-register__item">
+                <dt>Razão social</dt>
+                <dd>{{ company.legal_name }}</dd>
+            </div>
+            <div class="company-register__item">
+                <dt>CNPJ</dt>
+                <dd>{{ company.cnpj }}</dd>
+            </div>
+            <div class="company-register__item">
+                <dt>Início das atividades</dt>
+                <dd>{{ company.founded_on }}</dd>
+            </div>
+            <div class="company-register__item">
+                <dt>Situação cadastral</dt>
+                <dd>{{ company.status }}</dd>
+            </div>
+            <div class="company-register__item">
+                <dt>Sede</dt>
+                <dd>{{ copyminas_location.city }} / {{ company.state }}</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="company-presence" aria-labelledby="company-presence-title">
+        <div class="company-presence__copy">
+            <span>SEDE / ELÓI MENDES</span>
+            <h2 id="company-presence-title">Presença local em Minas Gerais.</h2>
+            <p>
+                A Copy Minas está sediada em {{ copyminas_location.city }}, Minas Gerais.
+                Para atendimento, disponibilidade ou condições comerciais, fale diretamente com a equipe.
+            </p>
+            <address>{{ copyminas_location.address }}</address>
+        </div>
+
+        <div class="company-presence__actions">
+            <a class="button button--primary" href="{{ url_for('public.contact') }}">Entrar em contato</a>
+            <a class="company-presence__link" href="{{ copyminas_location.maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Google Maps ↗</a>
         </div>
     </section>
 </main>
+
 {% include "public/_site_footer.html" %}
 {% endblock %}
