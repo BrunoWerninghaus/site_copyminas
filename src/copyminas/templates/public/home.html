@@ -43,7 +43,7 @@
     {% if home_news %}
     <section class="home-news section-shell" data-section="NOVIDADES">
         <header class="section-heading">
-            <p class="section-kicker">Novidades / Copy Minas</p>
+            <p class="section-kicker">Novidades da Copy Minas</p>
             <h2>Atualizações e avisos.</h2>
             <p>Informações recentes publicadas pela equipe da Copy Minas.</p>
         </header>
@@ -78,7 +78,7 @@
 {% if featured_products %}
     <section class="content-section section-shell" data-section="02 / PRODUTOS">
         <header class="section-heading">
-            <p class="section-kicker">Produtos / destaques</p>
+            <p class="section-kicker">Seleção do catálogo</p>
             <h2>Produtos em destaque</h2>
             <p>Uma seleção do catálogo da Copy Minas, com fichas individuais para consulta.</p>
         </header>
@@ -96,7 +96,7 @@
                 <div class="home-product__copy">
                     <span>{{ product.category }}</span>
                     <h3>{{ product.name }}</h3>
-                    <a href="{{ url_for('public.product_detail', slug=product.slug) }}">Abrir ficha →</a>
+                    <a href="{{ url_for('public.product_detail', slug=product.slug) }}">Ver produto →</a>
                 </div>
             </article>
             {% endfor %}
@@ -120,7 +120,7 @@
 {% if home_config.show_location %}
     <section class="location-section section-shell" id="localizacao" data-section="04 / LOCALIZAÇÃO">
         <div class="location-copy" data-register="LOC / {{ copyminas_location.latitude }}, {{ copyminas_location.longitude }}">
-            <p class="section-kicker">Localização / 21°S</p>
+            <p class="section-kicker">Localização</p>
             <h2>Elói Mendes, Minas Gerais.</h2>
                         <p class="location-note">
                 Abra o globo para explorar a localização. O endereço completo e os canais de atendimento ficam na página de Contato.
