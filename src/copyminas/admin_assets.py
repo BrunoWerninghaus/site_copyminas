@@ -1,5 +1,3 @@
-import base64
-import binascii
 import io
 import json
 import shutil
@@ -153,25 +151,29 @@ def _ensure_original_copy(source_path, product_id, slot):
     return source_relative
 
 
-def _decode_editor_image(data_url):
-    raw = (data_url or "").strip()
-    marker = ";base64,"
-    if not raw.startswith("data:image/") or marker not in raw:
-        raise AdminAssetError("A edição enviada não contém uma imagem válida.")
+def _decode_editor_upload(file_storage):
+    if file_storage is None or not file_storage.filename:
+        raise AdminAssetError("A edição enviada não contém um arquivo de imagem.")
 
-    encoded = raw.split(marker, 1)[1]
+    mimetype = (file_storage.mimetype or "").lower()
+    if mimetype and mimetype != "image/png":
+        raise AdminAssetError("A imagem editada precisa ser enviada em PNG.")
+
+    stream = file_storage.stream
     try:
-        payload = base64.b64decode(encoded, validate=True)
-    except (binascii.Error, ValueError) as exc:
-        raise AdminAssetError("A edição enviada está corrompida.") from exc
+        stream.seek(0, 2)
+        size = stream.tell()
+        stream.seek(0)
+    except (OSError, AttributeError) as exc:
+        raise AdminAssetError("Não foi possível ler a imagem editada.") from exc
 
-    if not payload:
+    if size <= 0:
         raise AdminAssetError("A edição enviada está vazia.")
-    if len(payload) > _EDITOR_MAX_RAW_BYTES:
+    if size > _EDITOR_MAX_RAW_BYTES:
         raise AdminAssetError("A imagem editada excede o limite permitido.")
 
     try:
-        with Image.open(io.BytesIO(payload)) as image:
+        with Image.open(stream) as image:
             image.load()
             if image.width > _EDITOR_MAX_DIMENSION or image.height > _EDITOR_MAX_DIMENSION:
                 raise AdminAssetError("A imagem editada possui dimensões excessivas.")
@@ -184,14 +186,19 @@ def _decode_editor_image(data_url):
         raise
     except (UnidentifiedImageError, OSError, ValueError) as exc:
         raise AdminAssetError("A edição enviada não pôde ser validada como imagem.") from exc
+    finally:
+        try:
+            stream.seek(0)
+        except (OSError, AttributeError):
+            pass
 
 
-def save_edited_product_image(data_url, source_path, product_id, slot):
+def save_edited_product_image(file_storage, source_path, product_id, slot):
     if int(slot) not in range(1, 6):
         raise AdminAssetError("Slot de imagem inválido.")
 
     original_relative = _ensure_original_copy(source_path, product_id, slot)
-    image = _decode_editor_image(data_url)
+    image = _decode_editor_upload(file_storage)
 
     relative_dir = Path("images") / "products" / "edited"
     target_dir = _static_root() / relative_dir
