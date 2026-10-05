@@ -69,6 +69,11 @@
     </section>
 
     <section class="admin-quick-actions" aria-label="Ações rápidas">
+        <a href="{{ url_for('admin.home_manager') }}">
+            <span>CONTEÚDO / HOME</span>
+            <strong>Editar Home</strong>
+            <small>Mensagens, destaques e novidades</small>
+        </a>
         <a href="{{ url_for('admin.product_new') }}">
             <span>NOVO / PRODUTO</span>
             <strong>Cadastrar produto</strong>
