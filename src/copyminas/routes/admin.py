@@ -963,8 +963,9 @@ def product_image_editor_save(product_id, slot):
 
     edited_path = None
     try:
+        image_file = request.files.get("image_file")
         edited_path, _original_path = save_edited_product_image(
-            request.form.get("image_data", ""),
+            image_file,
             current_value,
             product_id,
             slot,
