@@ -3116,3 +3116,194 @@
         -webkit-line-clamp: 2;
     }
 }
+
+
+/* Product detail mobile contract */
+@media (max-width: 720px) {
+    .page-product-detail {
+        --page-x: 1rem;
+    }
+
+    .page-product-detail .paper-stage {
+        padding-top: 1.25rem;
+        padding-bottom: 3rem;
+    }
+
+    .page-product-detail .product-sheet {
+        padding: 1.15rem;
+        border-top-width: 3px;
+        box-shadow: 7px 7px 0 rgba(0,0,0,.24);
+    }
+
+    .page-product-detail .paper-back {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: .45rem 0;
+        font-size: .66rem;
+    }
+
+    .page-product-detail .product-sheet__grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .page-product-detail .product-sheet__media {
+        width: 100%;
+        min-height: 0;
+        aspect-ratio: 1 / 1;
+        box-shadow: 5px 5px 0 rgba(0,0,0,.07);
+    }
+
+    .page-product-detail .product-sheet__media img {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        padding: .75rem;
+        object-fit: contain;
+    }
+
+    .page-product-detail .product-sheet__gallery {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: .45rem;
+        margin-top: .65rem;
+    }
+
+    .page-product-detail .product-thumb {
+        min-height: 64px;
+        aspect-ratio: 1 / 1;
+    }
+
+    .page-product-detail .product-thumb img {
+        width: 100%;
+        height: 100%;
+        aspect-ratio: auto;
+        padding: .35rem;
+        object-fit: contain;
+    }
+
+    .page-product-detail .paper-kicker {
+        margin-bottom: .55rem;
+        font-size: .64rem;
+        letter-spacing: .1em;
+    }
+
+    .page-product-detail .product-sheet__title {
+        max-width: none;
+        font-size: clamp(1.9rem, 9.6vw, 2.8rem);
+        line-height: 1;
+        letter-spacing: -.045em;
+        overflow-wrap: anywhere;
+    }
+
+    .page-product-detail .product-sheet__grid .paper-lead {
+        margin-top: .9rem;
+        font-size: .88rem;
+        line-height: 1.6;
+    }
+
+    .page-product-detail .product-availability {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: .75rem;
+        align-items: center;
+        margin-top: 1.15rem;
+        padding: .7rem 0;
+    }
+
+    .page-product-detail .product-availability span {
+        font-size: .62rem;
+    }
+
+    .page-product-detail .product-availability strong {
+        font-size: .72rem;
+        text-align: right;
+    }
+
+    .page-product-detail .product-services {
+        gap: .35rem;
+        margin-top: .8rem;
+    }
+
+    .page-product-detail .product-services span {
+        padding: .38rem .5rem;
+        font-size: .58rem;
+    }
+
+    .page-product-detail .paper-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .6rem;
+        margin-top: 1.25rem;
+    }
+
+    .page-product-detail .paper-actions .paper-action {
+        width: 100%;
+        min-height: 50px;
+        padding-inline: .85rem;
+    }
+
+    .page-product-detail .spec-sheet {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.25rem;
+    }
+
+    .page-product-detail .spec-sheet__heading {
+        position: static;
+    }
+
+    .page-product-detail .spec-sheet__heading > span {
+        font-size: .62rem;
+    }
+
+    .page-product-detail .spec-sheet__heading h2 {
+        margin-top: .35rem;
+        font-size: 1.2rem;
+    }
+
+    .page-product-detail .spec-sheet dl {
+        border-top: 1px solid var(--paper-line);
+    }
+
+    .page-product-detail .spec-sheet dl > div {
+        grid-template-columns: 1fr;
+        gap: .3rem;
+        padding: .75rem 0;
+    }
+
+    .page-product-detail .spec-sheet dt {
+        font-size: .65rem;
+        font-weight: 800;
+        letter-spacing: .04em;
+    }
+
+    .page-product-detail .spec-sheet dd {
+        font-size: .82rem;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 380px) {
+    .page-product-detail .product-sheet {
+        padding: 1rem;
+    }
+
+    .page-product-detail .product-sheet__gallery {
+        gap: .35rem;
+    }
+
+    .page-product-detail .product-thumb {
+        min-height: 58px;
+    }
+
+    .page-product-detail .product-sheet__title {
+        font-size: clamp(1.75rem, 9.2vw, 2.35rem);
+    }
+
+    .page-product-detail .product-services span {
+        font-size: .54rem;
+    }
+}
