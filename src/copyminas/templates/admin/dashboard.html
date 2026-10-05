@@ -22,6 +22,11 @@
         <article><span>Catálogo</span><strong>{{ "Disponível" if catalog_available else "Indisponível" }}</strong><small>main_bd</small></article>
         <article><span>Produtos publicados</span><strong>{{ product_count }}</strong><small>ativos no catálogo</small></article>
         <article><span>Categorias</span><strong>{{ category_count }}</strong><small>com produtos publicados</small></article>
+        <article>
+            <span>Contatos novos</span>
+            <strong>{{ contact_summary.novos if contacts_available else "—" }}</strong>
+            <small>{{ contact_summary.em_atendimento if contacts_available else "—" }} em atendimento</small>
+        </article>
     </section>
 
     <section class="admin-modules">
@@ -43,12 +48,13 @@
             <a href="{{ url_for('admin.categories') }}">Gerenciar categorias →</a>
         </article>
 
-        <article class="admin-module admin-module--future">
+        <article class="admin-module">
             <div>
                 <span>MÓDULO / 03</span>
                 <h2>Contatos</h2>
-                <p>Solicitações registradas no banco. A gestão administrativa entra no próximo bloco.</p>
+                <p>Consulte solicitações recebidas, acompanhe o atendimento e atualize o status sem apagar o histórico.</p>
             </div>
+            <a href="{{ url_for('admin.contacts') }}">Gerenciar contatos →</a>
         </article>
     </section>
 </main>
