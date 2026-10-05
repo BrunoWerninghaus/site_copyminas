@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Editor de imagem — {{ product.nome }} — Copy Minas Admin{% endblock %}
+{% block meta_description %}Editor interno de imagem de produto da Copy Minas.{% endblock %}
+{% block body_class %}admin-page{% endblock %}
+{% block page_styles %}
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+{% set admin_page = "products" %}
+{% include "admin/_header.html" %}
+
+<main
+    id="main-content"
+    class="admin-stage admin-image-editor-stage"
+    data-image-editor
+    data-source-url="{{ url_for('static', filename=source_image) }}"
+    data-save-url="{{ url_for('admin.product_image_editor_save', product_id=product.id, slot=slot) }}"
+>
+    <input type="hidden" value="{{ csrf_token }}" data-image-editor-csrf>
+
+    <div class="admin-form-heading admin-image-editor-heading">
+        <a href="{{ url_for('admin.product_edit', product_id=product.id) }}">← Produto #{{ product.id }}</a>
+        <span>EDITOR / IMAGEM {{ slot }}</span>
+        <h1>{{ product.nome }}</h1>
+        <p>Canvas de catálogo 1:1 · saída 1200 × 1200 PNG · edição não destrutiva.</p>
+    </div>
+
+    <section class="admin-image-editor-shell">
+        <aside class="admin-image-editor-tools" aria-label="Ferramentas de imagem">
+            <header>
+                <span>FERRAMENTAS</span>
+                <strong>Imagem {{ slot }}</strong>
+            </header>
+
+            <button type="button" data-editor-prepare>Preparar para catálogo</button>
+            <button type="button" data-editor-fit>Ajustar 1:1</button>
+            <button type="button" data-editor-remove-bg>Remover fundo</button>
+            <button type="button" data-editor-restore>Restaurar original</button>
+
+            <div class="admin-image-editor-tool-group">
+                <span>Orientação</span>
+                <div>
+                    <button type="button" data-editor-rotate="-90">↶ 90°</button>
+                    <button type="button" data-editor-rotate="90">↷ 90°</button>
+                </div>
+                <div>
+                    <button type="button" data-editor-flip="x">Espelhar H</button>
+                    <button type="button" data-editor-flip="y">Espelhar V</button>
+                </div>
+            </div>
+
+            <button type="button" data-editor-original>Ver original</button>
+        </aside>
+
+        <div class="admin-image-editor-workspace">
+            <div class="admin-image-editor-canvas-frame" data-editor-frame>
+                <canvas width="1200" height="1200" data-editor-canvas aria-label="Prévia da imagem editada"></canvas>
+            </div>
+
+            <div class="admin-image-editor-workspace__hint">
+                <span>ARRASTE A IMAGEM PARA POSICIONAR</span>
+                <span>RODA DO MOUSE = ZOOM</span>
+            </div>
+        </div>
+
+        <aside class="admin-image-editor-settings" aria-label="Ajustes da imagem">
+            <header>
+                <span>AJUSTES</span>
+                <strong>Catálogo</strong>
+            </header>
+
+            <label>
+                <span>Fundo</span>
+                <select data-editor-background>
+                    <option value="transparent">Transparente</option>
+                    <option value="white">Branco</option>
+                </select>
+            </label>
+
+            <label>
+                <span>Zoom <strong data-editor-zoom-value>100%</strong></span>
+                <input type="range" min="25" max="250" step="1" value="100" data-editor-zoom>
+            </label>
+
+            <label>
+                <span>Sensibilidade do fundo <strong data-editor-tolerance-value>55</strong></span>
+                <input type="range" min="20" max="110" step="1" value="55" data-editor-tolerance>
+                <small>Use valores menores quando o produto tem cor parecida com o fundo.</small>
+            </label>
+
+            <dl class="admin-image-editor-info">
+                <div><dt>Saída</dt><dd>1200 × 1200</dd></div>
+                <div><dt>Formato</dt><dd>PNG</dd></div>
+                <div><dt>Original</dt><dd>Preservada</dd></div>
+            </dl>
+
+            {% if source_image != current_image %}
+            <p class="admin-image-editor-version-note">
+                Esta imagem já possui edição. O editor abriu novamente a versão original preservada.
+            </p>
+            {% endif %}
+        </aside>
+    </section>
+
+    <div class="admin-image-editor-status" data-editor-status role="status" aria-live="polite">
+        Carregando imagem…
+    </div>
+
+    <div class="admin-image-editor-actions">
+        <a href="{{ url_for('admin.product_edit', product_id=product.id) }}">Cancelar</a>
+        <button class="admin-button" type="button" data-editor-save disabled>Salvar imagem editada</button>
+    </div>
+</main>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/admin-image-editor.js') }}" defer></script>
+{% endblock %}
