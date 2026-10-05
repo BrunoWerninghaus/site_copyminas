@@ -187,6 +187,30 @@ class PublicRoutesTestCase(unittest.TestCase):
                 self.assertIn("Falar com a Copy Minas".encode("utf-8"), response.data)
                 self.assertIn("Localização".encode("utf-8"), response.data)
 
+
+    def test_customer_pages_do_not_show_construction_placeholders(self):
+        for path in (
+            "/home",
+            "/produtos",
+            "/produtos/brother-dcp-8157dn",
+            "/solucoes",
+            "/empresa",
+            "/contato",
+        ):
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                self.assertNotIn("EM ATUALIZAÇÃO".encode("utf-8"), response.data)
+
+    def test_home_uses_real_company_facts_instead_of_institutional_placeholder(self):
+        response = self.client.get("/home")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"EMPRESA / RESUMO", response.data)
+        self.assertIn(b"12/07/2011", response.data)
+        self.assertIn("Situação".encode("utf-8"), response.data)
+        self.assertNotIn(b"home.company.image", response.data)
+
     def test_company(self):
         self.assert_page("/empresa", "Desde 2011 em Elói Mendes")
         response = self.client.get("/empresa")
