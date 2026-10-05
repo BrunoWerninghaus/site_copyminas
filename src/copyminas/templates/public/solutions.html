@@ -3,31 +3,96 @@
 {% block meta_description %}Conheça as áreas de atuação da Copy Minas em impressão, equipamentos, locação, manutenção e suporte.{% endblock %}
 {% block body_class %}paper-page page-solutions{% endblock %}
 {% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">{% endblock %}
+
 {% block body %}
 {% set active_page = "solutions" %}
 {% include "public/_paper_header.html" %}
-<main id="main-content" class="paper-stage">
-    <section class="paper-sheet" data-sheet="SOLUÇÕES / 03">
-        <p class="paper-kicker">Soluções / áreas de atuação</p>
-        <h1 class="paper-title">Tecnologia para a rotina de trabalho.</h1>
-        <p class="paper-lead">
-            Conheça as principais áreas de atuação da Copy Minas. Escopo, disponibilidade e condições de cada atendimento são confirmados diretamente com a equipe.
-        </p>
-        <div class="paper-grid">
+
+<main id="main-content" class="paper-stage solutions-stage">
+    <section class="paper-sheet solutions-hero-sheet" data-sheet="SOLUÇÕES / 03">
+        <div class="solutions-hero">
+            <div class="solutions-hero__copy">
+                <p class="paper-kicker">Soluções / áreas de atuação</p>
+                <h1 class="paper-title">Tecnologia para a rotina de trabalho.</h1>
+                <p class="paper-lead">
+                    Impressão, equipamentos, locação e manutenção reunidos em uma operação próxima.
+                    Escopo, disponibilidade e condições de cada atendimento são confirmados diretamente com a equipe.
+                </p>
+
+                <div class="paper-actions solutions-hero__actions">
+                    <a class="paper-action" href="{{ url_for('public.contact') }}">Falar com a Copy Minas</a>
+                    <a class="paper-action paper-action--ghost" href="{{ url_for('public.products') }}">Ver produtos</a>
+                </div>
+            </div>
+
+            <aside class="solutions-index" aria-label="Índice das soluções">
+                <header>
+                    <span>ÍNDICE / ATENDIMENTO</span>
+                    <strong>{{ company.solutions|length }} áreas</strong>
+                </header>
+
+                <nav>
+                    {% for solution in company.solutions %}
+                    <a href="#solucao-{{ solution.code }}">
+                        <span>{{ solution.code }}</span>
+                        <strong>{{ solution.title }}</strong>
+                        <i aria-hidden="true">↓</i>
+                    </a>
+                    {% endfor %}
+                </nav>
+            </aside>
+        </div>
+    </section>
+
+    <section class="solutions-section" aria-labelledby="solutions-list-title">
+        <header class="solutions-section__heading">
+            <div>
+                <p class="paper-kicker">Atendimento / catálogo de soluções</p>
+                <h2 id="solutions-list-title">Onde podemos ajudar.</h2>
+            </div>
+            <p>
+                Escolha uma área para entender o escopo cadastrado e, se fizer sentido para sua necessidade,
+                fale diretamente com a equipe.
+            </p>
+        </header>
+
+        <div class="solutions-list">
             {% for solution in company.solutions %}
-            <article class="paper-card">
-                <span class="paper-card__code">SOLUÇÃO / {{ solution.code }}</span>
-                <h2>{{ solution.title }}</h2>
-                <p>{{ solution.description }}</p>
-                <a class="solution-card__link" href="{{ url_for('public.contact') }}">Consultar esta área →</a>
+            <article class="solution-row" id="solucao-{{ solution.code }}">
+                <div class="solution-row__register" aria-hidden="true">
+                    <span>{{ solution.code }}</span>
+                    <small>SOLUÇÃO</small>
+                </div>
+
+                <div class="solution-row__body">
+                    <span class="solution-row__code">Área / {{ "%02d"|format(loop.index) }}</span>
+                    <h3>{{ solution.title }}</h3>
+                    <p>{{ solution.description }}</p>
+                </div>
+
+                <div class="solution-row__action">
+                    <a href="{{ url_for('public.contact') }}">Consultar esta área →</a>
+                </div>
             </article>
             {% endfor %}
         </div>
-        <div class="paper-actions">
-            <a class="paper-action" href="{{ url_for('public.contact') }}">Consultar atendimento</a>
-            <a class="paper-action paper-action--ghost" href="{{ url_for('public.products') }}">Ver produtos</a>
+    </section>
+
+    <section class="solutions-decision" aria-labelledby="solutions-decision-title">
+        <div>
+            <span>PRÓXIMO PASSO / ATENDIMENTO</span>
+            <h2 id="solutions-decision-title">Não sabe qual solução se encaixa?</h2>
+            <p>
+                Descreva o que você precisa. A equipe confirma o escopo, a disponibilidade e a forma de atendimento adequada ao seu caso.
+            </p>
+        </div>
+
+        <div class="solutions-decision__actions">
+            <a class="button button--primary" href="{{ url_for('public.contact') }}">Enviar uma solicitação</a>
+            <a class="solutions-decision__link" href="{{ url_for('public.products') }}">Explorar produtos →</a>
         </div>
     </section>
 </main>
+
 {% include "public/_site_footer.html" %}
 {% endblock %}
