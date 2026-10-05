@@ -230,3 +230,78 @@ Se uma dessas fontes estiver indisponível:
 - a outra parte do painel continua funcional;
 - indicadores indisponíveis aparecem sem valor;
 - o painel informa explicitamente qual fonte está offline.
+
+
+## Admin Shell 2.0
+
+A área autenticada usa um shell persistente de aplicação.
+
+### Navegação
+
+O shell administrativo contém:
+- sidebar fixa no desktop;
+- sidebar recolhível com preferência persistida localmente no navegador;
+- drawer de navegação no mobile;
+- topbar persistente;
+- breadcrumb do módulo atual;
+- acesso ao Site 3 público em nova aba;
+- logout autenticado já existente.
+
+Módulos atuais:
+- Visão geral;
+- Contatos;
+- Produtos;
+- Categorias.
+
+O login permanece fora do shell.
+
+### Busca global
+
+A busca global pode ser aberta pelo botão da topbar ou por `Ctrl+K` / `Cmd+K`.
+
+Endpoint:
+- `GET /admin/busca?q=<termo>`.
+
+A rota exige sessão administrativa.
+
+A busca consulta:
+- produtos;
+- categorias;
+- contatos.
+
+Campos pesquisáveis incluem, conforme o tipo:
+- ID;
+- nome;
+- categoria;
+- descrição;
+- protocolo;
+- empresa;
+- e-mail;
+- telefone;
+- cidade;
+- serviço.
+
+A resposta é limitada a resultados administrativos navegáveis e não expõe segredos de ambiente.
+
+Cada fonte é consultada de forma independente. Se uma fonte estiver indisponível, resultados das demais continuam sendo retornados e a interface informa degradação parcial.
+
+### Segurança da interface de busca
+
+Resultados vindos do banco são inseridos na interface por APIs de DOM com `textContent`, não por interpolação de HTML bruto.
+
+A busca:
+- não grava no banco;
+- não altera status;
+- não executa ações;
+- apenas navega para telas administrativas existentes.
+
+### Responsividade
+
+Em desktop a sidebar pode alternar entre expandida e compacta.
+
+Em telas menores:
+- o conteúdo volta a ocupar 100% da largura;
+- a sidebar vira drawer;
+- um backdrop fecha a navegação;
+- `Escape` fecha drawer ou busca;
+- a busca global ocupa a tela inteira em celulares estreitos.
