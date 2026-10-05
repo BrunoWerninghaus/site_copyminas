@@ -77,11 +77,86 @@ class PublicRoutesTestCase(unittest.TestCase):
             self.assertEqual(app.config["DB_USER"], "copyminas")
             self.assertEqual(app.config["DB_PASSWORD"], "secret")
 
-    def test_intro(self):
-        self.assert_page("/", "Copy Minas")
+    def test_root_opens_home_without_intro_screen(self):
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Impressão, tecnologia e equipamentos".encode("utf-8"), response.data)
+        self.assertIn(b'class="public-header"', response.data)
+        self.assertNotIn(b"intro-screen", response.data)
+        self.assertNotIn("Clique ou role para entrar".encode("utf-8"), response.data)
 
     def test_home(self):
         self.assert_page("/home", "Impressão, tecnologia e equipamentos")
+
+
+    @patch("src.copyminas.routes.public.list_home_news")
+    @patch("src.copyminas.routes.public.get_home_config")
+    @patch("src.copyminas.routes.public.get_public_products")
+    def test_home_uses_managed_content_and_featured_order(
+        self,
+        get_products,
+        get_config,
+        list_news,
+    ):
+        get_products.return_value = [
+            {
+                "id": 21,
+                "slug": "produto-21",
+                "name": "Produto 21",
+                "category": "Impressoras",
+                "image_url": None,
+            },
+            {
+                "id": 25,
+                "slug": "produto-25",
+                "name": "Produto 25",
+                "category": "Impressoras",
+                "image_url": None,
+            },
+        ]
+        get_config.return_value = {
+            "announcement_active": True,
+            "announcement_label": "AVISO",
+            "announcement_text": "Atendimento especial nesta semana.",
+            "announcement_link_label": "Falar conosco",
+            "announcement_link_url": "/contato",
+            "hero_kicker": "Copy Minas / Hoje",
+            "hero_title": "Título administrável",
+            "hero_summary": "Resumo administrável.",
+            "primary_cta_label": "Catálogo",
+            "primary_cta_url": "/produtos",
+            "secondary_cta_label": "Contato",
+            "secondary_cta_url": "/contato",
+            "featured_product_ids": [25, 21],
+            "show_solutions": False,
+            "show_company": True,
+            "show_location": True,
+        }
+        list_news.return_value = [
+            {
+                "id": 1,
+                "label": "NOVIDADE",
+                "title": "Nova mensagem",
+                "body": "Conteúdo da novidade.",
+                "link_label": "",
+                "link_url": "",
+                "active": 1,
+                "sort_order": 0,
+            }
+        ]
+
+        response = self.client.get("/home")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Título administrável".encode("utf-8"), response.data)
+        self.assertIn("Atendimento especial nesta semana.".encode("utf-8"), response.data)
+        self.assertIn("Nova mensagem".encode("utf-8"), response.data)
+        self.assertLess(
+            response.data.index(b"Produto 25"),
+            response.data.index(b"Produto 21"),
+        )
+        self.assertNotIn("Áreas de atuação".encode("utf-8"), response.data)
 
     def test_solutions(self):
         self.assert_page("/solucoes", "Tecnologia para a rotina de trabalho")
