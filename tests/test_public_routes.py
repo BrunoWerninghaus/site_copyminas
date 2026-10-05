@@ -292,20 +292,16 @@ class PublicRoutesTestCase(unittest.TestCase):
         self.assertNotIn(b"home.company.image", response.data)
 
     def test_company(self):
-        self.assert_page(
-            "/empresa",
-            "Uma empresa de Elói Mendes desde 2011.",
-        )
+        self.assert_page("/empresa", "Quem é a Copy Minas.")
         response = self.client.get("/empresa")
-        self.assertIn("Tecnologia e impressão com base local.".encode("utf-8"), response.data)
-        self.assertIn("Da abertura até hoje.".encode("utf-8"), response.data)
         self.assertIn("Identidade empresarial.".encode("utf-8"), response.data)
-        self.assertIn("Onde encontrar a Copy Minas.".encode("utf-8"), response.data)
-        self.assertIn("Abrir no Google Maps".encode("utf-8"), response.data)
-        self.assertIn("Falar com a Copy Minas".encode("utf-8"), response.data)
+        self.assertIn("O que você procura?".encode("utf-8"), response.data)
         self.assertIn(b"97.537.200/0001-10", response.data)
         self.assertIn(b"12/07/2011", response.data)
-        self.assertNotIn(b'class="company-activity-item"', response.data)
+        self.assertIn(b"/solucoes", response.data)
+        self.assertIn(b"/produtos", response.data)
+        self.assertIn(b"/contato", response.data)
+        self.assertNotIn(b"Rua Tonico da Serra", response.data)
         for title in (
             "Impressão e reprografia",
             "Equipamentos e suprimentos",
@@ -314,6 +310,44 @@ class PublicRoutesTestCase(unittest.TestCase):
             "Cartuchos e impressão",
         ):
             self.assertNotIn(title.encode("utf-8"), response.data)
+
+
+    def test_public_pages_keep_information_with_its_authority(self):
+        home = self.client.get("/home").data
+        solutions = self.client.get("/solucoes").data
+        company = self.client.get("/empresa").data
+        contact = self.client.get("/contato").data
+
+        cnpj = b"97.537.200/0001-10"
+        founded = b"12/07/2011"
+        address = "Rua Tonico da Serra, 89".encode("utf-8")
+
+        self.assertIn(cnpj, company)
+        self.assertIn(founded, company)
+        self.assertNotIn(cnpj, home)
+        self.assertNotIn(cnpj, solutions)
+        self.assertNotIn(cnpj, contact)
+        self.assertNotIn(founded, home)
+        self.assertNotIn(founded, solutions)
+        self.assertNotIn(founded, contact)
+
+        self.assertIn(address, contact)
+        self.assertNotIn(address, home)
+        self.assertNotIn(address, company)
+        self.assertNotIn(address, solutions)
+
+        for title in (
+            "Impressão e reprografia",
+            "Equipamentos e suprimentos",
+            "Locação para escritório",
+            "Manutenção e suporte",
+            "Cartuchos e impressão",
+        ):
+            encoded = title.encode("utf-8")
+            self.assertIn(encoded, solutions)
+            self.assertNotIn(encoded, home)
+            self.assertNotIn(encoded, company)
+            self.assertNotIn(encoded, contact)
 
     def test_contact(self):
         self.assert_page("/contato", "(35) 98877-6969")
@@ -324,6 +358,7 @@ class PublicRoutesTestCase(unittest.TestCase):
         self.assertNotIn(b"main_bd", response.data)
         self.assertNotIn(b"main_bd.contatos", response.data)
         self.assertNotIn(b"STATUS INICIAL", response.data)
+        self.assertNotIn(b"97.537.200/0001-10", response.data)
 
     @patch("src.copyminas.routes.public.send_contact_notifications")
     @patch(
