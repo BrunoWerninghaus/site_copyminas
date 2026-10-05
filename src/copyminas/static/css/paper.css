@@ -1743,3 +1743,13 @@
         justify-content: center;
     }
 }
+
+
+/* Solutions hero after index removal */
+.page-solutions .solutions-hero {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.page-solutions .solutions-hero__copy {
+    max-width: 980px;
+}
