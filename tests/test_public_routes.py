@@ -282,13 +282,14 @@ class PublicRoutesTestCase(unittest.TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertNotIn("EM ATUALIZAÇÃO".encode("utf-8"), response.data)
 
-    def test_home_uses_real_company_facts_instead_of_institutional_placeholder(self):
+    def test_home_links_to_company_without_repeating_institutional_data(self):
         response = self.client.get("/home")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"EMPRESA / RESUMO", response.data)
-        self.assertIn(b"12/07/2011", response.data)
-        self.assertIn("Situação".encode("utf-8"), response.data)
+        self.assertIn("Conheça a Copy Minas.".encode("utf-8"), response.data)
+        self.assertIn(b"/empresa", response.data)
+        self.assertNotIn(b"97.537.200/0001-10", response.data)
+        self.assertNotIn(b"12/07/2011", response.data)
         self.assertNotIn(b"home.company.image", response.data)
 
     def test_company(self):
