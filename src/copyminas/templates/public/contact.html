@@ -13,7 +13,7 @@
 
 <main id="main-content" class="paper-stage contact-stage">
     <section class="paper-sheet contact-hero" data-sheet="CONTATO / 03">
-        <p class="paper-kicker">Contato / diretório</p>
+        <p class="paper-kicker">Fale com a Copy Minas</p>
         <h1 class="paper-title">Contato & orçamento.</h1>
         <p class="paper-lead">
             Fale diretamente com a Copy Minas ou registre uma solicitação para atendimento.
@@ -152,18 +152,18 @@
 
                 <div class="contact-form__submit">
                     <button class="paper-action" type="submit">Enviar solicitação</button>
-                    <span>CONFIRMAÇÃO POR E-MAIL</span>
+                    <span>Você receberá uma confirmação por e-mail.</span>
                 </div>
             </form>
         </section>
 
-        <aside class="contact-directory" aria-label="Ficha de contato da Copy Minas">
-            <span class="contact-directory__code">FICHA / COPY MINAS</span>
+        <aside class="contact-directory" aria-label="Canais de contato da Copy Minas">
+            <span class="contact-directory__code">Canais de atendimento</span>
 
             <dl>
                 {% for phone in contact.phones %}
                 <div>
-                    <dt>WhatsApp {{ "%02d"|format(loop.index) }}</dt>
+                    <dt>WhatsApp e telefone {{ loop.index }}</dt>
                     <dd><a href="{{ phone.whatsapp }}" target="_blank" rel="noopener noreferrer">{{ phone.display }}</a></dd>
                 </div>
                 {% endfor %}
@@ -183,7 +183,7 @@
 
             <div class="contact-directory__actions">
                 <a class="contact-directory__link" href="{{ copyminas_location.maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Google Maps →</a>
-                <a class="contact-directory__link" href="{{ url_for('public.company') }}">Ficha da empresa →</a>
+                <a class="contact-directory__link" href="{{ url_for('public.company') }}">Dados da empresa →</a>
             </div>
 
         </aside>
