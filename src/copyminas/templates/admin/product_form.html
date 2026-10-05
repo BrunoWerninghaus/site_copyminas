@@ -148,6 +148,14 @@
                             <input type="file" name="upload{{ index }}" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
                             <small>PNG, JPG/JPEG ou WEBP. O upload substitui o caminho deste slot ao salvar.</small>
                         </label>
+
+                        {% if mode == "edit" and image_previews[key] %}
+                        <a class="admin-image-edit-link" href="{{ url_for('admin.product_image_editor', product_id=product.id, slot=index) }}">
+                            Editar imagem {{ index }} →
+                        </a>
+                        {% elif mode == "new" %}
+                        <small class="admin-image-edit-note">Salve o produto para liberar o editor de imagem.</small>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
