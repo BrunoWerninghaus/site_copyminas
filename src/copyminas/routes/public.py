@@ -12,6 +12,12 @@ from src.copyminas.contact import COPY_MINAS_CONTACT
 from src.copyminas.contact_store import create_contact_request
 from src.copyminas.db import DatabaseUnavailable
 from src.copyminas.location import COPY_MINAS_LOCATION
+from src.copyminas.home_content import (
+    HomeContentError,
+    HomeContentNotInitialized,
+    get_home_config,
+    list_home_news,
+)
 from src.copyminas.notifications import (
     ContactNotificationError,
     send_contact_notifications,
@@ -43,28 +49,82 @@ def _contact_label_maps():
     )
 
 
-@public_bp.get("/")
-def intro():
-    return render_template(
-        "public/intro.html",
-        copyminas_location=COPY_MINAS_LOCATION,
-    )
+def _default_home_config():
+    return {
+        "announcement_active": False,
+        "announcement_label": "AVISO",
+        "announcement_text": "",
+        "announcement_link_label": "",
+        "announcement_link_url": "",
+        "hero_kicker": "Copy Minas · Elói Mendes / MG",
+        "hero_title": COPY_MINAS_COMPANY["headline"],
+        "hero_summary": COPY_MINAS_COMPANY["summary"],
+        "primary_cta_label": "Conhecer soluções",
+        "primary_cta_url": "/solucoes",
+        "secondary_cta_label": "Ver produtos",
+        "secondary_cta_url": "/produtos",
+        "featured_product_ids": [],
+        "show_solutions": True,
+        "show_company": True,
+        "show_location": True,
+    }
 
 
-@public_bp.get("/home")
-def home():
+def _render_home_page():
     try:
-        featured_products = get_public_products(limit=3)
+        catalog_products = get_public_products()
     except DatabaseUnavailable as exc:
         current_app.logger.error("Catalog unavailable on Home: %s", exc)
-        featured_products = []
+        catalog_products = []
+
+    home_config = _default_home_config()
+    home_news = []
+    initialized = False
+
+    try:
+        stored_config = get_home_config()
+        home_news = list_home_news(active_only=True)
+    except HomeContentNotInitialized:
+        stored_config = None
+    except (DatabaseUnavailable, HomeContentError) as exc:
+        current_app.logger.error("Home content unavailable: %s", exc)
+        stored_config = None
+
+    if stored_config is not None:
+        home_config = stored_config
+        initialized = True
+
+    if initialized:
+        products_by_id = {
+            int(product["id"]): product
+            for product in catalog_products
+        }
+        featured_products = [
+            products_by_id[product_id]
+            for product_id in home_config["featured_product_ids"]
+            if product_id in products_by_id
+        ]
+    else:
+        featured_products = catalog_products[:3]
 
     return render_template(
         "public/home.html",
         company=COPY_MINAS_COMPANY,
         copyminas_location=COPY_MINAS_LOCATION,
+        home_config=home_config,
+        home_news=home_news,
         featured_products=featured_products,
     )
+
+
+@public_bp.get("/")
+def root():
+    return _render_home_page()
+
+
+@public_bp.get("/home")
+def home():
+    return _render_home_page()
 
 
 @public_bp.get("/solucoes")
