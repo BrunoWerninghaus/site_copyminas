@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Empresa — Copy Minas{% endblock %}
-{% block meta_description %}Conheça a Copy Minas, empresa de impressão, tecnologia, equipamentos, locação e manutenção sediada em Elói Mendes, Minas Gerais.{% endblock %}
+{% block meta_description %}Conheça a Copy Minas, empresa sediada em Elói Mendes, Minas Gerais, com atividades iniciadas em 2011.{% endblock %}
 {% block body_class %}paper-page page-company{% endblock %}
 {% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/paper.css') }}">{% endblock %}
 
@@ -8,71 +8,77 @@
 {% set active_page = "company" %}
 {% include "public/_paper_header.html" %}
 
-<main id="main-content" class="paper-stage company-stage">
+<main id="main-content" class="paper-stage company-stage company-stage--institutional">
     <section class="paper-sheet company-hero-sheet" data-sheet="EMPRESA / 03">
-        <div class="company-hero">
+        <div class="company-hero company-hero--institutional">
             <div class="company-hero__copy">
                 <p class="paper-kicker">Copy Minas / Elói Mendes — MG</p>
-                <h1 class="paper-title">Desde 2011 trabalhando com tecnologia e impressão.</h1>
-                <p class="paper-lead">{{ company.summary }}</p>
+                <h1 class="paper-title">Uma empresa de Elói Mendes desde 2011.</h1>
+                <p class="paper-lead">
+                    A Copy Minas reúne atividades ligadas a impressão, tecnologia, equipamentos,
+                    locação e manutenção, com sede em {{ copyminas_location.city }}, Minas Gerais.
+                </p>
 
                 <div class="paper-actions company-hero__actions">
                     <a class="paper-action" href="{{ url_for('public.contact') }}">Falar com a Copy Minas</a>
-                    <a class="paper-action paper-action--ghost" href="{{ url_for('public.solutions') }}">Conhecer soluções</a>
+                    <a class="paper-action paper-action--ghost" href="{{ url_for('public.solutions') }}">Conhecer a atuação</a>
                 </div>
             </div>
 
-            <aside class="company-identity-panel" aria-label="Identidade da empresa">
-                <header>
-                    <span>IDENTIDADE / REGISTRO</span>
-                    <strong>{{ company.status }}</strong>
-                </header>
-
-                <dl>
-                    <div>
-                        <dt>Nome</dt>
-                        <dd>{{ company.name }}</dd>
-                    </div>
-                    <div>
-                        <dt>Início</dt>
-                        <dd>{{ company.founded_on }}</dd>
-                    </div>
-                    <div>
-                        <dt>Sede</dt>
-                        <dd>{{ copyminas_location.city }} / {{ company.state }}</dd>
-                    </div>
-                    <div>
-                        <dt>CNPJ</dt>
-                        <dd>{{ company.cnpj }}</dd>
-                    </div>
-                </dl>
+            <aside class="company-year-panel" aria-label="Início das atividades da Copy Minas">
+                <span class="company-year-panel__label">INÍCIO / ATIVIDADES</span>
+                <strong class="company-year-panel__year">2011</strong>
+                <div class="company-year-panel__footer">
+                    <span>{{ company.founded_on }}</span>
+                    <span>{{ copyminas_location.city }} / {{ company.state }}</span>
+                </div>
             </aside>
         </div>
     </section>
 
-    <section class="company-activity" aria-labelledby="company-activity-title">
-        <header class="company-section-heading">
-            <div>
-                <p class="paper-kicker">Atuação / atividades registradas</p>
-                <h2 id="company-activity-title">O que faz parte da Copy Minas.</h2>
-            </div>
+    <section class="company-story" aria-labelledby="company-story-title">
+        <div class="company-story__register">
+            <span>EMPRESA / PRESENÇA LOCAL</span>
+            <strong>{{ company.name }}</strong>
+            <small>{{ company.status }}</small>
+        </div>
+
+        <div class="company-story__copy">
+            <p class="paper-kicker">Quem somos</p>
+            <h2 id="company-story-title">Tecnologia e impressão com base local.</h2>
             <p>
-                As áreas abaixo refletem as atividades empresariais já confirmadas.
-                Escopo, disponibilidade e condições de cada atendimento são consultados diretamente com a equipe.
+                A Copy Minas está sediada em Elói Mendes e mantém sua identidade empresarial
+                vinculada à cidade desde o início de suas atividades em {{ company.founded_on }}.
             </p>
+            <p>
+                O cadastro empresarial reúne frentes relacionadas a impressão e fotocópias,
+                equipamentos e suprimentos de informática, equipamentos para escritório,
+                locação e manutenção.
+            </p>
+            <a href="{{ url_for('public.solutions') }}">Ver as soluções da Copy Minas →</a>
+        </div>
+    </section>
+
+    <section class="company-timeline" aria-labelledby="company-timeline-title">
+        <header>
+            <span>TRAJETÓRIA / FATOS CONFIRMADOS</span>
+            <h2 id="company-timeline-title">Da abertura até hoje.</h2>
         </header>
 
-        <div class="company-activity-list">
-            {% for solution in company.solutions %}
-            <article class="company-activity-item">
-                <span class="company-activity-item__number">{{ solution.code }}</span>
-                <div>
-                    <h3>{{ solution.title }}</h3>
-                    <p>{{ solution.description }}</p>
-                </div>
-                <a href="{{ url_for('public.solutions') }}">Ver solução →</a>
+        <div class="company-timeline__track">
+            <article>
+                <span>12 / 07 / 2011</span>
+                <strong>Início das atividades</strong>
+                <p>Data de início das atividades empresariais da Copy Minas.</p>
             </article>
-            {% endfor %}
+
+            <div class="company-timeline__line" aria-hidden="true"></div>
+
+            <article>
+                <span>ATUAL</span>
+                <strong>Empresa ativa</strong>
+                <p>Situação cadastral: {{ company.status }} · sede em {{ copyminas_location.city }} / {{ company.state }}.</p>
+            </article>
         </div>
     </section>
 
@@ -82,7 +88,7 @@
                 <p class="paper-kicker">Dados institucionais</p>
                 <h2>Identidade empresarial.</h2>
             </div>
-            <p>Informações formais apresentadas de forma separada do conteúdo comercial.</p>
+            <p>Informações formais da empresa, separadas do conteúdo comercial.</p>
         </header>
 
         <dl class="company-register">
@@ -116,10 +122,10 @@
     <section class="company-presence" aria-labelledby="company-presence-title">
         <div class="company-presence__copy">
             <span>SEDE / ELÓI MENDES</span>
-            <h2 id="company-presence-title">Presença local em Minas Gerais.</h2>
+            <h2 id="company-presence-title">Onde encontrar a Copy Minas.</h2>
             <p>
-                A Copy Minas está sediada em {{ copyminas_location.city }}, Minas Gerais.
-                Para atendimento, disponibilidade ou condições comerciais, fale diretamente com a equipe.
+                Para atendimento, disponibilidade ou condições comerciais, fale diretamente
+                com a equipe ou consulte a localização da empresa.
             </p>
             <address>{{ copyminas_location.address }}</address>
         </div>
