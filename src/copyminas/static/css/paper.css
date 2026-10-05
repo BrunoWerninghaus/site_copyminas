@@ -2615,3 +2615,44 @@
         min-width: 620px;
     }
 }
+
+
+/* Customer-facing public UI: keep technical metadata in markup, do not render it */
+.paper-page .paper-sheet::before {
+    display: none;
+}
+
+.page-solutions .solution-row__register {
+    display: none;
+}
+
+.page-solutions .solution-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.page-company .company-directory__links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.page-company .company-directory__links a {
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.page-company .company-directory__links a > span {
+    display: none;
+}
+
+.page-company .company-directory__links small {
+    grid-column: 1;
+}
+
+.page-company .company-directory__links i {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+}
+
+@media (max-width: 700px) {
+    .page-solutions .solution-row {
+        grid-template-columns: 1fr;
+    }
+}
