@@ -294,20 +294,26 @@ class PublicRoutesTestCase(unittest.TestCase):
     def test_company(self):
         self.assert_page(
             "/empresa",
-            "Desde 2011 trabalhando com tecnologia e impressão.",
+            "Uma empresa de Elói Mendes desde 2011.",
         )
         response = self.client.get("/empresa")
-        self.assertIn("O que faz parte da Copy Minas.".encode("utf-8"), response.data)
+        self.assertIn("Tecnologia e impressão com base local.".encode("utf-8"), response.data)
+        self.assertIn("Da abertura até hoje.".encode("utf-8"), response.data)
         self.assertIn("Identidade empresarial.".encode("utf-8"), response.data)
-        self.assertIn("Presença local em Minas Gerais.".encode("utf-8"), response.data)
+        self.assertIn("Onde encontrar a Copy Minas.".encode("utf-8"), response.data)
         self.assertIn("Abrir no Google Maps".encode("utf-8"), response.data)
         self.assertIn("Falar com a Copy Minas".encode("utf-8"), response.data)
         self.assertIn(b"97.537.200/0001-10", response.data)
         self.assertIn(b"12/07/2011", response.data)
-        self.assertEqual(
-            response.data.count(b'class="company-activity-item"'),
-            5,
-        )
+        self.assertNotIn(b'class="company-activity-item"', response.data)
+        for title in (
+            "Impressão e reprografia",
+            "Equipamentos e suprimentos",
+            "Locação para escritório",
+            "Manutenção e suporte",
+            "Cartuchos e impressão",
+        ):
+            self.assertNotIn(title.encode("utf-8"), response.data)
 
     def test_contact(self):
         self.assert_page("/contato", "(35) 98877-6969")
