@@ -334,13 +334,36 @@
         const previousOriginalState = state.showOriginal;
         state.showOriginal = false;
         draw(true);
-        const imageData = canvas.toDataURL("image/png");
+
+        let imageBlob = null;
+        try {
+            imageBlob = await new Promise((resolve, reject) => {
+                canvas.toBlob(
+                    (blob) => {
+                        if (blob) resolve(blob);
+                        else reject(new Error("Não foi possível gerar o PNG editado."));
+                    },
+                    "image/png"
+                );
+            });
+        } catch (error) {
+            state.showOriginal = previousOriginalState;
+            draw();
+            setStatus(error.message || "Não foi possível gerar o PNG editado.", "error");
+            saveButton.disabled = false;
+            return;
+        }
+
         state.showOriginal = previousOriginalState;
         draw();
 
         const form = new FormData();
         form.append("csrf_token", csrf.value);
-        form.append("image_data", imageData);
+        form.append(
+            "image_file",
+            imageBlob,
+            "produto-editado-1200x1200.png"
+        );
 
         try {
             const response = await fetch(root.dataset.saveUrl, {
