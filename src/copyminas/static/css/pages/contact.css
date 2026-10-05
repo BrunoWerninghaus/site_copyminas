@@ -415,3 +415,9 @@
     line-height: 1.45;
     text-transform: uppercase;
 }
+
+
+/* Internal channel codes stay as metadata, not customer-facing labels */
+.contact-channel::before {
+    display: none;
+}
