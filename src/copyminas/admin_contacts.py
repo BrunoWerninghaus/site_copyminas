@@ -15,6 +15,29 @@ CONTACT_STATUSES = (
     "spam",
 )
 
+CONTACT_STATUS_LABELS = {
+    "novo": "Novo",
+    "em_atendimento": "Em atendimento",
+    "convertido": "Convertido",
+    "encerrado": "Encerrado",
+    "spam": "Spam",
+}
+
+CONTACT_SERVICE_LABELS = {
+    "locacao_impressora": "Locação de impressora",
+    "locacao_computador": "Locação de computador",
+    "manutencao_impressora": "Manutenção de impressora",
+    "manutencao_computador": "Manutenção de computador",
+    "suporte": "Suporte",
+    "outro": "Outro",
+}
+
+CONTACT_PREFERENCE_LABELS = {
+    "whatsapp": "WhatsApp",
+    "telefone": "Telefone",
+    "email": "E-mail",
+}
+
 
 def _database_error(exc, action):
     if isinstance(exc, DatabaseUnavailable):
