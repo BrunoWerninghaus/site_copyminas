@@ -20,8 +20,11 @@ from flask import (
 
 from src.copyminas.admin_assets import (
     AdminAssetError,
+    cleanup_editor_output,
     cleanup_new_uploads,
     normalize_static_path,
+    resolve_editor_source,
+    save_edited_product_image,
     save_product_image,
     static_asset_exists,
 )
@@ -37,6 +40,7 @@ from src.copyminas.admin_catalog import (
     set_product_active,
     update_category,
     update_product,
+    update_product_image_slot,
 )
 from src.copyminas.admin_contacts import (
     AdminContactError,
@@ -870,6 +874,119 @@ def product_edit(product_id):
             csrf_token=_csrf_token(),
         ),
         422 if errors else 200,
+    )
+
+
+@admin_bp.get("/produtos/<int:product_id>/imagem/<int:slot>/editar")
+@login_required
+def product_image_editor(product_id, slot):
+    if slot not in range(1, 6):
+        return _admin_error(
+            "Slot de imagem inválido",
+            "Escolha uma das cinco imagens do produto.",
+            404,
+        )
+
+    try:
+        product = get_product(product_id)
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        current_app.logger.error("Admin image editor product lookup failed: %s", exc)
+        return _admin_error(
+            "Produto indisponível",
+            "Não foi possível consultar este produto.",
+            503,
+        )
+
+    if product is None:
+        return _admin_error(
+            "Produto não encontrado",
+            "O registro solicitado não existe no banco.",
+            404,
+        )
+
+    key = f"imagem{slot}"
+    current_value = product.get(key) or ""
+    if not static_asset_exists(current_value):
+        return _admin_error(
+            "Imagem indisponível",
+            "Este slot ainda não possui uma imagem local para editar.",
+            404,
+        )
+
+    try:
+        current_image = normalize_static_path(current_value)
+        source_image = resolve_editor_source(current_value)
+    except AdminAssetError as exc:
+        return _admin_error("Imagem indisponível", str(exc), 400)
+
+    return render_template(
+        "admin/product_image_editor.html",
+        product=product,
+        slot=slot,
+        current_image=current_image,
+        source_image=source_image,
+        csrf_token=_csrf_token(),
+    )
+
+
+@admin_bp.post("/produtos/<int:product_id>/imagem/<int:slot>/salvar")
+@login_required
+def product_image_editor_save(product_id, slot):
+    if slot not in range(1, 6):
+        return jsonify({"ok": False, "error": "Slot de imagem inválido."}), 400
+
+    if not _csrf_valid(request.form.get("csrf_token", "")):
+        return jsonify(
+            {
+                "ok": False,
+                "error": "Sessão inválida. Recarregue o editor antes de salvar.",
+            }
+        ), 400
+
+    try:
+        product = get_product(product_id)
+    except (DatabaseUnavailable, AdminCatalogError) as exc:
+        current_app.logger.error("Admin image editor lookup failed: %s", exc)
+        return jsonify(
+            {"ok": False, "error": "Não foi possível consultar o produto agora."}
+        ), 503
+
+    if product is None:
+        return jsonify({"ok": False, "error": "Produto não encontrado."}), 404
+
+    key = f"imagem{slot}"
+    current_value = product.get(key) or ""
+    if not static_asset_exists(current_value):
+        return jsonify(
+            {"ok": False, "error": "A imagem atual deste slot não está disponível."}
+        ), 400
+
+    edited_path = None
+    try:
+        edited_path, _original_path = save_edited_product_image(
+            request.form.get("image_data", ""),
+            current_value,
+            product_id,
+            slot,
+        )
+        update_product_image_slot(product_id, slot, edited_path)
+    except (DatabaseUnavailable, AdminCatalogError, AdminAssetError) as exc:
+        cleanup_editor_output(edited_path)
+        current_app.logger.error("Admin image editor save failed: %s", exc)
+        return jsonify({"ok": False, "error": str(exc)}), (
+            503 if isinstance(exc, DatabaseUnavailable) else 400
+        )
+
+    flash(
+        f"Imagem {slot} editada e aplicada ao produto. A original foi preservada.",
+        "admin-success",
+    )
+    return jsonify(
+        {
+            "ok": True,
+            "path": edited_path,
+            "redirect": url_for("admin.product_edit", product_id=product_id),
+        }
     )
 
 
