@@ -4,6 +4,7 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
+BASE_CSS = ROOT / "src/copyminas/static/css/base.css"
 PAPER_CSS = ROOT / "src/copyminas/static/css/paper.css"
 CONTACT_CSS = ROOT / "src/copyminas/static/css/pages/contact.css"
 
@@ -266,6 +267,60 @@ class PublicMobileContractTestCase(unittest.TestCase):
         source = CONTACT_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
 
         mobile_start = source.index("/*contactmobilecontract*/")
+        mobile = source[mobile_start:]
+
+        self.assertNotIn("overflow-x:hidden", mobile)
+        self.assertNotIn("overflow-x:clip", mobile)
+
+
+    def test_public_nav_mobile_contract_is_explicit(self):
+        source = BASE_CSS.read_text(encoding="utf-8")
+
+        self.assertIn("/* Public navigation contract */", source)
+        self.assertRegex(
+            source,
+            r"@media \(max-width: 980px\)[\s\S]*?\.public-header__menu\s*\{[\s\S]*?display:\s*flex[\s\S]*?min-height:\s*44px",
+        )
+        self.assertRegex(
+            source,
+            r"\.public-nav\s*\{[\s\S]*?position:\s*fixed[\s\S]*?top:\s*64px[\s\S]*?bottom:\s*0",
+        )
+
+    def test_public_nav_mobile_links_and_cta_have_touch_targets(self):
+        source = BASE_CSS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            source,
+            r"\.public-nav a\s*\{[\s\S]*?min-height:\s*60px",
+        )
+        self.assertRegex(
+            source,
+            r"\.public-nav__contact\s*\{[\s\S]*?min-height:\s*54px",
+        )
+        self.assertRegex(
+            source,
+            r"\.public-nav a\[aria-current=\"page\"\]\s*\{[\s\S]*?box-shadow:\s*inset 3px 0 0 var\(--red\)",
+        )
+
+    def test_public_nav_behavior_locks_page_and_updates_menu_label(self):
+        script = (
+            ROOT / "src/copyminas/static/js/public-nav.js"
+        ).read_text(encoding="utf-8")
+        header = (
+            ROOT / "src/copyminas/templates/public/_site_header.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('document.documentElement.classList.toggle("public-menu-open", open);', script)
+        self.assertIn('label.textContent = open ? "FECHAR" : "MENU";', script)
+        self.assertIn('window.matchMedia("(min-width: 981px)")', script)
+        self.assertIn('window.addEventListener("pageshow"', script)
+        self.assertIn("data-public-menu-label", header)
+        self.assertIn("public-header__menu-icon", header)
+
+    def test_public_nav_mobile_does_not_mask_horizontal_overflow(self):
+        source = BASE_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
+
+        mobile_start = source.index("/*publicnavigationcontract*/")
         mobile = source[mobile_start:]
 
         self.assertNotIn("overflow-x:hidden", mobile)
