@@ -205,8 +205,6 @@ class PublicBrowserGateTestCase(unittest.TestCase):
                         page,
                         f"{viewport_name} {path}",
                     )
-                    self._assert_keyboard_entry(page)
-                    self._assert_navigation(page, viewport_name)
 
                     screenshot_dir = ARTIFACT_DIR / viewport_name
                     screenshot_dir.mkdir(parents=True, exist_ok=True)
@@ -214,6 +212,9 @@ class PublicBrowserGateTestCase(unittest.TestCase):
                         path=str(screenshot_dir / f"{screenshot_name}.png"),
                         full_page=True,
                     )
+
+                    self._assert_keyboard_entry(page)
+                    self._assert_navigation(page, viewport_name)
 
                     self._assert_no_console_errors(
                         console_errors,
@@ -415,6 +416,58 @@ class PublicBrowserGateTestCase(unittest.TestCase):
                 page.screenshot(
                     path=str(screenshot_dir / "catalog-503.png"),
                     full_page=True,
+                )
+                context.close()
+
+
+    def test_public_brand_assets_render_with_visible_shell(self):
+        for viewport_name, viewport in VIEWPORTS.items():
+            with self.subTest(viewport=viewport_name):
+                context, page = self._new_page(viewport)
+                page.goto(BASE_URL + "/", wait_until="domcontentloaded")
+
+                header_image = page.locator(".public-header__brand img")
+                footer_image = page.locator(".public-footer__brand img")
+
+                self.assertGreater(
+                    header_image.evaluate("(img) => img.naturalWidth"),
+                    0,
+                )
+                self.assertGreater(
+                    footer_image.evaluate("(img) => img.naturalWidth"),
+                    0,
+                )
+
+                header_bg = page.locator(".public-header__brand").evaluate(
+                    "(node) => getComputedStyle(node).backgroundColor"
+                )
+                footer_bg = footer_image.evaluate(
+                    "(node) => getComputedStyle(node).backgroundColor"
+                )
+
+                self.assertNotIn(header_bg, ("rgba(0, 0, 0, 0)", "transparent"))
+                self.assertNotIn(footer_bg, ("rgba(0, 0, 0, 0)", "transparent"))
+                context.close()
+
+    def test_mobile_menu_visual_evidence(self):
+        for viewport_name in ("tablet", "mobile"):
+            with self.subTest(viewport=viewport_name):
+                context, page = self._new_page(VIEWPORTS[viewport_name])
+                page.goto(BASE_URL + "/", wait_until="domcontentloaded")
+
+                page.locator("[data-public-menu-toggle]").click()
+                self.assertEqual(
+                    page.locator("[data-public-menu-toggle]").get_attribute(
+                        "aria-expanded"
+                    ),
+                    "true",
+                )
+
+                screenshot_dir = ARTIFACT_DIR / viewport_name
+                screenshot_dir.mkdir(parents=True, exist_ok=True)
+                page.screenshot(
+                    path=str(screenshot_dir / "menu-open.png"),
+                    full_page=False,
                 )
                 context.close()
 
