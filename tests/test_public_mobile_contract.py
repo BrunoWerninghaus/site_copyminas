@@ -5,6 +5,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 PAPER_CSS = ROOT / "src/copyminas/static/css/paper.css"
+CONTACT_CSS = ROOT / "src/copyminas/static/css/pages/contact.css"
 
 
 class PublicMobileContractTestCase(unittest.TestCase):
@@ -210,6 +211,61 @@ class PublicMobileContractTestCase(unittest.TestCase):
         source = PAPER_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
 
         mobile_start = source.index("/*companymobilecontract*/")
+        mobile = source[mobile_start:]
+
+        self.assertNotIn("overflow-x:hidden", mobile)
+        self.assertNotIn("overflow-x:clip", mobile)
+
+
+    def test_contact_mobile_contract_is_explicit(self):
+        source = CONTACT_CSS.read_text(encoding="utf-8")
+
+        self.assertIn("/* Contact mobile contract */", source)
+        self.assertRegex(
+            source,
+            r"@media \(max-width: 720px\)[\s\S]*?\.contact-page\s*\{[\s\S]*?--page-x:\s*1rem",
+        )
+
+    def test_contact_mobile_form_is_touch_friendly(self):
+        source = CONTACT_CSS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            source,
+            r"\.contact-form input,[\s\S]*?\.contact-form select\s*\{[\s\S]*?min-height:\s*52px[\s\S]*?font-size:\s*16px",
+        )
+        self.assertRegex(
+            source,
+            r"\.contact-form textarea\s*\{[\s\S]*?min-height:\s*140px[\s\S]*?font-size:\s*16px",
+        )
+        self.assertRegex(
+            source,
+            r"\.contact-form__submit \.paper-action\s*\{[\s\S]*?width:\s*100%[\s\S]*?min-height:\s*52px",
+        )
+        self.assertRegex(
+            source,
+            r"\.contact-consent input\s*\{[\s\S]*?width:\s*20px[\s\S]*?height:\s*20px",
+        )
+
+    def test_contact_mobile_channels_and_directory_are_compact(self):
+        source = CONTACT_CSS.read_text(encoding="utf-8")
+
+        self.assertRegex(
+            source,
+            r"\.contact-channel\s*\{[\s\S]*?min-height:\s*0",
+        )
+        self.assertRegex(
+            source,
+            r"\.contact-channel a\s*\{[\s\S]*?min-height:\s*44px",
+        )
+        self.assertRegex(
+            source,
+            r"\.contact-directory dl > div\s*\{[\s\S]*?grid-template-columns:\s*minmax\(100px, \.4fr\) minmax\(0, 1\.6fr\)",
+        )
+
+    def test_contact_mobile_does_not_mask_overflow(self):
+        source = CONTACT_CSS.read_text(encoding="utf-8").replace(" ", "").lower()
+
+        mobile_start = source.index("/*contactmobilecontract*/")
         mobile = source[mobile_start:]
 
         self.assertNotIn("overflow-x:hidden", mobile)
