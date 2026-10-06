@@ -4,13 +4,20 @@
     const header = document.querySelector("[data-public-header]");
     const toggle = document.querySelector("[data-public-menu-toggle]");
     const nav = document.querySelector("[data-public-nav]");
+    const label = document.querySelector("[data-public-menu-label]");
 
     if (!header || !toggle || !nav) return;
 
     const setOpen = (open) => {
         header.classList.toggle("is-open", open);
+        document.documentElement.classList.toggle("public-menu-open", open);
+
         toggle.setAttribute("aria-expanded", String(open));
         toggle.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
+
+        if (label) {
+            label.textContent = open ? "FECHAR" : "MENU";
+        }
     };
 
     toggle.addEventListener("click", () => {
@@ -31,8 +38,12 @@
     });
 
     window.addEventListener("resize", () => {
-        if (window.matchMedia("(min-width: 861px)").matches) {
+        if (window.matchMedia("(min-width: 981px)").matches) {
             setOpen(false);
         }
+    });
+
+    window.addEventListener("pageshow", () => {
+        setOpen(false);
     });
 })();
