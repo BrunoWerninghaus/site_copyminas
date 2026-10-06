@@ -203,6 +203,10 @@ a {
 .public-header__brand {
     display: block;
     width: clamp(138px, 14vw, 210px);
+    box-sizing: border-box;
+    padding: .3rem .48rem;
+    border: 1px solid #ece9e0;
+    background: #ece9e0;
 }
 
 .public-header__brand img {
@@ -352,6 +356,10 @@ a {
 
 .public-footer__brand img {
     width: min(180px, 48vw);
+    box-sizing: border-box;
+    padding: .3rem .48rem;
+    border: 1px solid #ece9e0;
+    background: #ece9e0;
 }
 
 .public-footer__brand span,
