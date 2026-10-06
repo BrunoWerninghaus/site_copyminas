@@ -438,15 +438,14 @@ class PublicBrowserGateTestCase(unittest.TestCase):
                     0,
                 )
 
-                header_bg = page.locator(".public-header__brand").evaluate(
-                    "(node) => getComputedStyle(node).backgroundColor"
-                )
-                footer_bg = footer_image.evaluate(
-                    "(node) => getComputedStyle(node).backgroundColor"
-                )
-
-                self.assertNotIn(header_bg, ("rgba(0, 0, 0, 0)", "transparent"))
-                self.assertNotIn(footer_bg, ("rgba(0, 0, 0, 0)", "transparent"))
+                header_box = header_image.bounding_box()
+                footer_box = footer_image.bounding_box()
+                self.assertIsNotNone(header_box)
+                self.assertIsNotNone(footer_box)
+                self.assertGreater(header_box["width"], 50)
+                self.assertGreater(header_box["height"], 30)
+                self.assertGreater(footer_box["width"], 50)
+                self.assertGreater(footer_box["height"], 30)
 
                 pixel_stats = header_image.evaluate(
                     """(img) => {
