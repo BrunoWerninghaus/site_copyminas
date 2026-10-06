@@ -447,6 +447,57 @@ class PublicBrowserGateTestCase(unittest.TestCase):
 
                 self.assertNotIn(header_bg, ("rgba(0, 0, 0, 0)", "transparent"))
                 self.assertNotIn(footer_bg, ("rgba(0, 0, 0, 0)", "transparent"))
+
+                pixel_stats = header_image.evaluate(
+                    """(img) => {
+                        const canvas = document.createElement("canvas");
+                        canvas.width = img.naturalWidth;
+                        canvas.height = img.naturalHeight;
+                        const ctx = canvas.getContext("2d", {willReadFrequently: true});
+                        ctx.drawImage(img, 0, 0);
+                        const data = ctx.getImageData(
+                            0,
+                            0,
+                            canvas.width,
+                            canvas.height
+                        ).data;
+
+                        let visible = 0;
+                        let minLuma = 255;
+                        let maxLuma = 0;
+
+                        for (let i = 0; i < data.length; i += 4) {
+                            const alpha = data[i + 3];
+                            if (alpha < 16) continue;
+                            visible += 1;
+                            const luma =
+                                data[i] * 0.2126 +
+                                data[i + 1] * 0.7152 +
+                                data[i + 2] * 0.0722;
+                            minLuma = Math.min(minLuma, luma);
+                            maxLuma = Math.max(maxLuma, luma);
+                        }
+
+                        return {
+                            width: canvas.width,
+                            height: canvas.height,
+                            visible,
+                            total: canvas.width * canvas.height,
+                            lumaRange: maxLuma - minLuma,
+                        };
+                    }"""
+                )
+
+                self.assertGreater(
+                    pixel_stats["visible"],
+                    max(10, int(pixel_stats["total"] * 0.01)),
+                    f"Brand asset has too few visible pixels: {pixel_stats}",
+                )
+                self.assertGreater(
+                    pixel_stats["lumaRange"],
+                    20,
+                    f"Brand asset lacks visible tonal detail: {pixel_stats}",
+                )
                 context.close()
 
     def test_mobile_menu_visual_evidence(self):
@@ -456,6 +507,7 @@ class PublicBrowserGateTestCase(unittest.TestCase):
                 page.goto(BASE_URL + "/", wait_until="domcontentloaded")
 
                 page.locator("[data-public-menu-toggle]").click()
+                page.wait_for_timeout(220)
                 self.assertEqual(
                     page.locator("[data-public-menu-toggle]").get_attribute(
                         "aria-expanded"
