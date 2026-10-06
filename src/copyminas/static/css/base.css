@@ -455,3 +455,197 @@ a {
         align-items: center;
     }
 }
+
+
+/* Public navigation contract */
+@media (min-width: 981px) {
+    .public-header {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .public-nav {
+        flex-wrap: nowrap;
+    }
+
+    .public-nav a {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+    }
+}
+
+@media (max-width: 980px) {
+    html.public-menu-open {
+        overflow-y: hidden;
+    }
+
+    .public-header {
+        min-height: 64px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: .75rem;
+        padding: .6rem var(--page-x);
+    }
+
+    .public-header.is-open {
+        border-bottom-color: rgba(255,255,255,.24);
+        box-shadow: 0 10px 28px rgba(0,0,0,.28);
+    }
+
+    .public-header__brand {
+        width: clamp(118px, 34vw, 150px);
+    }
+
+    .public-header__menu {
+        display: flex;
+        min-width: 98px;
+        min-height: 44px;
+        align-items: center;
+        justify-content: space-between;
+        gap: .65rem;
+        padding: .55rem .7rem;
+        touch-action: manipulation;
+    }
+
+    .public-header__menu-label {
+        line-height: 1;
+    }
+
+    .public-header__menu-icon {
+        position: relative;
+        display: grid;
+        width: 17px;
+        height: 12px;
+        align-content: space-between;
+    }
+
+    .public-header__menu-icon i {
+        display: block;
+        width: 17px;
+        border-top: 1px solid currentColor;
+        transform-origin: center;
+        transition:
+            transform 160ms ease,
+            translate 160ms ease;
+    }
+
+    .public-header.is-open .public-header__menu-icon i:first-child {
+        transform: translateY(5.5px) rotate(45deg);
+    }
+
+    .public-header.is-open .public-header__menu-icon i:last-child {
+        transform: translateY(-5.5px) rotate(-45deg);
+    }
+
+    .public-nav {
+        position: fixed;
+        z-index: 39;
+        top: 64px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        align-content: start;
+        gap: 0;
+        margin: 0;
+        padding: .5rem var(--page-x) calc(1rem + env(safe-area-inset-bottom));
+        border-top: 1px solid rgba(255,255,255,.12);
+        background:
+            linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+            #080b0f;
+        background-size: 100% 2rem;
+        opacity: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        pointer-events: none;
+        transform: translateY(-8px);
+        visibility: hidden;
+        transition:
+            opacity 150ms ease,
+            transform 150ms ease,
+            visibility 150ms step-end;
+    }
+
+    .public-header.is-open .public-nav {
+        display: grid;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+        visibility: visible;
+        transition:
+            opacity 150ms ease,
+            transform 150ms ease,
+            visibility 0s step-start;
+    }
+
+    .public-nav a {
+        display: flex;
+        min-height: 60px;
+        align-items: center;
+        padding: .9rem .75rem;
+        border-bottom: 1px solid rgba(255,255,255,.1);
+        background: transparent;
+        color: #d9dde0;
+        font-size: .94rem;
+        letter-spacing: .055em;
+        white-space: normal;
+    }
+
+    .public-nav a::after {
+        display: none;
+    }
+
+    .public-nav a:hover,
+    .public-nav a:focus-visible {
+        background: rgba(255,255,255,.04);
+        color: white;
+    }
+
+    .public-nav a[aria-current="page"] {
+        padding-left: 1rem;
+        background: rgba(226,26,34,.075);
+        box-shadow: inset 3px 0 0 var(--red);
+        color: white;
+    }
+
+    .public-nav__contact {
+        min-height: 54px !important;
+        justify-content: center;
+        margin-top: .75rem;
+        padding: .85rem 1rem !important;
+        border: 1px solid white !important;
+        background: white !important;
+        color: #101216 !important;
+        text-align: center;
+    }
+
+    .public-nav__contact:hover,
+    .public-nav__contact:focus-visible,
+    .public-nav__contact[aria-current="page"] {
+        border-color: var(--red) !important;
+        background: var(--red) !important;
+        box-shadow: none;
+        color: white !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .public-header__brand {
+        width: 118px;
+    }
+
+    .public-header__menu {
+        min-width: 92px;
+        padding-inline: .6rem;
+    }
+
+    .public-nav a {
+        min-height: 56px;
+        padding-block: .8rem;
+        font-size: .86rem;
+    }
+
+    .public-nav__contact {
+        min-height: 52px !important;
+    }
+}
