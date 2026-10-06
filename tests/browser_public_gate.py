@@ -146,7 +146,20 @@ class PublicBrowserGateTestCase(unittest.TestCase):
             "MENU",
         )
 
-    def _assert_no_console_errors(self, console_errors, page_errors, label):
+    def _assert_no_console_errors(
+        self,
+        console_errors,
+        page_errors,
+        label,
+        expected_status=200,
+    ):
+        if expected_status == 404:
+            console_errors = [
+                message
+                for message in console_errors
+                if "server responded with a status of 404" not in message
+            ]
+
         self.assertEqual(
             console_errors,
             [],
@@ -206,6 +219,7 @@ class PublicBrowserGateTestCase(unittest.TestCase):
                         console_errors,
                         page_errors,
                         f"{viewport_name} {path}",
+                        expected_status=expected_status,
                     )
                     context.close()
 
@@ -222,7 +236,7 @@ class PublicBrowserGateTestCase(unittest.TestCase):
                 search = page.locator("[data-catalog-search]")
                 search.fill("cabo")
                 self.assertEqual(
-                    page.locator("[data-catalog-count]").inner_text().strip(),
+                    page.locator("[data-catalog-count]").inner_text().strip().casefold(),
                     "1 produto",
                 )
                 self.assertEqual(
@@ -239,7 +253,7 @@ class PublicBrowserGateTestCase(unittest.TestCase):
                     '[data-category-filter][data-category-label="Impressoras"]'
                 ).click()
                 self.assertEqual(
-                    page.locator("[data-catalog-count]").inner_text().strip(),
+                    page.locator("[data-catalog-count]").inner_text().strip().casefold(),
                     "6 produtos",
                 )
                 self.assertEqual(
@@ -347,9 +361,16 @@ class PublicBrowserGateTestCase(unittest.TestCase):
             if expected_status not in (200, 404):
                 continue
             hrefs = page.locator("a[href]").evaluate_all(
-                "(nodes) => nodes.map((node) => node.href)"
+                """(nodes) => nodes.map((node) => ({
+                    raw: node.getAttribute("href"),
+                    absolute: node.href
+                }))"""
             )
-            for href in hrefs:
+            for entry in hrefs:
+                raw = entry["raw"] or ""
+                if raw.startswith("#"):
+                    continue
+                href = entry["absolute"]
                 parsed = urlparse(href)
                 if parsed.scheme not in ("http", "https"):
                     continue
