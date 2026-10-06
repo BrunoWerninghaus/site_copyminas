@@ -13,17 +13,17 @@ O projeto está sendo reconstruído do zero.
 
 ## Rotas atuais
 
-- `/` — entrada imersiva Copy Minas;
-- `/home` — Home institucional / capa editorial;
+- `/` — Home pública;
+- `/home` — mesma Home pública;
 - `/solucoes` — áreas de atuação;
 - `/produtos` — catálogo migrado do Site 2;
 - `/produtos/<slug>` — ficha individual do produto;
-- `/empresa` — ficha institucional;
+- `/empresa` — identidade e dados institucionais;
 - `/contato` — contato e localização.
 
 ## Contrato de conteúdo
 
-Enquanto textos e imagens definitivos não forem fornecidos, o site usa placeholders explícitos e não inventa informações comerciais.
+O site usa somente informações confirmadas pela autoridade de conteúdo definida no projeto e não inventa informações comerciais.
 
 Leia `docs/SITE_CONTRACT.md`.
 
