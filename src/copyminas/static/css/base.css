@@ -481,6 +481,7 @@ a {
 
     .public-header {
         min-height: 64px;
+        backdrop-filter: none;
         grid-template-columns: minmax(0, 1fr) auto;
         gap: .75rem;
         padding: .6rem var(--page-x);
