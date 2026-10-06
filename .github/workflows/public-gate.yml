@@ -1,0 +1,112 @@
+name: Public Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  public-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install application dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run structural and functional tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Install Chromium gate dependencies
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Start fixture public server
+        env:
+          CATALOG_SOURCE: fixture
+          SECRET_KEY: public-gate-fixture
+          HOST: 127.0.0.1
+          PORT: "5000"
+        run: |
+          python app.py > /tmp/copyminas-fixture.log 2>&1 &
+          echo $! > /tmp/copyminas-fixture.pid
+
+      - name: Start unavailable-database server
+        env:
+          CATALOG_SOURCE: database
+          DB_HOST: 127.0.0.1
+          DB_PORT: "1"
+          DB_NAME: main_bd
+          DB_USER: public_gate
+          DB_PASSWORD: public_gate
+          SECRET_KEY: public-gate-unavailable
+          HOST: 127.0.0.1
+          PORT: "5001"
+        run: |
+          python app.py > /tmp/copyminas-unavailable.log 2>&1 &
+          echo $! > /tmp/copyminas-unavailable.pid
+
+      - name: Wait for public servers
+        run: |
+          python - <<'PY'
+          import time
+          import urllib.error
+          import urllib.request
+
+          targets = (
+              ("http://127.0.0.1:5000/produtos", {200}),
+              ("http://127.0.0.1:5001/produtos", {503}),
+          )
+
+          for url, accepted in targets:
+              last = None
+              for _ in range(60):
+                  try:
+                      with urllib.request.urlopen(url, timeout=2) as response:
+                          status = response.status
+                  except urllib.error.HTTPError as error:
+                      status = error.code
+                  except Exception as error:
+                      last = error
+                      time.sleep(0.25)
+                      continue
+
+                  if status in accepted:
+                      break
+                  last = RuntimeError(f"{url} returned {status}")
+                  time.sleep(0.25)
+              else:
+                  raise SystemExit(f"Server did not become ready: {url}: {last}")
+          PY
+
+      - name: Run Chromium public matrix
+        env:
+          PUBLIC_GATE_BASE_URL: http://127.0.0.1:5000
+          PUBLIC_GATE_UNAVAILABLE_BASE_URL: http://127.0.0.1:5001
+          PUBLIC_GATE_ARTIFACT_DIR: artifacts/public-gate
+        run: python tests/browser_public_gate.py
+
+      - name: Upload public gate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-gate-${{ github.sha }}
+          if-no-files-found: warn
+          path: |
+            artifacts/public-gate
+            /tmp/copyminas-fixture.log
+            /tmp/copyminas-unavailable.log
