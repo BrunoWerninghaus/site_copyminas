@@ -108,5 +108,6 @@ jobs:
           if-no-files-found: warn
           path: |
             artifacts/public-gate
+            src/copyminas/static/images/brand/copy-minas-logo.webp
             /tmp/copyminas-fixture.log
             /tmp/copyminas-unavailable.log
