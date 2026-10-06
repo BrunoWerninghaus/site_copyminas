@@ -3465,3 +3465,17 @@
         font-size: .82rem;
     }
 }
+
+
+/* Catalog visual gate — incomplete rows must not look like empty cards */
+@media (min-width: 721px) {
+    .page-products .catalog-category .paper-grid {
+        border: 0;
+        background: transparent;
+    }
+
+    .page-products .catalog-category .product-card {
+        outline: 1px solid var(--paper-line);
+        outline-offset: -1px;
+    }
+}
