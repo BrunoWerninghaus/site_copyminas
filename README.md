@@ -61,3 +61,10 @@ Os testes públicos usam apenas `unittest` da biblioteca padrão:
 ```bash
 python -m unittest discover -s tests -v
 ```
+
+
+## Segurança e publicação
+
+Antes de publicar, siga o checklist de [hardening de produção](docs/PRODUCTION_SECURITY.md).
+No servidor configure `APP_ENV=production`, uma `SECRET_KEY` exclusiva e SMTP com
+STARTTLS/SSL. A aplicação recusará configurações básicas inseguras em produção.

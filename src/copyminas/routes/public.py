@@ -1,6 +1,9 @@
 import re
 
-from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, flash, make_response, redirect, render_template, request, url_for
+from werkzeug.exceptions import RequestEntityTooLarge
+
+from src.copyminas.contact_abuse import contact_retry_after
 
 from src.copyminas.catalog import (
     get_product_by_slug,
@@ -25,6 +28,20 @@ from src.copyminas.notifications import (
 
 
 public_bp = Blueprint("public", __name__)
+
+
+@public_bp.before_request
+def limit_contact_request_size():
+    if request.endpoint == "public.contact_submit":
+        request.max_content_length = current_app.config["CONTACT_MAX_BYTES"]
+
+
+@public_bp.errorhandler(RequestEntityTooLarge)
+def contact_request_too_large(_error):
+    return _render_contact(
+        form_errors=["A solicitação excedeu o tamanho permitido. Reduza a mensagem."],
+        status=413,
+    )
 
 CONTACT_SERVICE_TYPES = (
     ("locacao_impressora", "Locação de impressora"),
@@ -241,6 +258,22 @@ def contact():
 
 @public_bp.post("/contato/enviar")
 def contact_submit():
+    retry_seconds = contact_retry_after()
+    if retry_seconds:
+        response = make_response(_render_contact(
+            form_errors=["Muitas tentativas de envio. Tente novamente mais tarde."],
+            status=429,
+        ))
+        response.headers["Retry-After"] = str(retry_seconds)
+        return response
+
+    # Invisible to people, attractive to simple form-filling bots.
+    if request.form.get("website", "").strip():
+        return _render_contact(
+            form_errors=["Não foi possível processar esta solicitação."],
+            status=422,
+        )
+
     fields = (
         "name",
         "company",
