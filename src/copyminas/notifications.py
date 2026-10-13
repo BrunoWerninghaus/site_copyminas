@@ -231,6 +231,8 @@ def send_contact_notifications(protocol, data):
 
     port = current_app.config["SMTP_PORT"]
     security = current_app.config["SMTP_SECURITY"]
+    if current_app.config.get("IS_PRODUCTION") and security not in {"starttls", "ssl"}:
+        raise ContactNotificationError("Insecure SMTP is forbidden in production.")
     username = current_app.config.get("SMTP_USER", "")
     password = current_app.config.get("SMTP_PASSWORD", "")
 
@@ -242,7 +244,9 @@ def send_contact_notifications(protocol, data):
 
         with smtp:
             if security == "starttls":
+                smtp.ehlo()
                 smtp.starttls()
+                smtp.ehlo()
 
             if username:
                 smtp.login(username, password)
